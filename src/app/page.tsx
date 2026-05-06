@@ -37,10 +37,10 @@ export default function Page() {
       <main className={styles.main}>
         {/*
         <AnimatePresence mode="wait">{isLoading && <Loader />}</AnimatePresence>
-        <Hero />
 
         */}
 
+        <Hero />
         <About />
         <Roster />
         <Contact />
