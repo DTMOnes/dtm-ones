@@ -26,6 +26,7 @@ export const signIn = actionClient
 
     await auth.api.signInEmail({
       body: { email, password },
+      headers: await headers(),
     });
 
     revalidatePath("/", "layout");

@@ -1,7 +1,6 @@
 // Next
 import { redirect } from "next/navigation";
 
-// Supabase
 import { getSession } from "@/utils/get-session";
 
 // Components

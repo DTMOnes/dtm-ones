@@ -16,7 +16,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  BrowsersIcon,
   FolderIcon,
   HouseIcon,
   UserGearIcon,
@@ -32,13 +31,14 @@ type MenuItem = {
   icon: React.ComponentType<{ className?: string }>;
 };
 
-const landingItems: MenuItem[] = [
-  {
-    title: "Content",
-    url: "/dashboard/landing",
-    icon: BrowsersIcon,
-  },
-];
+// Landing Page Content — deshabilitado por ahora
+// const landingItems: MenuItem[] = [
+//   {
+//     title: "Content",
+//     url: "/dashboard/landing",
+//     icon: BrowsersIcon,
+//   },
+// ];
 
 const playersItems: MenuItem[] = [
   {
@@ -107,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup label="Landing Page Content" items={landingItems} />
+        {/* <NavGroup label="Landing Page Content" items={landingItems} /> */}
         <NavGroup label="Players Content" items={playersItems} />
         <NavGroup label="Users" items={usersItems} />
       </SidebarContent>

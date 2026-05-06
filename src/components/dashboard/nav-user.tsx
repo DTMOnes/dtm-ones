@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DotsThreeVerticalIcon, SignOutIcon } from "@phosphor-icons/react";
 
-// Supabase
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+// Better Auth
+import { authClient } from "@/lib/auth/client";
 
 // Components
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,49 +23,28 @@ import {
 // Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import type { User } from "@supabase/supabase-js";
-
-function displayName(user: User): string {
-  const meta = user.user_metadata as Record<string, unknown> | undefined;
-  const fromMeta =
-    (typeof meta?.["full_name"] === "string" && meta["full_name"]) ||
-    (typeof meta?.["name"] === "string" && meta["name"]) ||
-    null;
-  return fromMeta ?? user.email?.split("@")[0] ?? "Usuario";
+function displayName(user: {
+  name?: string | null;
+  email?: string | null;
+}): string {
+  const trimmed = user.name?.trim();
+  if (trimmed) return trimmed;
+  return user.email?.split("@")[0] ?? "Usuario";
 }
 
 export function NavUser() {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    void supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user ?? null;
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await authClient.signOut();
     router.push("/auth/signin");
     router.refresh();
   };
 
-  if (loading) {
+  if (isPending) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
@@ -89,6 +67,7 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
+              tooltip={displayName(user)}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
