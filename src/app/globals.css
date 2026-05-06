@@ -80,6 +80,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Landing Page Styles */
+  --landing-title-size: calc(84 * 100vw / 1920);
+  --landing-paragraph-size: calc(20 * 100vw / 1920);
+  --landing-color-muted: #aaaaaa;
 }
 
 body {
@@ -127,5 +132,27 @@ body {
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+
+@media (max-width: 1920px) {
+  :root {
+    --landing-title-size: 84px;
+    --landing-paragraph-size: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --landing-title-size: 60px;
+    --landing-paragraph-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --landing-title-size: 48px;
+    --landing-paragraph-size: 14px;
   }
 }

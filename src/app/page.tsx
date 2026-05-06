@@ -44,7 +44,6 @@ export default function Page() {
         <About />
         <Roster />
         <Contact />
-        <Footer />
       </main>
     </ReactLenis>
   );
