@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import ContactForm from "@/components/contact/contact-form";
+import Header from "@/components/landing/header";
 
 import styles from "./page.module.scss";
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <main className={styles.page}>
+      <Header />
       <Link href="/" className={styles.back}>
         ← Back home
       </Link>

@@ -14,7 +14,7 @@ import styles from "./styles.module.scss";
 
 export default function Contact() {
   return (
-    <section className={styles.container}>
+    <section id="contact" className={styles.container}>
       <div className={styles.contact}>
         <div className={styles.contact_content}>
           <h2 className={styles.title}>Contact Us</h2>

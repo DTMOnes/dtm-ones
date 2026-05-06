@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  padding: 48px 16px 80px;
+  padding: calc(48px + clamp(56px, 10vw, 72px)) 16px 80px;
   box-sizing: border-box;
   background: #000000;
   color: #ffffff;

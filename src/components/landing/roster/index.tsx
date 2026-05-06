@@ -46,7 +46,7 @@ export default function Roster() {
   const y4 = useTransform(scrollYProgress, [0, 1], [0, height * 3]);
 
   return (
-    <section className={styles.section}>
+    <section id="roster" className={styles.section}>
       <div className={styles.spacer}></div>
       <div ref={container} className={styles.gallery}>
         <Column images={[images[0], images[1], images[2]]} y={y} />

@@ -1,6 +1,6 @@
-.header {
+.bar {
   width: 100%;
-  padding: 20px;
+  padding: clamp(16px, 3vw, 24px) clamp(18px, 4vw, 32px);
   position: fixed;
   top: 0;
   left: 0;
@@ -9,4 +9,222 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  pointer-events: none;
+}
+
+.barMenuOpen {
+  z-index: 160;
+}
+
+.bar > * {
+  pointer-events: auto;
+}
+
+.logoWrap {
+  display: block;
+  line-height: 0;
+}
+
+.logo {
+  height: clamp(36px, 5vw, 48px);
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+.logoDark {
+  height: clamp(36px, 5vw, 48px);
+  width: auto;
+}
+
+.menuTrigger {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.menuTrigger:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.menuTriggerOnLight {
+  border-color: oklch(0.82 0.02 280);
+  background: rgba(255, 255, 255, 0.65);
+  color: oklch(0.22 0.03 280);
+}
+
+.menuTriggerOnLight:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: oklch(0.7 0.03 280);
+}
+
+.menuIcon {
+  width: 26px;
+  height: 26px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: oklch(0.97 0.012 85);
+  color: oklch(0.18 0.02 280);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overlayInner {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-sizing: border-box;
+  padding: clamp(72px, 12vw, 104px) clamp(18px, 4vw, 40px)
+    clamp(12px, 3vw, 24px);
+}
+
+.overlayTop {
+  position: absolute;
+  top: clamp(16px, 3vw, 28px);
+  left: clamp(18px, 4vw, 40px);
+  right: clamp(18px, 4vw, 40px);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.menuMain {
+  margin-top: auto;
+  width: 100%;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-height: 0;
+}
+
+.nav {
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.navList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: clamp(2px, 0.5vw, 6px);
+}
+
+.navLink {
+  font-family: var(--font-bebas-neue), sans-serif;
+  font-size: clamp(2.75rem, 11vw, 6.75rem);
+  line-height: 0.92;
+  letter-spacing: -2%;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: #0084ff;
+}
+
+.overlaySocial {
+  margin-top: clamp(12px, 3vw, 24px);
+  padding-top: 0;
+  flex-shrink: 0;
+}
+
+.socials {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.socialsLink {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-bebas-neue), sans-serif;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1;
+  letter-spacing: -2%;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: oklch(0.28 0.03 280);
+  transition: color 0.2s ease;
+}
+
+.socialsIcon {
+  color: oklch(0.35 0.03 280);
+  transition: color 0.2s ease;
+}
+
+.socialsLink:hover,
+.socialsLink:hover .socialsIcon {
+  color: #0084ff;
+}
+
+@media (min-width: 1029px) {
+  .overlay {
+    overflow: hidden;
+  }
+
+  .menuMain {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: clamp(32px, 5vw, 80px);
+  }
+
+  .nav {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .overlaySocial {
+    margin-top: 0;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    display: flex;
+  }
+
+  .socials {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .navList {
+    align-items: flex-start;
+  }
 }

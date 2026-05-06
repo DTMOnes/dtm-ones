@@ -26,7 +26,7 @@ const content = [
 
 export default function About() {
   return (
-    <section className={styles.container}>
+    <section id="about" className={styles.container}>
       {content.map((item) => (
         <article key={item.index} className={styles.item}>
           <span className={styles.item_index}>{item.index}</span>
