@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DTM Ones
 
-## Getting Started
+Turborepo monorepo with two Next.js apps:
 
-First, run the development server:
+| App | Package | Dev URL | Role |
+| --- | --- | --- | --- |
+| Landing | `@dtm/landing` | http://localhost:3000 | Public marketing site |
+| Dashboard | `@dtm/dashboard` | http://localhost:3001 | Admin panel & auth |
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Environment variables live in `.env` at the **repository root**. Both apps load them via `loadEnvConfig` in each `next.config.ts`. Keep that file complete for dashboard builds (auth, database, Supabase).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev          # Run landing + dashboard (Turborepo)
+pnpm build        # Build all apps
+pnpm lint         # Lint all apps
 
-## Learn More
+pnpm db:push      # Drizzle push (dashboard)
+pnpm db:studio    # Drizzle Studio (dashboard)
+pnpm db:seed      # Seed dev admin (dashboard)
+```
 
-To learn more about Next.js, take a look at the following resources:
+Run a single app:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm --filter @dtm/landing dev
+pnpm --filter @dtm/dashboard dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure
 
-## Deploy on Vercel
+```
+apps/
+  landing/     # Public site (/, /contact, /roster)
+  dashboard/   # Admin (/dashboard, /auth, /api/auth)
+packages/
+  typescript-config/   # Shared TS configs
+supabase/              # Migrations & local Supabase
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Turborepo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This repo uses [Turborepo](https://turbo.build) for task orchestration and caching. See `turbo.json` for pipeline tasks.
+
+Optional: install the Turborepo agent skill for AI-assisted monorepo work:
+
+```bash
+npx skills add vercel/turborepo
+```
