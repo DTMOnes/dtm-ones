@@ -8,9 +8,10 @@ export const env = createEnv({
     BLOB_READ_WRITE_TOKEN: z.string().min(32),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
-    DEV_SEED_ADMIN_EMAIL: z.email(),
-    DEV_SEED_ADMIN_PASSWORD: z.string().min(8),
-    DEV_SEED_ADMIN_NAME: z.string().min(1),
+    /** Only required when running `pnpm db:seed` locally. */
+    DEV_SEED_ADMIN_EMAIL: z.email().optional(),
+    DEV_SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
+    DEV_SEED_ADMIN_NAME: z.string().min(1).optional(),
   },
 
   client: {
