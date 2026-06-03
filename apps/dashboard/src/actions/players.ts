@@ -9,6 +9,9 @@ import { db } from "@/lib/db";
 import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
+// Vercel Blob
+import { del } from "@vercel/blob";
+
 // Schema
 import { players, playerCategories, categories } from "@/lib/db/schema";
 
@@ -16,6 +19,7 @@ import { players, playerCategories, categories } from "@/lib/db/schema";
 import {
   createPlayerSchema,
   updatePlayerSchema,
+  deletePlayerSchema,
 } from "@/lib/validation/players";
 
 export const createPlayer = authClient
@@ -34,7 +38,7 @@ export const createPlayer = authClient
       });
 
       if (existingCategories.length !== categoryIds.length) {
-        throw new Error("Categoría no encontrada.");
+        throw new Error("Category not found.");
       }
     }
 
@@ -44,7 +48,7 @@ export const createPlayer = authClient
       .returning();
 
     if (!newPlayer) {
-      throw new Error("Error al crear el jugador.");
+      throw new Error("Failed to create player.");
     }
 
     if (categoryIds.length > 0) {
@@ -72,47 +76,88 @@ export const updatePlayer = authClient
     },
   })
   .action(async ({ parsedInput }) => {
-    const { id, playerCategories: categoryIds, ...data } = parsedInput;
+    const { id: playerId, categoryIds, ...changes } = parsedInput;
 
-    await db.transaction(async (tx) => {
-      const [updatedPlayer] = await tx
-        .update(players)
-        .set({
-          ...data,
-          updatedAt: new Date(),
-        })
-        .where(eq(players.id, id))
-        .returning();
-
-      if (!updatedPlayer) {
-        throw new Error("Jugador no encontrado.");
-      }
-
-      await tx
-        .delete(playerCategories)
-        .where(eq(playerCategories.playerId, id));
-
-      for (const categoryId of categoryIds) {
-        const existingCategory = await tx.query.categories.findFirst({
-          where: eq(categories.id, categoryId),
-        });
-
-        if (!existingCategory) {
-          throw new Error("Categoría no encontrada.");
-        }
-
-        await tx.insert(playerCategories).values({
-          playerId: id,
-          categoryId: existingCategory.id,
-        });
-      }
+    const existingPlayer = await db.query.players.findFirst({
+      where: eq(players.id, playerId),
     });
 
-    revalidatePath(`/dashboard/players/${id}`);
-    revalidatePath("/dashboard/players");
+    if (!existingPlayer) {
+      throw new Error("Player not found.");
+    }
 
-    return {
-      success: true,
-      message: "Jugador actualizado correctamente.",
-    };
+    const [updatedPlayer] = await db
+      .update(players)
+      .set({
+        ...changes,
+        updatedAt: new Date(),
+      })
+      .where(eq(players.id, playerId))
+      .returning();
+
+    if (!updatedPlayer) {
+      throw new Error("Player not found.");
+    }
+
+    if (categoryIds !== undefined) {
+      if (categoryIds.length > 0) {
+        const existingCategories = await db.query.categories.findMany({
+          where: inArray(categories.id, categoryIds),
+        });
+
+        if (existingCategories.length !== categoryIds.length) {
+          throw new Error("Category not found.");
+        }
+      }
+
+      await db
+        .delete(playerCategories)
+        .where(eq(playerCategories.playerId, playerId));
+
+      if (categoryIds.length > 0) {
+        await db.insert(playerCategories).values(
+          categoryIds.map((categoryId) => ({
+            playerId,
+            categoryId,
+          })),
+        );
+      }
+    }
+
+    revalidatePath(`/players/${playerId}`);
+    revalidatePath("/players");
+
+    return { message: "Player updated successfully." };
+  });
+
+export const deletePlayer = authClient
+  .metadata({ actionName: "deletePlayer" })
+  .inputSchema(deletePlayerSchema, {
+    handleValidationErrorsShape: async (errors) => {
+      return flattenValidationErrors(errors).fieldErrors;
+    },
+  })
+  .action(async ({ parsedInput }) => {
+    const player = await db.query.players.findFirst({
+      where: eq(players.id, parsedInput.id),
+      with: {
+        playerMedia: true,
+      },
+    });
+
+    if (!player) {
+      throw new Error("Player not found.");
+    }
+
+    const imageUrls = player.playerMedia
+      .filter((media) => media.mediaType === "image")
+      .map((media) => media.url);
+
+    await Promise.all(imageUrls.map((url) => del(url)));
+
+    await db.delete(players).where(eq(players.id, parsedInput.id));
+
+    revalidatePath("/players");
+
+    return { message: "Player deleted successfully." };
   });

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Figtree } from "next/font/google";
+import { Bebas_Neue, Figtree, Geist } from "next/font/google";
 import "./globals.css";
 
 // Shadcn
 import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
 
-const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const bebas_neue = Bebas_Neue({
   weight: "400",
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bebas_neue.variable} ${figtree.variable} dark`}
+      className={cn("dark", bebas_neue.variable, "font-sans", geist.variable)}
     >
       <body className="antialiased">
         {children}

@@ -10,10 +10,10 @@ import { useMemo } from "react";
 import type { PlayerWithRelations } from "@/types/players";
 
 // Components
-import PlayerImageField from "@/components/media/player-image-field";
-import PlayerImagePreview from "@/components/media/player-image-preview";
-import PlayerVideoField from "@/components/media/player-video-field";
-import PlayerVideoPreview from "@/components/media/player-video-preview";
+import PlayerImageField from "@/components/players/player-image-field";
+import PlayerImagePreview from "@/components/players/player-image-preview";
+import PlayerVideoField from "@/components/players/player-video-field";
+import PlayerVideoPreview from "@/components/players/player-video-preview";
 import {
   Card,
   CardContent,

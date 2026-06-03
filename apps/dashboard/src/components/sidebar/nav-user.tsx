@@ -23,42 +23,26 @@ import {
 // Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
 
-function displayName(user: {
+export type NavUserData = {
   name?: string | null;
   email?: string | null;
-}): string {
+};
+
+function displayName(user: NavUserData): string {
   const trimmed = user.name?.trim();
   if (trimmed) return trimmed;
-  return user.email?.split("@")[0] ?? "Usuario";
+  return user.email?.split("@")[0] ?? "User";
 }
 
-export function NavUser() {
+export function NavUser({ user }: { user: NavUserData }) {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { data: session, isPending } = authClient.useSession();
-  const user = session?.user ?? null;
 
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push("/auth/signin");
     router.refresh();
   };
-
-  if (isPending) {
-    return (
-      <SidebarMenu>
-        <SidebarMenuItem>
-          <SidebarMenuButton size="lg" disabled>
-            <span className="text-muted-foreground text-sm">Cargando…</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      </SidebarMenu>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <SidebarMenu>

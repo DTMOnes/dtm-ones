@@ -8,7 +8,8 @@ import type { CategoryData } from "@/lib/validation/categories";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Components
-import PlayerGeneralInfo from "@/components/players/player-general-info";
+import EditPlayerForm from "@/components/players/edit-player-form";
+import DeletePlayerCard from "@/components/players/delete-player-card";
 import PlayerMedia from "@/components/players/player-media";
 
 export default function PlayerProfileTabs({
@@ -24,8 +25,9 @@ export default function PlayerProfileTabs({
         <TabsTrigger value="general-info">General Info</TabsTrigger>
         <TabsTrigger value="player-media">Player Media</TabsTrigger>
       </TabsList>
-      <TabsContent value="general-info">
-        <PlayerGeneralInfo player={player} categories={categories} />
+      <TabsContent value="general-info" className="flex flex-col gap-6">
+        <EditPlayerForm player={player} categories={categories} />
+        <DeletePlayerCard playerId={player.id} fullName={player.fullName} />
       </TabsContent>
       <TabsContent value="player-media">
         <PlayerMedia player={player} />

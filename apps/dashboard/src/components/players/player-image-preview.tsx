@@ -5,7 +5,7 @@ import Image from "next/image";
 
 // Utils
 import { cn } from "@/lib/utils";
-import DeletePlayerImage from "@/components/media/delete-player-image";
+import DeletePlayerImage from "@/components/players/delete-player-image";
 
 export default function PlayerImagePreview({
   url,

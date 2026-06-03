@@ -58,14 +58,39 @@ export const createPlayerSchema = z.object({
     }),
 });
 
-export const updatePlayerSchema = playerSchema
-  .pick({
-    id: true,
-    fullName: true,
-    height: true,
-    dateOfBirth: true,
-    nationality: true,
-    lastClub: true,
+export const updatePlayerSchema = z
+  .object({
+    id: z.uuid({ message: "Invalid player ID." }),
+    fullName: z
+      .string()
+      .trim()
+      .min(1, "Full name cannot be empty.")
+      .max(150, "Maximum 150 characters."),
+    height: z
+      .string()
+      .trim()
+      .min(1, "Height cannot be empty.")
+      .max(20, "Maximum 20 digits."),
+    dateOfBirth: z
+      .string()
+      .trim()
+      .min(1, "Date of birth cannot be empty.")
+      .max(50, "Maximum 50 characters."),
+    nationality: z
+      .string()
+      .trim()
+      .min(1, "Nationality cannot be empty.")
+      .max(100, "Maximum 100 characters."),
+    lastClub: z
+      .string()
+      .trim()
+      .min(1, "Last club cannot be empty.")
+      .max(150, "Maximum 150 characters."),
+    categoryIds: z
+      .array(z.uuid({ message: "Each category must be a valid ID." }))
+      .refine((ids) => new Set(ids).size === ids.length, {
+        message: "Do not repeat the same category.",
+      }),
   })
   .partial({
     fullName: true,
@@ -73,11 +98,14 @@ export const updatePlayerSchema = playerSchema
     dateOfBirth: true,
     nationality: true,
     lastClub: true,
-  })
-  .extend({
-    playerCategories: z.array(z.string().min(1).max(100)),
+    categoryIds: true,
   });
+
+export const deletePlayerSchema = z.object({
+  id: z.uuid({ message: "Invalid player ID." }),
+});
 
 export type PlayerData = z.infer<typeof playerSchema>;
 export type CreatePlayerInput = z.infer<typeof createPlayerSchema>;
-export type UpdatePlayerData = z.infer<typeof updatePlayerSchema>;
+export type UpdatePlayerInput = z.infer<typeof updatePlayerSchema>;
+export type DeletePlayerInput = z.infer<typeof deletePlayerSchema>;

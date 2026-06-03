@@ -36,7 +36,7 @@ import {
   TrashIcon,
 } from "@phosphor-icons/react/ssr";
 
-import CreateCategoryDialog from "@/components/dashboard/categories/create-category-dialog";
+import CreateCategoryDialog from "@/components/categories/create-category-dialog";
 
 export default async function Page() {
   const allCategories = await db.query.categories.findMany({

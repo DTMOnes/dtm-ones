@@ -101,7 +101,7 @@ export default function CreateUserDialog() {
       ) {
         return;
       }
-      toast.error("No se pudo crear el usuario.", {
+      toast.error("Could not create user.", {
         description: error.serverError,
       });
     },
@@ -120,15 +120,15 @@ export default function CreateUserDialog() {
       <DialogTrigger asChild>
         <Button variant="outline">
           <PlusIcon />
-          Nuevo usuario
+          New user
         </Button>
       </DialogTrigger>
       <DialogContent showCloseButton={!isExecuting}>
         <DialogHeader>
-          <DialogTitle>Nuevo usuario</DialogTitle>
+          <DialogTitle>New user</DialogTitle>
           <DialogDescription>
-            Crea una cuenta con email y contraseña. El usuario podrá iniciar
-            sesión en el panel según el rol asignado.
+            Create an account with email and password. The user can sign in to
+            the dashboard according to the assigned role.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
@@ -140,8 +140,8 @@ export default function CreateUserDialog() {
             <FieldGroup>
               <TextField
                 name="name"
-                label="Nombre"
-                placeholder="Nombre y apellido"
+                label="Name"
+                placeholder="Full name"
                 disabled={isExecuting}
               />
               <Field className="gap-2">
@@ -150,7 +150,7 @@ export default function CreateUserDialog() {
                   id="create-user-email"
                   type="email"
                   autoComplete="email"
-                  placeholder="usuario@email.com"
+                  placeholder="user@email.com"
                   disabled={isExecuting}
                   aria-invalid={!!emailError}
                   {...register("email")}
@@ -161,11 +161,11 @@ export default function CreateUserDialog() {
               </Field>
               <PasswordField
                 name="password"
-                label="Contraseña"
+                label="Password"
                 disabled={isExecuting}
               />
               <Field className="gap-2">
-                <FieldLabel htmlFor="create-user-role">Rol</FieldLabel>
+                <FieldLabel htmlFor="create-user-role">Role</FieldLabel>
                 <Controller
                   name="role"
                   control={control}
@@ -180,11 +180,11 @@ export default function CreateUserDialog() {
                         className="w-full"
                         aria-invalid={!!errors.role}
                       >
-                        <SelectValue placeholder="Rol" />
+                        <SelectValue placeholder="Role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="user">Usuario</SelectItem>
-                        <SelectItem value="admin">Administrador</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="admin">Administrator</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -204,10 +204,10 @@ export default function CreateUserDialog() {
                 disabled={isExecuting}
                 onClick={() => setOpen(false)}
               >
-                Cancelar
+                Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Crear usuario" isExecuting={isExecuting} />
+                <SubmitButton label="Create user" isExecuting={isExecuting} />
               </div>
             </DialogFooter>
           </form>

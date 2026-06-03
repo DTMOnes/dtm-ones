@@ -20,26 +20,31 @@ export const createUserSchema = userSchema
     role: true,
   })
   .extend({
-    name: z.string().min(1, "El nombre es obligatorio."),
-    password: z
-      .string()
-      .min(8, "La contraseña debe tener al menos 8 caracteres."),
+    name: z.string().min(1, "Name is required."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
   });
 
-export const updateUserSchema = userSchema
-  .pick({
-    id: true,
-    email: true,
-    password: true,
-    name: true,
-    role: true,
+export const updateUserGeneralSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Name is required."),
+  email: z.email("Enter a valid email address."),
+});
+
+export const changeUserPasswordSchema = z
+  .object({
+    userId: z.string(),
+    password: z.string().min(8, "Password must be at least 8 characters."),
+    confirmPassword: z.string().min(1, "Confirm your password."),
   })
-  .partial({
-    email: true,
-    password: true,
-    name: true,
-    role: true,
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
   });
+
+export const setUserRoleSchema = z.object({
+  userId: z.string(),
+  role: userRoleSchema,
+});
 
 export const deleteUserSchema = userSchema.pick({
   id: true,

@@ -2,9 +2,9 @@
 import Link from "next/link";
 
 // Components
-import CreatePlayerDialog from "@/components/dashboard/players/create-player-dialog";
-import FilterButton from "@/components/dashboard/players/filter-button";
-import SearchBar from "@/components/dashboard/players/search-bar";
+import CreatePlayerDialog from "@/components/players/create-player-dialog";
+import FilterButton from "@/components/players/filter-button";
+import SearchBar from "@/components/players/search-bar";
 
 // Db + Drizzle
 import { db } from "@/lib/db";

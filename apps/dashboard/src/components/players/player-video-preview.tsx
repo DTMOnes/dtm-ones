@@ -6,7 +6,7 @@ import {
   getYouTubeEmbedUrl,
   parseYouTubeVideoId,
 } from "@/lib/youtube";
-import DeletePlayerVideo from "@/components/media/delete-player-video";
+import DeletePlayerVideo from "@/components/players/delete-player-video";
 
 export default function PlayerVideoPreview({
   url,

@@ -4,11 +4,11 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/utils/get-session";
 
 // Components
-import { AppSidebar } from "@/components/dashboard/app-sidebar";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SiteHeader } from "@/components/sidebar/site-header";
 
 // Shadcn
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { SiteHeader } from "@/components/dashboard/site-header";
 
 export default async function Layout({
   children,
@@ -30,7 +30,11 @@ export default async function Layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar
+        variant="inset"
+        user={session.user}
+        isAdmin={session.user.role === "admin"}
+      />
       <SidebarInset>
         <SiteHeader />
         {children}

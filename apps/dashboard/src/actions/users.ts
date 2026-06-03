@@ -3,7 +3,6 @@
 // Next
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 // Safe Action
 import { flattenValidationErrors } from "next-safe-action";
@@ -12,21 +11,38 @@ import { actionClient } from "@/lib/safe-action";
 // Better Auth
 import { auth } from "@/lib/auth/auth";
 
+// Db + Drizzle
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+
+// Lib
+import { countAdminUsers, isOnlyAdmin } from "@/lib/users/admin-count";
+
+// Utils
+import { assertAdmin } from "@/utils/require-admin";
+
 // Validation Schema
 import {
   createUserSchema,
-  updateUserSchema,
+  updateUserGeneralSchema,
+  changeUserPasswordSchema,
+  setUserRoleSchema,
   deleteUserSchema,
 } from "@/lib/validation/users";
 
+const validationErrorsShape = {
+  handleValidationErrorsShape: async (
+    errors: Parameters<typeof flattenValidationErrors>[0],
+  ) => flattenValidationErrors(errors).fieldErrors,
+};
+
 export const createUser = actionClient
   .metadata({ actionName: "createUser" })
-  .inputSchema(createUserSchema, {
-    handleValidationErrorsShape: async (errors) => {
-      return flattenValidationErrors(errors).fieldErrors;
-    },
-  })
+  .inputSchema(createUserSchema, validationErrorsShape)
   .action(async ({ parsedInput }) => {
+    await assertAdmin();
+
     const newUser = await auth.api.createUser({
       body: {
         email: parsedInput.email,
@@ -38,77 +54,152 @@ export const createUser = actionClient
     });
 
     if (!newUser.user) {
-      throw new Error("No se pudo crear el usuario.");
+      throw new Error("Could not create user.");
     }
 
-    revalidatePath("/dashboard/users");
+    revalidatePath("/users");
 
     return {
       success: true,
-      message: "Usuario creado correctamente.",
+      message: "User created successfully.",
     };
   });
 
-export const updateUser = actionClient
-  .metadata({ actionName: "updateUser" })
-  .inputSchema(updateUserSchema, {
-    handleValidationErrorsShape: async (errors) => {
-      return flattenValidationErrors(errors).fieldErrors;
-    },
-  })
+export const updateUserGeneral = actionClient
+  .metadata({ actionName: "updateUserGeneral" })
+  .inputSchema(updateUserGeneralSchema, validationErrorsShape)
   .action(async ({ parsedInput }) => {
-    const { id, password, ...rest } = parsedInput;
+    await assertAdmin();
+
+    const { id, name, email } = parsedInput;
 
     const existingUser = await auth.api.getUser({
-      query: {
-        id,
-      },
+      query: { id },
       headers: await headers(),
     });
 
     if (!existingUser) {
       throw new Error("User not found.");
-    }
-
-    const data: Record<string, unknown> = { ...rest };
-    if (password !== undefined && password !== "") {
-      data.password = password;
     }
 
     await auth.api.adminUpdateUser({
       body: {
         userId: id,
-        data,
+        data: { name, email },
       },
       headers: await headers(),
     });
 
-    revalidatePath("/dashboard/users");
-    revalidatePath(`/dashboard/users/${id}`);
+    revalidatePath("/users");
+    revalidatePath(`/users/${id}`);
 
     return {
       success: true,
-      message: "User updated successfully.",
+      message: "Profile updated successfully.",
     };
   });
 
-export const deleteUser = actionClient
-  .metadata({ actionName: "deleteUser" })
-  .inputSchema(deleteUserSchema, {
-    handleValidationErrorsShape: async (errors) => {
-      return flattenValidationErrors(errors).fieldErrors;
-    },
-  })
+export const changeUserPassword = actionClient
+  .metadata({ actionName: "changeUserPassword" })
+  .inputSchema(changeUserPasswordSchema, validationErrorsShape)
   .action(async ({ parsedInput }) => {
+    await assertAdmin();
+
+    const { userId, password } = parsedInput;
+
     const existingUser = await auth.api.getUser({
-      query: {
-        id: parsedInput.id,
-      },
+      query: { id: userId },
       headers: await headers(),
     });
 
     if (!existingUser) {
       throw new Error("User not found.");
+    }
+
+    await auth.api.setUserPassword({
+      body: {
+        userId,
+        newPassword: password,
+      },
+      headers: await headers(),
+    });
+
+    revalidatePath(`/users/${userId}`);
+
+    return {
+      success: true,
+      message: "Password updated successfully.",
+    };
+  });
+
+export const setUserRole = actionClient
+  .metadata({ actionName: "setUserRole" })
+  .inputSchema(setUserRoleSchema, validationErrorsShape)
+  .action(async ({ parsedInput }) => {
+    await assertAdmin();
+
+    const { userId, role } = parsedInput;
+
+    const targetUser = await db.query.user.findFirst({
+      where: eq(user.id, userId),
+    });
+
+    if (!targetUser) {
+      throw new Error("User not found.");
+    }
+
+    const adminCount = await countAdminUsers();
+
+    if (
+      isOnlyAdmin(targetUser, adminCount) &&
+      role !== "admin"
+    ) {
+      throw new Error(
+        "Cannot remove administrator role from the only admin. Promote another user or create a new administrator first.",
+      );
+    }
+
+    await auth.api.setRole({
+      body: {
+        userId,
+        role,
+      },
+      headers: await headers(),
+    });
+
+    revalidatePath("/users");
+    revalidatePath(`/users/${userId}`);
+
+    return {
+      success: true,
+      message: "Role updated successfully.",
+    };
+  });
+
+export const deleteUser = actionClient
+  .metadata({ actionName: "deleteUser" })
+  .inputSchema(deleteUserSchema, validationErrorsShape)
+  .action(async ({ parsedInput }) => {
+    const session = await assertAdmin();
+
+    const targetUser = await db.query.user.findFirst({
+      where: eq(user.id, parsedInput.id),
+    });
+
+    if (!targetUser) {
+      throw new Error("User not found.");
+    }
+
+    const adminCount = await countAdminUsers();
+
+    if (isOnlyAdmin(targetUser, adminCount)) {
+      throw new Error(
+        "Cannot delete the only administrator. Promote another user or create a new administrator first.",
+      );
+    }
+
+    if (parsedInput.id === session.user.id) {
+      throw new Error("You cannot delete your own account.");
     }
 
     await auth.api.removeUser({
@@ -118,5 +209,10 @@ export const deleteUser = actionClient
       headers: await headers(),
     });
 
-    redirect("/dashboard/users");
+    revalidatePath("/users");
+
+    return {
+      success: true,
+      message: "User deleted successfully.",
+    };
   });
