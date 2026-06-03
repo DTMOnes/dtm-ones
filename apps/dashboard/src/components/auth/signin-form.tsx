@@ -41,12 +41,12 @@ export function SignInForm() {
 
   const { execute, isExecuting } = useAction(signIn, {
     onSuccess: ({ data }) => {
-      toast.success(data?.message ?? "Error al iniciar sesión");
-      router.push("/dashboard");
+      toast.success(data?.message ?? "Signed in successfully");
+      router.push("/");
       router.refresh();
     },
     onError: ({ error: actionError }) => {
-      toast.error(actionError.serverError ?? "Error al iniciar sesión");
+      toast.error(actionError.serverError ?? "Failed to sign in");
     },
   });
 
@@ -67,9 +67,9 @@ export function SignInForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Iniciar Sesión</CardTitle>
+        <CardTitle>Sign In</CardTitle>
         <CardDescription>
-          Ingresa tu email y contraseña para continuar
+          Enter your email and password to continue
         </CardDescription>
       </CardHeader>
       <FormProvider {...methods}>
@@ -78,15 +78,15 @@ export function SignInForm() {
           className="p-4 flex flex-col gap-10"
         >
           <CardContent className="space-y-4">
-            <TextField name="email" label="Email" placeholder="tu@email.com" />
-            <PasswordField name="password" label="Contraseña" />
+            <TextField name="email" label="Email" placeholder="you@email.com" />
+            <PasswordField name="password" label="Password" />
           </CardContent>
 
           <Separator />
 
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isExecuting}>
-              {isExecuting ? "Iniciando sesión..." : "Iniciar Sesión"}
+              {isExecuting ? "Signing in..." : "Sign In"}
             </Button>
           </CardFooter>
         </form>

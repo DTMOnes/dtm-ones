@@ -8,7 +8,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 // Utils
 import { cn } from "@/lib/utils";
-import DeleteFileButton from "@/components/files/delete-file-button";
+import DeleteFileButton from "@/components/media/delete-player-image";
 
 const DEFAULT_BUCKET = "public-assets";
 

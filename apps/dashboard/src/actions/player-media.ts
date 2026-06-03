@@ -6,55 +6,55 @@ import { flattenValidationErrors } from "next-safe-action";
 
 // Database
 import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+// Vercel Blob
+import { del } from "@vercel/blob";
 
 // Schema
 import { players, playerMedia } from "@/lib/db/schema";
 
-// Supabase
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-
 // Validation Schema
 import {
-  createPlayerMediaSchema,
-  deletePlayerMediaSchema,
+  uploadPlayerImageSchema,
+  uploadPlayerVideoSchema,
+  deletePlayerImageSchema,
+  deletePlayerVideoSchema,
 } from "@/lib/validation/player-media";
 
-export const createPlayerMedia = actionClient
-  .metadata({ actionName: "createPlayerMedia" })
-  .inputSchema(createPlayerMediaSchema, {
+export const uploadPlayerImage = actionClient
+  .metadata({ actionName: "uploadPlayerImage" })
+  .inputSchema(uploadPlayerImageSchema, {
     handleValidationErrorsShape: async (errors) => {
       return flattenValidationErrors(errors).fieldErrors;
     },
   })
   .action(async ({ parsedInput }) => {
-    const { playerId, ...data } = parsedInput;
+    const { playerId, url } = parsedInput;
 
     const existingPlayer = await db.query.players.findFirst({
       where: eq(players.id, playerId),
     });
 
     if (!existingPlayer) {
-      throw new Error("Jugador no encontrado.");
+      throw new Error("Player not found.");
     }
 
     await db.insert(playerMedia).values({
-      playerId,
-      ...data,
+      playerId: existingPlayer.id,
+      mediaType: "image",
+      url,
     });
 
     revalidatePath(`/dashboard/players/${playerId}`);
 
-    return {
-      success: true,
-      message: "Media agregada correctamente.",
-    };
+    return { message: "Media added successfully." };
   });
 
-export const deletePlayerMedia = actionClient
-  .metadata({ actionName: "deletePlayerMedia" })
-  .inputSchema(deletePlayerMediaSchema, {
+export const deletePlayerImage = actionClient
+  .metadata({ actionName: "deletePlayerImage" })
+  .inputSchema(deletePlayerImageSchema, {
     handleValidationErrorsShape: async (errors) => {
       return flattenValidationErrors(errors).fieldErrors;
     },
@@ -65,24 +65,85 @@ export const deletePlayerMedia = actionClient
     });
 
     if (!mediaToDelete) {
-      throw new Error("Asset no encontrado.");
+      throw new Error("Image not found.");
     }
 
-    const supabase = await createSupabaseServerClient();
-    const { error: storageError } = await supabase.storage
-      .from("public-assets")
-      .remove([mediaToDelete.storagePath]);
+    if (mediaToDelete.mediaType !== "image") {
+      throw new Error("Only images can be deleted with this action.");
+    }
 
-    if (storageError) {
-      throw new Error("No se pudo eliminar el archivo en almacenamiento.");
+    await del(mediaToDelete.url);
+
+    await db.delete(playerMedia).where(eq(playerMedia.id, parsedInput.id));
+
+    revalidatePath(`/dashboard/players/${mediaToDelete.playerId}`);
+
+    return { message: "Image deleted successfully." };
+  });
+
+export const uploadPlayerVideo = actionClient
+  .metadata({ actionName: "uploadPlayerVideo" })
+  .inputSchema(uploadPlayerVideoSchema, {
+    handleValidationErrorsShape: async (errors) => {
+      return flattenValidationErrors(errors).fieldErrors;
+    },
+  })
+  .action(async ({ parsedInput }) => {
+    const { playerId, url } = parsedInput;
+
+    const existingPlayer = await db.query.players.findFirst({
+      where: eq(players.id, playerId),
+    });
+
+    if (!existingPlayer) {
+      throw new Error("Player not found.");
+    }
+
+    const existingVideo = await db.query.playerMedia.findFirst({
+      where: and(
+        eq(playerMedia.playerId, playerId),
+        eq(playerMedia.mediaType, "video"),
+      ),
+    });
+
+    if (existingVideo) {
+      throw new Error("This player already has a presentation video.");
+    }
+
+    await db.insert(playerMedia).values({
+      playerId: existingPlayer.id,
+      mediaType: "video",
+      url,
+    });
+
+    revalidatePath(`/dashboard/players/${playerId}`);
+
+    return { message: "Video added successfully." };
+  });
+
+export const deletePlayerVideo = actionClient
+  .metadata({ actionName: "deletePlayerVideo" })
+  .inputSchema(deletePlayerVideoSchema, {
+    handleValidationErrorsShape: async (errors) => {
+      return flattenValidationErrors(errors).fieldErrors;
+    },
+  })
+  .action(async ({ parsedInput }) => {
+    const mediaToDelete = await db.query.playerMedia.findFirst({
+      where: eq(playerMedia.id, parsedInput.id),
+    });
+
+    if (!mediaToDelete) {
+      throw new Error("Video not found.");
+    }
+
+    if (mediaToDelete.mediaType !== "video") {
+      throw new Error("Only videos can be deleted with this action.");
     }
 
     await db.delete(playerMedia).where(eq(playerMedia.id, parsedInput.id));
 
     revalidatePath(`/dashboard/players/${mediaToDelete.playerId}`);
 
-    return {
-      success: true,
-      message: "Asset eliminado correctamente.",
-    };
+    return { message: "Video deleted successfully." };
   });

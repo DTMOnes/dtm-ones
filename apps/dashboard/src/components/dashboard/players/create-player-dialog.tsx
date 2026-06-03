@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import { z } from "zod";
-
 import { createPlayer } from "@/actions/players";
-import { createPlayerSchema as schema } from "@/lib/validation/players";
+import {
+  createPlayerSchema,
+  type CreatePlayerInput,
+} from "@/lib/validation/players";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,14 +22,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
-import TextField from "@/components/form/text-field";
-import OptionsField from "@/components/form/options-field";
-import SubmitButton from "@/components/form/submit-button";
-
-import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 
-type FormValues = z.infer<typeof schema>;
+// Components
+import TextField from "@/components/form/text-field";
+import OptionsField from "@/components/form/options-field";
+
+// Icons
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 export default function CreatePlayerDialog({
   categories,
@@ -38,15 +40,15 @@ export default function CreatePlayerDialog({
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  const methods = useForm<FormValues>({
-    resolver: zodResolver(schema as never),
+  const methods = useForm<CreatePlayerInput>({
+    resolver: zodResolver(createPlayerSchema),
     defaultValues: {
       fullName: "",
       height: "",
       dateOfBirth: "",
       nationality: "",
       lastClub: "",
-      playerCategories: [],
+      categoryIds: [],
     },
   });
 
@@ -54,15 +56,13 @@ export default function CreatePlayerDialog({
 
   const { execute, isExecuting } = useAction(createPlayer, {
     onSuccess: ({ data }) => {
-      if (data?.success) {
-        toast.success(data.message ?? "Jugador creado correctamente");
-        reset();
-        setOpen(false);
-        router.refresh();
-      }
+      toast.success(data.message);
+      reset();
+      setOpen(false);
+      router.refresh();
     },
     onError: ({ error }) => {
-      toast.error("Error al crear el jugador.", {
+      toast.error("Failed to create player.", {
         description: error.serverError,
       });
     },
@@ -79,7 +79,7 @@ export default function CreatePlayerDialog({
       <DialogTrigger asChild>
         <Button variant="outline">
           <PlusIcon />
-          Nuevo jugador
+          New player
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -87,10 +87,10 @@ export default function CreatePlayerDialog({
         className="flex max-h-[90vh] max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
       >
         <DialogHeader className="shrink-0 border-b px-6 py-4">
-          <DialogTitle>Nuevo jugador</DialogTitle>
+          <DialogTitle>New player</DialogTitle>
           <DialogDescription>
-            Completa los datos básicos; podrás ampliar la ficha después desde el
-            detalle.
+            Fill in the basic details; you can expand the profile later from the
+            detail page.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
@@ -103,55 +103,52 @@ export default function CreatePlayerDialog({
               <FieldGroup className="gap-4">
                 <TextField
                   name="fullName"
-                  label="Nombre completo"
-                  placeholder="Juan Pérez"
+                  label="Full name"
+                  placeholder="John Doe"
                   disabled={isExecuting}
                 />
                 <TextField
                   name="dateOfBirth"
-                  label="Fecha de nacimiento"
+                  label="Date of birth"
                   placeholder="DD/MM/YYYY"
                   disabled={isExecuting}
                 />
                 <TextField
                   name="nationality"
-                  label="Nacionalidad"
+                  label="Nationality"
                   placeholder="Argentina"
                   disabled={isExecuting}
                 />
                 <TextField
                   name="height"
-                  label="Altura"
-                  placeholder="1,85 m"
+                  label="Height (cm)"
+                  placeholder="185"
                   disabled={isExecuting}
                 />
                 <TextField
                   name="lastClub"
-                  label="Último club"
-                  placeholder="Nombre del club"
+                  label="Last club"
+                  placeholder="Club name"
                   disabled={isExecuting}
                 />
                 <OptionsField
-                  name="playerCategories"
-                  label="Categorías"
+                  name="categoryIds"
+                  label="Categories"
                   options={categories}
+                  emptyMessage="No categories created yet"
                   disabled={isExecuting}
                 />
               </FieldGroup>
             </div>
-            <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:justify-end">
+            <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:justify-end bg-muted/20">
               <Button
-                type="button"
+                type="submit"
                 variant="outline"
-                className="flex-1 sm:flex-initial"
                 disabled={isExecuting}
-                onClick={() => setOpen(false)}
+                aria-label="submit"
               >
-                Cancelar
+                {isExecuting ? <Spinner /> : "Create player"}
               </Button>
-              <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Guardar" isExecuting={isExecuting} />
-              </div>
             </DialogFooter>
           </form>
         </FormProvider>

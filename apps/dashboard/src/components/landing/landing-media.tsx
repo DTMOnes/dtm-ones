@@ -16,9 +16,9 @@ import {
 import type { LandingMediaData } from "@/lib/validation/landing-media";
 
 // Components
-import FileField from "@/components/files/file-field";
-import ImagePreview from "@/components/files/image-preview";
-import VideoPreview from "@/components/files/video-preview";
+import FileField from "@/components/media/player-image-field";
+import ImagePreview from "@/components/media/player-image-preview";
+import VideoPreview from "@/components/media/video-preview";
 import {
   Card,
   CardContent,

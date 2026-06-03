@@ -5,6 +5,7 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
     DATABASE_URL: z.url(),
+    BLOB_READ_WRITE_TOKEN: z.string().min(32),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
     DEV_SEED_ADMIN_EMAIL: z.email(),
@@ -13,8 +14,6 @@ export const env = createEnv({
   },
 
   client: {
-    NEXT_PUBLIC_SUPABASE_URL: z.url(),
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
   },
 
@@ -23,9 +22,6 @@ export const env = createEnv({
    * Server variables are read from `process.env` at runtime (see env-nextjs).
    */
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
   },
 

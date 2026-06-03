@@ -1,12 +1,12 @@
 "use server";
 
 // Safe Action
-import { actionClient } from "@/lib/safe-action";
+import { authClient } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 
 // Database
 import { db } from "@/lib/db";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 // Schema
@@ -18,7 +18,7 @@ import {
   updatePlayerSchema,
 } from "@/lib/validation/players";
 
-export const createPlayer = actionClient
+export const createPlayer = authClient
   .metadata({ actionName: "createPlayer" })
   .inputSchema(createPlayerSchema, {
     handleValidationErrorsShape: async (errors) => {
@@ -26,43 +26,45 @@ export const createPlayer = actionClient
     },
   })
   .action(async ({ parsedInput }) => {
-    const { playerCategories: array, ...data } = parsedInput;
+    const { categoryIds, ...data } = parsedInput;
 
-    await db.transaction(async (tx) => {
-      const [newPlayer] = await tx
-        .insert(players)
-        .values({ ...data })
-        .returning();
+    if (categoryIds.length > 0) {
+      const existingCategories = await db.query.categories.findMany({
+        where: inArray(categories.id, categoryIds),
+      });
 
-      if (!newPlayer) {
-        throw new Error("Error al crear el jugador.");
+      if (existingCategories.length !== categoryIds.length) {
+        throw new Error("Categoría no encontrada.");
       }
+    }
 
-      for (const cat of array) {
-        const existingCategory = await tx.query.categories.findFirst({
-          where: eq(categories.id, cat),
-        });
+    const [newPlayer] = await db
+      .insert(players)
+      .values({ ...data })
+      .returning();
 
-        if (!existingCategory) {
-          throw new Error("Categoría no encontrada.");
-        }
+    if (!newPlayer) {
+      throw new Error("Error al crear el jugador.");
+    }
 
-        await tx.insert(playerCategories).values({
-          playerId: newPlayer.id,
-          categoryId: existingCategory.id,
-        });
+    if (categoryIds.length > 0) {
+      try {
+        await db.insert(playerCategories).values(
+          categoryIds.map((categoryId) => ({
+            playerId: newPlayer.id,
+            categoryId,
+          })),
+        );
+      } catch (error) {
+        await db.delete(players).where(eq(players.id, newPlayer.id));
+        throw error;
       }
+    }
 
-      return newPlayer;
-    });
-
-    return {
-      success: true,
-      message: "Jugador creado correctamente.",
-    };
+    return { message: "Player created successfully." };
   });
 
-export const updatePlayer = actionClient
+export const updatePlayer = authClient
   .metadata({ actionName: "updatePlayer" })
   .inputSchema(updatePlayerSchema, {
     handleValidationErrorsShape: async (errors) => {

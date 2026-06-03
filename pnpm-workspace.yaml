@@ -2,6 +2,13 @@ packages:
   - "apps/*"
   - "packages/*"
 
+allowBuilds:
+  '@parcel/watcher': false
+  esbuild: false
+  msw: false
+  sharp: false
+  unrs-resolver: false
+
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver

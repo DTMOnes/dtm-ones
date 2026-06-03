@@ -6,16 +6,14 @@ import { useRouter } from "next/navigation";
 // React
 import { useMemo } from "react";
 
-// Actions
-import { createPlayerMedia, deletePlayerMedia } from "@/actions/player-media";
-
 // Types
-import type { PlayerData } from "@/lib/validation/players";
+import type { PlayerWithRelations } from "@/types/players";
 
 // Components
-import FileField from "@/components/files/file-field";
-import ImagePreview from "@/components/files/image-preview";
-import VideoPreview from "@/components/files/video-preview";
+import PlayerImageField from "@/components/media/player-image-field";
+import PlayerImagePreview from "@/components/media/player-image-preview";
+import PlayerVideoField from "@/components/media/player-video-field";
+import PlayerVideoPreview from "@/components/media/player-video-preview";
 import {
   Card,
   CardContent,
@@ -34,7 +32,11 @@ import {
 // Phosphor
 import { ImageSquareIcon, VideoCameraIcon } from "@phosphor-icons/react";
 
-export default function PlayerMedia({ player }: { player: PlayerData }) {
+export default function PlayerMedia({
+  player,
+}: {
+  player: PlayerWithRelations;
+}) {
   const router = useRouter();
 
   const videos = useMemo(
@@ -47,59 +49,41 @@ export default function PlayerMedia({ player }: { player: PlayerData }) {
     [player.playerMedia],
   );
 
-  const namespaceBase = `players/${player.id}`;
-
   return (
     <div className="flex flex-col gap-10">
       <Card>
         <CardHeader>
           <CardTitle>Presentation Video</CardTitle>
           <CardDescription>
-            Upload videos (for example MP4). Each file is linked to this player
-            profile.
+            Add a YouTube link as this player&apos;s presentation video. One link
+            per profile.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <FileField
-            action={createPlayerMedia}
-            namespace={`${namespaceBase}/video`}
-            accept="video/*"
-            buildPayload={({ uploadedFile, file }) => ({
-              id: crypto.randomUUID(),
-              playerId: player.id,
-              mediaType: "video" as const,
-              mimeType: file.type || "application/octet-stream",
-              storagePath: uploadedFile.path,
-            })}
-            onPersistSuccess={() => router.refresh()}
-          />
           {videos.length === 0 ? (
-            <Empty className="border border-dashed">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <VideoCameraIcon />
-                </EmptyMedia>
-                <EmptyTitle>No videos yet</EmptyTitle>
-                <EmptyDescription>
-                  Upload a short presentation clip so this player profile has a
-                  quick visual introduction.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <>
+              <Empty className="border border-dashed">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <VideoCameraIcon />
+                  </EmptyMedia>
+                  <EmptyTitle>No video yet</EmptyTitle>
+                  <EmptyDescription>
+                    Paste a YouTube URL so visitors can watch a short
+                    introduction on this profile.
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+              <PlayerVideoField
+                playerId={player.id}
+                onUploadSuccess={() => router.refresh()}
+              />
+            </>
           ) : (
-            <ul className="flex flex-col gap-6 border border-dashed">
-              {videos.map((m) => (
-                <li key={m.id}>
-                  <VideoPreview
-                    storagePath={m.storagePath}
-                    className="sm:max-w-md"
-                    deleteAction={deletePlayerMedia}
-                    deleteInput={{ id: m.id }}
-                    onDeleted={() => router.refresh()}
-                  />
-                </li>
-              ))}
-            </ul>
+            <PlayerVideoPreview
+              url={videos[0].url}
+              mediaId={videos[0].id}
+            />
           )}
         </CardContent>
       </Card>
@@ -108,22 +92,13 @@ export default function PlayerMedia({ player }: { player: PlayerData }) {
         <CardHeader>
           <CardTitle>Image Gallery</CardTitle>
           <CardDescription>
-            Upload photos in standard image formats (JPEG, PNG, WebP, etc.).
+            Upload photos in standard image formats (JPEG, PNG, WebP).
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <FileField
-            action={createPlayerMedia}
-            namespace={`${namespaceBase}/gallery`}
-            accept="image/*"
-            buildPayload={({ uploadedFile, file }) => ({
-              id: crypto.randomUUID(),
-              playerId: player.id,
-              mediaType: "image" as const,
-              mimeType: file.type || "application/octet-stream",
-              storagePath: uploadedFile.path,
-            })}
-            onPersistSuccess={() => router.refresh()}
+          <PlayerImageField
+            playerId={player.id}
+            onUploadSuccess={() => router.refresh()}
           />
           {images.length === 0 ? (
             <Empty className="border border-dashed">
@@ -142,13 +117,11 @@ export default function PlayerMedia({ player }: { player: PlayerData }) {
             <ul className="p-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 border border-dashed">
               {images.map((m) => (
                 <li key={m.id}>
-                  <ImagePreview
-                    storagePath={m.storagePath}
+                  <PlayerImagePreview
+                    url={m.url}
                     alt=""
                     className="w-full"
-                    deleteAction={deletePlayerMedia}
-                    deleteInput={{ id: m.id }}
-                    onDeleted={() => router.refresh()}
+                    mediaId={m.id}
                   />
                 </li>
               ))}

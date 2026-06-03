@@ -43,21 +43,13 @@ type MenuItem = {
 const playersItems: MenuItem[] = [
   {
     title: "Players",
-    url: "/dashboard/players",
+    url: "/players",
     icon: UsersIcon,
   },
   {
     title: "Categories",
-    url: "/dashboard/categories",
+    url: "/categories",
     icon: FolderIcon,
-  },
-];
-
-const usersItems: MenuItem[] = [
-  {
-    title: "Manage users",
-    url: "/dashboard/users",
-    icon: UserGearIcon,
   },
 ];
 
@@ -109,7 +101,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {/* <NavGroup label="Landing Page Content" items={landingItems} /> */}
         <NavGroup label="Players Content" items={playersItems} />
-        <NavGroup label="Users" items={usersItems} />
       </SidebarContent>
       <SidebarRail />
       <SidebarContent>

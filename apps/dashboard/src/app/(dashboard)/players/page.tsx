@@ -97,7 +97,7 @@ export default async function Page({
               </EmptyMedia>
               <EmptyTitle>No players found</EmptyTitle>
               <EmptyDescription>
-                Create a new player to get started.
+                You can start by creating a new player.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -105,7 +105,7 @@ export default async function Page({
           allPlayers.map((player) => (
             <Item key={player.id} variant="muted" asChild>
               <Link
-                href={`/dashboard/players/${player.id}`}
+                href={`/players/${player.id}`}
                 className="w-full flex items-start justify-between gap-4"
               >
                 <ItemContent>

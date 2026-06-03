@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Empty, EmptyDescription } from "@/components/ui/empty";
 
 // Phosphor
 import { FunnelSimpleIcon } from "@phosphor-icons/react";
@@ -66,7 +67,7 @@ export default function FilterButton({
         <Button
           variant="outline"
           size="icon"
-          aria-label="Filtrar por categoría"
+          aria-label="Filter by category"
           aria-pressed={selected.size > 0}
           className={cn(
             selected.size > 0 &&
@@ -77,21 +78,29 @@ export default function FilterButton({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Categorías</DropdownMenuLabel>
-        {categories.map((cat) => {
-          const id = cat.id.toString();
+        <DropdownMenuLabel>Categories</DropdownMenuLabel>
+        {categories.length === 0 ? (
+          <Empty className="border-0 bg-muted p-3 gap-0">
+            <EmptyDescription className="text-xs">
+              No categories created yet
+            </EmptyDescription>
+          </Empty>
+        ) : (
+          categories.map((cat) => {
+            const id = cat.id.toString();
 
-          return (
-            <DropdownMenuCheckboxItem
-              key={cat.id}
-              checked={selected.has(id)}
-              onCheckedChange={(checked) => handleToggle(id, checked)}
-              onSelect={(e) => e.preventDefault()}
-            >
-              {cat.name}
-            </DropdownMenuCheckboxItem>
-          );
-        })}
+            return (
+              <DropdownMenuCheckboxItem
+                key={cat.id}
+                checked={selected.has(id)}
+                onCheckedChange={(checked) => handleToggle(id, checked)}
+                onSelect={(e) => e.preventDefault()}
+              >
+                {cat.name}
+              </DropdownMenuCheckboxItem>
+            );
+          })
+        )}
         {selected.size > 0 ? (
           <>
             <DropdownMenuSeparator />
@@ -99,7 +108,7 @@ export default function FilterButton({
               className="text-muted-foreground focus:text-foreground"
               onSelect={() => handleClear()}
             >
-              Quitar filtros
+              Clear filters
             </DropdownMenuItem>
           </>
         ) : null}

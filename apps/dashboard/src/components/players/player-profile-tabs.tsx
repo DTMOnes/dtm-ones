@@ -1,7 +1,7 @@
 "use client";
 
 // Types
-import type { PlayerData } from "@/lib/validation/players";
+import type { PlayerWithRelations } from "@/types/players";
 import type { CategoryData } from "@/lib/validation/categories";
 
 // Shadcn
@@ -15,7 +15,7 @@ export default function PlayerProfileTabs({
   player,
   categories,
 }: {
-  player: PlayerData;
+  player: PlayerWithRelations;
   categories: CategoryData[];
 }) {
   return (

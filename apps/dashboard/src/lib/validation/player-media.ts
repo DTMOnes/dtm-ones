@@ -1,26 +1,34 @@
 // Zod
 import { z } from "zod";
 
-export const playerMediaSchema = z.object({
-  id: z.uuid(),
+// Utils
+import { parseYouTubeVideoId } from "@/lib/youtube";
+
+export const youtubeVideoUrlSchema = z
+  .string()
+  .url()
+  .refine((url) => parseYouTubeVideoId(url) !== null, {
+    message: "Introduce una URL válida de YouTube.",
+  });
+
+export const uploadPlayerImageSchema = z.object({
   playerId: z.uuid(),
-  mediaType: z.enum(["image", "video"]),
-  mimeType: z.string(),
-  storagePath: z.string(),
-  createdAt: z.date(),
+  url: z.url(),
 });
 
-export const createPlayerMediaSchema = playerMediaSchema.pick({
-  id: true,
-  playerId: true,
-  mediaType: true,
-  mimeType: true,
-  storagePath: true,
+export const uploadPlayerVideoSchema = z.object({
+  playerId: z.uuid(),
+  url: youtubeVideoUrlSchema,
 });
 
-export const deletePlayerMediaSchema = playerMediaSchema.pick({
-  id: true,
+export const deletePlayerImageSchema = z.object({
+  id: z.uuid(),
 });
 
-export type PlayerMediaData = z.infer<typeof playerMediaSchema>;
-export type CreatePlayerMediaData = z.infer<typeof createPlayerMediaSchema>;
+export const deletePlayerVideoSchema = z.object({
+  id: z.uuid(),
+});
+
+export const playerVideoFormSchema = z.object({
+  url: youtubeVideoUrlSchema,
+});
