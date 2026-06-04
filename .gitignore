@@ -1,36 +1,43 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
+# dependencies (all workspaces — not only repo root)
+node_modules/
+.pnp
 .pnp.*
+.pnpm-store/
+
+# yarn (if ever used)
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-/playwright-report/
-/test-results/
-
-# next.js
-/.next/
-/out/
-apps/*/.next/
-apps/*/out/
-
-# production
-/build
+# turbo
 .turbo/
 
-# misc
-.DS_Store
-Thumbs.db
-*.pem
-.eslintcache
-.idea/
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# production / package build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# env (keep .env.example committable)
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
 
 # debug
 npm-debug.log*
@@ -38,17 +45,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# misc / OS / editors
+.DS_Store
+Thumbs.db
+*.pem
+.eslintcache
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# cursor
+# cursor / agent tooling
 .cursor
 .agents/**
 skills-lock.json
