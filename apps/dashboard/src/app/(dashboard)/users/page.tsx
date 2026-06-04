@@ -29,18 +29,6 @@ import {
 // Phosphor
 import { UserCircleIcon } from "@phosphor-icons/react/ssr";
 
-function formatDate(value: Date) {
-  return value.toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
-
-function roleLabel(role: string | null) {
-  if (role === "admin") return "Administrator";
-  return "User";
-}
-
 export default async function Page() {
   const allUsers = await db.query.user.findMany({
     orderBy: [desc(user.createdAt)],
@@ -68,22 +56,17 @@ export default async function Page() {
             </EmptyHeader>
           </Empty>
         ) : (
-          allUsers.map((foundUser) => (
-            <Item key={foundUser.id} variant="muted" asChild>
+          allUsers.map((user) => (
+            <Item key={user.id} variant="muted" asChild>
               <Link
-                href={`/users/${foundUser.id}`}
+                href={`/users/${user.id}`}
                 className="w-full flex items-start justify-between gap-4"
               >
                 <ItemContent>
-                  <ItemTitle>{foundUser.name}</ItemTitle>
-                  <ItemDescription>
-                    {foundUser.email} · Joined:{" "}
-                    {formatDate(foundUser.createdAt)}
-                  </ItemDescription>
+                  <ItemTitle>{user.name}</ItemTitle>
+                  <ItemDescription>{user.email}</ItemDescription>
                 </ItemContent>
-                <Badge variant="secondary">
-                  {roleLabel(foundUser.role ?? null)}
-                </Badge>
+                <Badge variant="secondary">{user.role?.toUpperCase()}</Badge>
               </Link>
             </Item>
           ))

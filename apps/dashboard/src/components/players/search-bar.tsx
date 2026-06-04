@@ -9,7 +9,11 @@ import { useDebouncedCallback } from "use-debounce";
 // Shadcn
 import { Input } from "@/components/ui/input";
 
-export default function SearchBar() {
+export default function SearchBar({
+  placeholder = "Buscar por nombre...",
+}: {
+  placeholder?: string;
+}) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -28,7 +32,7 @@ export default function SearchBar() {
 
   return (
     <Input
-      placeholder="Buscar por nombre..."
+      placeholder={placeholder}
       onChange={(e) => handleSearch(e.target.value)}
       defaultValue={searchParams.get("q")?.toString()}
     />
