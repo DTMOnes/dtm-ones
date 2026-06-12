@@ -6,7 +6,7 @@ import { flattenValidationErrors } from "next-safe-action";
 
 // Database
 import { db } from "@/lib/db";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 // Vercel Blob
@@ -97,17 +97,6 @@ export const uploadPlayerVideo = actionClient
 
     if (!existingPlayer) {
       throw new Error("Player not found.");
-    }
-
-    const existingVideo = await db.query.playerMedia.findFirst({
-      where: and(
-        eq(playerMedia.playerId, playerId),
-        eq(playerMedia.mediaType, "video"),
-      ),
-    });
-
-    if (existingVideo) {
-      throw new Error("This player already has a presentation video.");
     }
 
     await db.insert(playerMedia).values({

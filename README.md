@@ -1,11 +1,12 @@
 # DTM Ones
 
-Turborepo monorepo with two Next.js apps:
+Turborepo monorepo with three Next.js apps:
 
 | App | Package | Dev URL | Role |
 | --- | --- | --- | --- |
 | Landing | `@dtm/landing` | http://localhost:3000 | Public marketing site |
 | Dashboard | `@dtm/dashboard` | http://localhost:3001 | Admin panel & auth |
+| Landing 2 | `@dtm/landing2` | http://localhost:3002 | Alternate landing (v0 import) |
 
 ## Setup
 
@@ -18,7 +19,7 @@ Environment variables live in `.env` at the **repository root**. Both apps load 
 ## Scripts
 
 ```bash
-pnpm dev          # Run landing + dashboard (Turborepo)
+pnpm dev          # Run all apps (Turborepo)
 pnpm build        # Build all apps
 pnpm lint         # Lint all apps
 
@@ -32,6 +33,7 @@ Run a single app:
 ```bash
 pnpm --filter @dtm/landing dev
 pnpm --filter @dtm/dashboard dev
+pnpm --filter @dtm/landing2 dev
 ```
 
 ## Structure
@@ -39,6 +41,7 @@ pnpm --filter @dtm/dashboard dev
 ```
 apps/
   landing/     # Public site (/, /contact, /roster)
+  landing2/    # Alternate landing (single-page)
   dashboard/   # Admin (/dashboard, /auth, /api/auth)
 packages/
   typescript-config/   # Shared TS configs

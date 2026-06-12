@@ -10,10 +10,10 @@ import { useMemo } from "react";
 import type { PlayerWithRelations } from "@/types/players";
 
 // Components
-import PlayerImageField from "@/components/players/player-image-field";
+import PlayerImageField from "@/components/players/media/player-image-field";
+import PlayerVideoListItem from "@/components/players/media/player-video-list-item";
 import PlayerImagePreview from "@/components/players/player-image-preview";
 import PlayerVideoField from "@/components/players/player-video-field";
-import PlayerVideoPreview from "@/components/players/player-video-preview";
 import {
   Card,
   CardContent,
@@ -40,7 +40,13 @@ export default function PlayerMedia({
   const router = useRouter();
 
   const videos = useMemo(
-    () => player.playerMedia.filter((m) => m.mediaType === "video"),
+    () =>
+      player.playerMedia
+        .filter((m) => m.mediaType === "video")
+        .sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+        ),
     [player.playerMedia],
   );
 
@@ -53,37 +59,38 @@ export default function PlayerMedia({
     <div className="flex flex-col gap-10">
       <Card>
         <CardHeader>
-          <CardTitle>Presentation Video</CardTitle>
+          <CardTitle>Presentation Videos</CardTitle>
           <CardDescription>
-            Add a YouTube link as this player&apos;s presentation video. One link
-            per profile.
+            Add YouTube links as this player&apos;s presentation videos. Paste
+            a URL and save to add more.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          <PlayerVideoField
+            playerId={player.id}
+            onUploadSuccess={() => router.refresh()}
+          />
           {videos.length === 0 ? (
-            <>
-              <Empty className="border border-dashed">
-                <EmptyHeader>
-                  <EmptyMedia variant="icon">
-                    <VideoCameraIcon />
-                  </EmptyMedia>
-                  <EmptyTitle>No video yet</EmptyTitle>
-                  <EmptyDescription>
-                    Paste a YouTube URL so visitors can watch a short
-                    introduction on this profile.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-              <PlayerVideoField
-                playerId={player.id}
-                onUploadSuccess={() => router.refresh()}
-              />
-            </>
+            <Empty className="border border-dashed">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <VideoCameraIcon />
+                </EmptyMedia>
+                <EmptyTitle>No videos yet</EmptyTitle>
+                <EmptyDescription>
+                  Paste a YouTube URL so visitors can watch short introductions
+                  on this profile.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           ) : (
-            <PlayerVideoPreview
-              url={videos[0].url}
-              mediaId={videos[0].id}
-            />
+            <ul className="flex flex-col gap-2 p-4 border border-dashed">
+              {videos.map((m) => (
+                <li key={m.id}>
+                  <PlayerVideoListItem url={m.url} mediaId={m.id} />
+                </li>
+              ))}
+            </ul>
           )}
         </CardContent>
       </Card>
