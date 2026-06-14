@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import Header from "@/components/landing/header";
-import Roster from "@/components/landing/roster";
+import RosterGallery from "@/components/landing/roster-gallery";
+import Footer from "@/components/landing/footer";
 
 import styles from "./page.module.scss";
 
@@ -13,12 +14,15 @@ export const metadata: Metadata = {
 
 export default function RosterPage() {
   return (
-    <main className={styles.page}>
+    <>
       <Header />
-      <Link href="/" className={styles.back}>
-        ← Back home
-      </Link>
-      <Roster />
-    </main>
+      <main className={styles.page}>
+        <Link href="/" className={styles.back}>
+          Back home
+        </Link>
+        <RosterGallery />
+      </main>
+      <Footer />
+    </>
   );
 }

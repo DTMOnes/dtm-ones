@@ -1,34 +1,26 @@
-"use client";
-
-// Next
-import Link from "next/link";
-
 // Styles
 import styles from "./styles.module.scss";
 
-export default function HeroSection() {
+export default function Hero() {
   return (
-    <section id="hero" className={styles.container}>
-      <div className={styles.content}>
-        <h1 className={styles.title}>
-          The name <br /> talent <br /> trusts
-        </h1>
-
-        <Link href="/roster" className={styles.button}>
-          Check Our Roster
-        </Link>
+    <section id="hero" className={styles.container} aria-label="Introduction">
+      <div className={styles.background} aria-hidden="true">
+        <div className={styles.background_image} />
+        <div className={styles.background_overlay} />
+        <div className={styles.background_ellipse_blue} />
+        <div className={styles.background_ellipse_red} />
       </div>
-
-      <video
-        className={styles.video}
-        src="https://gpkuudzvcgjdfquuodpo.supabase.co/storage/v1/object/public/public-assets/YTDown.com_Shorts_Steph-Curry-s-shot-in-Slow-Motion-shorts_Media_iQVNOyQES0A_001_1080p.mp4"
-        autoPlay
-        muted
-        loop
-        onCanPlay={() => {
-          console.log("can play");
-        }}
-      />
+      <h1 className={styles.title}>
+        THE NAME <br /> TALENT TRUSTS
+      </h1>
+      <p className={styles.subtitle}>
+        We are a full-service talent agency that represents a wide range of
+        talent, from actors to athletes.
+      </p>
+      <div className={styles.button_container}>
+        <button className={styles.button}>Check Our Roster</button>
+        <button className={styles.button}>Contact Us</button>
+      </div>
     </section>
   );
 }

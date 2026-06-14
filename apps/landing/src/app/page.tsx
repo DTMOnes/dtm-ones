@@ -7,11 +7,8 @@ import { useEffect } from "react";
 import { ReactLenis } from "lenis/react";
 
 // Components
-import Header from "@/components/landing/header";
 import Hero from "@/components/landing/hero";
 import About from "@/components/landing/about";
-import Roster from "@/components/landing/roster";
-import Contact from "@/components/landing/contact";
 
 // Styles
 import styles from "./styles.module.scss";
@@ -29,11 +26,8 @@ export default function Page() {
   return (
     <ReactLenis root options={{ lerp: 0.05 }}>
       <main className={styles.main}>
-        <Header />
         <Hero />
         <About />
-        <Roster />
-        <Contact />
       </main>
     </ReactLenis>
   );

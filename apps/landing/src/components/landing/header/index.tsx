@@ -25,30 +25,18 @@ import styles from "./styles.module.scss";
 
 const SECTIONS = [
   { id: "hero", label: "Home", href: "/#hero" },
-  { id: "about", label: "About", href: "/#about" },
-  { id: "roster", label: "Roster", href: "/roster" },
-  { id: "contact", label: "Connect", href: "/contact" },
+  { id: "values", label: "About", href: "/#values" },
+  { id: "roster", label: "Roster", href: "/#roster" },
+  { id: "contact", label: "Connect", href: "/#contact" },
 ] as const;
 
 const LOGO_LIGHT = "/assets/dtm-ones-logo.svg";
 const LOGO_DARK = "/assets/dtm-ones-logo-black.svg";
 
 const SOCIALS = [
-  {
-    label: "Instagram",
-    href: "#",
-    Icon: InstagramLogoIcon,
-  },
-  {
-    label: "Tiktok",
-    href: "#",
-    Icon: TiktokLogoIcon,
-  },
-  {
-    label: "Youtube",
-    href: "#",
-    Icon: YoutubeLogoIcon,
-  },
+  { label: "Instagram", href: "#", Icon: InstagramLogoIcon },
+  { label: "Tiktok", href: "#", Icon: TiktokLogoIcon },
+  { label: "Youtube", href: "#", Icon: YoutubeLogoIcon },
 ] as const;
 
 export default function Header() {
@@ -91,21 +79,37 @@ export default function Header() {
 
   return (
     <>
-      <header className={`${styles.bar} ${open ? styles.barMenuOpen : ""}`}>
-        <Link href="/" className={styles.logoWrap} aria-label="Home">
+      <header className={`${styles.bar} ${open ? styles.barOpen : ""}`}>
+        <Link href="/" className={styles.logoWrap} aria-label="DTM Ones home">
           <Image
             src={open ? LOGO_DARK : LOGO_LIGHT}
             alt=""
-            width={160}
-            height={48}
-            className={open ? styles.logoDark : styles.logo}
+            width={140}
+            height={42}
+            className={styles.logo}
             priority
           />
         </Link>
 
+        <nav className={styles.desktopNav} aria-label="Primary">
+          <ul className={styles.desktopList}>
+            {SECTIONS.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={item.href}
+                  className={styles.desktopLink}
+                  onClick={(e) => onSectionLinkClick(e, item.id)}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         <button
           type="button"
-          className={`${styles.menuTrigger} ${open ? styles.menuTriggerOnLight : ""}`}
+          className={`${styles.menuTrigger} ${open ? styles.menuTriggerOpen : ""}`}
           aria-expanded={open}
           aria-controls="site-menu"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -114,11 +118,7 @@ export default function Header() {
           {open ? (
             <XIcon weight="regular" className={styles.menuIcon} aria-hidden />
           ) : (
-            <ListIcon
-              weight="regular"
-              className={styles.menuIcon}
-              aria-hidden
-            />
+            <ListIcon weight="regular" className={styles.menuIcon} aria-hidden />
           )}
         </button>
       </header>
@@ -143,46 +143,38 @@ export default function Header() {
               exit={{ y: 8, opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className={styles.menuMain}>
-                <nav className={styles.nav} aria-label="Primary">
-                  <ul className={styles.navList}>
-                    {SECTIONS.map((item) => (
-                      <li key={item.id}>
-                        <Link
-                          href={item.href}
-                          className={styles.navLink}
-                          onClick={(e) => onSectionLinkClick(e, item.id)}
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
+              <nav className={styles.nav} aria-label="Primary mobile">
+                <ul className={styles.navList}>
+                  {SECTIONS.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={item.href}
+                        className={styles.navLink}
+                        onClick={(e) => onSectionLinkClick(e, item.id)}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
 
-                <div className={styles.overlaySocial}>
-                  <ul className={styles.socials}>
-                    {SOCIALS.map(({ label, href, Icon }) => (
-                      <li key={label}>
-                        <Link
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.socialsLink}
-                          onClick={() => setOpen(false)}
-                        >
-                          {label}
-                          <Icon
-                            size={24}
-                            className={styles.socialsIcon}
-                            aria-hidden
-                          />
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              <ul className={styles.socials}>
+                {SOCIALS.map(({ label, href, Icon }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.socialsLink}
+                      onClick={() => setOpen(false)}
+                    >
+                      {label}
+                      <Icon size={22} className={styles.socialsIcon} aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </motion.div>
           </motion.div>
         ) : null}

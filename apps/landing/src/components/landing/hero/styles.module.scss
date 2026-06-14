@@ -1,73 +1,94 @@
+@use "styles/typography" as type;
+
 .container {
   width: 100%;
   height: 100dvh;
   position: relative;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 50px;
 }
 
-.content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 60px;
-}
-
-.title {
-  font-family: var(--font-bebas-neue);
-  font-size: 148px;
-  font-weight: 700;
-  color: #ffffff;
-  text-align: center;
-  text-transform: uppercase;
-  line-height: 0.9;
-  letter-spacing: -3%;
-}
-
-.button {
-  /* Layout */
-  width: 200px;
-  height: 45px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  /* Typography */
-  font-family: var(--font-bebas-neue);
-  font-size: 20px;
-  color: #ffffff;
-
-  /* Box */
-  cursor: pointer;
-  border-radius: 4px;
-  background: radial-gradient(ellipse at 75% 0%, #166dbe 0%, #0084ff 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.video {
+.background {
   width: 100%;
   height: 100%;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  object-fit: cover;
-  opacity: 20%;
-  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
-@media (max-width: 1024px) {
-  .title {
-    font-size: 124px;
-  }
+.background_image {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background: url("/assets/images/hero-background.png") center / cover no-repeat;
+  filter: grayscale(100%);
+  opacity: 0.15;
 }
 
-@media (max-width: 480px) {
-  .title {
-    font-size: 96px;
-  }
+.background_overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgb(29, 29, 29) 0%,
+    rgba(29, 29, 29, 0) 100%
+  );
+}
+
+.background_ellipse_blue {
+  width: 90%;
+  height: 65%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-35%, -50%);
+  background-color: var(--color-light-blue);
+  border-radius: 100%;
+  filter: blur(150px);
+  opacity: 0.2;
+}
+
+.background_ellipse_red {
+  width: 90%;
+  height: 65%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(35%, -50%);
+  background-color: var(--color-red);
+  border-radius: 100%;
+  filter: blur(150px);
+  opacity: 0.2;
+}
+
+.title {
+  @include type.title-main;
+}
+
+.subtitle {
+  @include type.body-main;
+  width: 500px;
+}
+
+.button_container {
+  display: flex;
+  gap: 20px;
+}
+
+.button {
+  @include type.button-main;
+}
+
+.title,
+.subtitle,
+.button_container {
+  z-index: 1;
 }
