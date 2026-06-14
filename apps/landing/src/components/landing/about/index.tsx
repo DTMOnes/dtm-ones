@@ -6,9 +6,6 @@ import { useRef } from "react";
 // Motion
 import { motion, useScroll, useTransform } from "motion/react";
 
-// Components
-import BasketballCourt from "./basketball-court";
-
 // Styles
 import styles from "./styles.module.scss";
 
@@ -35,10 +32,10 @@ export default function About() {
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end start"],
+    offset: ["start end", "end end"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <section
@@ -47,10 +44,14 @@ export default function About() {
       className={styles.container}
       aria-label="About"
     >
-      <div className={styles.court} aria-hidden="true">
-        <motion.div className={styles.court_motion} style={{ y }}>
-          <BasketballCourt className={styles.court_svg} />
-        </motion.div>
+      <div className={styles.background}>
+        <motion.div className={styles.blob_blue} style={{ y }}></motion.div>
+        <motion.div className={styles.blob_red} style={{ y }}></motion.div>
+
+        <div className={styles.court}>
+          <motion.div className={styles.blob_blue} style={{ y }}></motion.div>
+          <motion.div className={styles.blob_red} style={{ y }}></motion.div>
+        </div>
       </div>
 
       {content.map((item, index) => (

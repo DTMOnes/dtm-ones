@@ -9,6 +9,7 @@ import { ReactLenis } from "lenis/react";
 // Components
 import Hero from "@/components/landing/hero";
 import About from "@/components/landing/about";
+import Roster from "@/components/landing/roster";
 
 // Styles
 import styles from "./styles.module.scss";
@@ -28,6 +29,7 @@ export default function Page() {
       <main className={styles.main}>
         <Hero />
         <About />
+        <Roster />
       </main>
     </ReactLenis>
   );
