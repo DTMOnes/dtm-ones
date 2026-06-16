@@ -1,0 +1,91 @@
+@use "styles/typography" as type;
+
+.container {
+  width: 100%;
+  padding: 120px 120px;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.content {
+  width: var(--content-width);
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.wrapper_content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+
+  .title {
+    @include type.title-main;
+  }
+
+  .subtitle {
+    @include type.body-main;
+    width: 500px;
+    text-align: start;
+  }
+}
+
+.socials {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+
+  .title {
+    @include type.anton-ui;
+  }
+
+  .links {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+
+    a {
+      @include type.anton-ui;
+      opacity: 0.5;
+      transition: opacity 0.2s ease;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.form {
+  width: 500px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.button_container {
+  display: flex;
+  gap: 20px;
+}
+
+.button {
+  @include type.button-main;
+}

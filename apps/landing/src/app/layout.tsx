@@ -15,7 +15,7 @@ const anton = Anton({
 });
 
 export const metadata: Metadata = {
-  title: "DTM Ones — The Name Talent Trusts",
+  title: "DTM ONES",
   description:
     "Basketball talent agency built on 25 years of trust. Connecting players and coaches with opportunities worldwide.",
 };

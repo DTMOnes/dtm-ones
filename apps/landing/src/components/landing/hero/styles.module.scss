@@ -5,10 +5,8 @@
   height: 100dvh;
   position: relative;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 50px;
 }
 
 .background {
@@ -43,30 +41,30 @@
   );
 }
 
-.background_ellipse_blue {
-  width: 90%;
-  height: 65%;
+.background_blob {
+  width: 100%;
+  height: 50dvh;
   position: absolute;
   top: 0;
-  left: 0;
-  transform: translate(-35%, -50%);
-  background-color: var(--color-light-blue);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(
+    to right,
+    var(--color-light-blue) 0%,
+    var(--color-red) 100%
+  );
   border-radius: 100%;
-  filter: blur(150px);
-  opacity: 0.2;
+  filter: blur(750);
+  opacity: 0.3;
 }
 
-.background_ellipse_red {
-  width: 90%;
-  height: 65%;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(35%, -50%);
-  background-color: var(--color-red);
-  border-radius: 100%;
-  filter: blur(150px);
-  opacity: 0.2;
+.content {
+  width: var(--content-width);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
 }
 
 .title {

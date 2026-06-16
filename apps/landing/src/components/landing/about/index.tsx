@@ -32,10 +32,12 @@ export default function About() {
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end end"],
+    offset: ["start end", "end start"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "200%"]);
+  const x = useTransform(scrollYProgress, [0, 1], ["90%", "0%"]);
+  const rotate = useTransform(scrollYProgress, [0, 1], ["0deg", "180deg"]);
 
   return (
     <section
@@ -45,24 +47,30 @@ export default function About() {
       aria-label="About"
     >
       <div className={styles.background}>
-        <motion.div className={styles.blob_blue} style={{ y }}></motion.div>
-        <motion.div className={styles.blob_red} style={{ y }}></motion.div>
+        <motion.div
+          className={styles.outer_blob}
+          style={{ y, x, rotate }}
+        ></motion.div>
 
         <div className={styles.court}>
-          <motion.div className={styles.blob_blue} style={{ y }}></motion.div>
-          <motion.div className={styles.blob_red} style={{ y }}></motion.div>
+          <motion.div
+            className={styles.inner_blob}
+            style={{ y, x, rotate }}
+          ></motion.div>
         </div>
       </div>
 
-      {content.map((item, index) => (
-        <div key={index} className={styles.item}>
-          <span className={styles.index}>0{index + 1}</span>
-          <div className={styles.content}>
-            <h2 className={styles.title}>{item.title}</h2>
-            <p className={styles.description}>{item.description}</p>
+      <div className={styles.content}>
+        {content.map((item, index) => (
+          <div key={index} className={styles.item}>
+            <span className={styles.index}>0{index + 1}</span>
+            <div className={styles.item_content}>
+              <h2 className={styles.title}>{item.title}</h2>
+              <p className={styles.description}>{item.description}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
   );
 }

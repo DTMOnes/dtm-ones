@@ -1,10 +1,30 @@
-@mixin title-main {
+@mixin anton-display {
   font-family: var(--font-title);
-  font-size: var(--title-size);
+  font-size: var(--anton-size-display);
   line-height: 1;
   text-transform: uppercase;
   text-align: center;
   color: var(--color-white);
+}
+
+@mixin anton-player {
+  font-family: var(--font-title);
+  font-size: var(--anton-size-player);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+@mixin anton-ui {
+  font-family: var(--font-title);
+  font-size: var(--anton-size-ui);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+@mixin title-main {
+  @include anton-display;
 }
 
 @mixin body-main {
@@ -25,10 +45,7 @@
   border: none;
   border-radius: 4px;
 
-  font-family: var(--font-title);
-  font-size: var(--button-size);
-  line-height: 1.1;
-  text-transform: uppercase;
+  @include anton-ui;
   text-align: center;
   color: var(--color-dark-gray);
 }

@@ -115,12 +115,23 @@ textarea {
 /* ── Design Tokens ──────────────────────────────────── */
 
 :root {
+  --content-width: 1280px;
+
   --font-title: var(--font-anton);
   --font-body: var(--font-poppins);
 
-  --title-size: 96px;
-  --body-size: 16px;
+
+  /* Anton type scale */
+  --anton-size-display: 84px;
+  --anton-size-player: 32px;
+  --anton-size-ui: 18px;
+
+  /* Aliases (legacy) */
+  --title-size: var(--anton-size-display);
   --button-size: 16px;
+  /* deprecated: migrate to --anton-size-ui in phase 2 */
+
+  --body-size: 16px;
 
   --spacing-sm: 16px;
   --spacing-md: 32px;
@@ -132,3 +143,11 @@ textarea {
   --color-light-blue: #0084ff;
   --color-red: #ff0000;
 }
+
+/* @media (max-width: 768px) {
+  :root {
+    --anton-size-display: 64px;
+    --anton-size-player: 24px;
+    --anton-size-ui: 18px;
+  }
+} */
