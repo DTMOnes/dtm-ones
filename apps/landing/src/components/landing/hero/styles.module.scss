@@ -90,3 +90,9 @@
 .button_container {
   z-index: 1;
 }
+
+@media (max-width: 1280px) {
+  .button_container {
+    flex-direction: column;
+  }
+}

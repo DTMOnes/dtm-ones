@@ -62,13 +62,15 @@ export default function About() {
 
       <div className={styles.content}>
         {content.map((item, index) => (
-          <div key={index} className={styles.item}>
-            <span className={styles.index}>0{index + 1}</span>
+          <article key={index} className={styles.item}>
+            <span className={styles.index} aria-hidden="true">
+              0{index + 1}
+            </span>
             <div className={styles.item_content}>
               <h2 className={styles.title}>{item.title}</h2>
               <p className={styles.description}>{item.description}</p>
             </div>
-          </div>
+          </article>
         ))}
       </div>
     </section>

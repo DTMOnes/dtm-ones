@@ -144,10 +144,10 @@ textarea {
   --color-red: #ff0000;
 }
 
-/* @media (max-width: 768px) {
+@media (max-width: 1280px) {
   :root {
-    --anton-size-display: 64px;
+    --anton-size-display: 72px;
     --anton-size-player: 24px;
-    --anton-size-ui: 18px;
+    --anton-size-ui: 16px;
   }
-} */
+}

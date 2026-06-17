@@ -89,3 +89,9 @@
 .button {
   @include type.button-main;
 }
+
+@media (max-width: 1280px) {
+  .content {
+    flex-direction: column;
+  }
+}

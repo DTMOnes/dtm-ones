@@ -67,13 +67,14 @@
 }
 
 .item {
+  width: 80%;
+  max-width: 950px;
   position: relative;
-  z-index: 1;
-  width: 950px;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: start;
   gap: 75px;
+  z-index: 1;
 }
 
 .index {

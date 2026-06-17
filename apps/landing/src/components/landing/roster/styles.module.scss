@@ -35,13 +35,14 @@
 .cards_container {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 20px;
 }
 
 .card {
-  width: 380px;
-  height: 480px;
+  width: 300px;
+  aspect-ratio: 4/5;
   padding: 32px 20px;
   position: relative;
   display: flex;
