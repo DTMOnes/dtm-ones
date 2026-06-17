@@ -23,6 +23,8 @@ import {
   deletePlayerVideoSchema,
 } from "@/lib/validation/player-media";
 
+const blobImageMediaTypes = ["image", "institutional_picture"];
+
 export const uploadPlayerImage = actionClient
   .metadata({ actionName: "uploadPlayerImage" })
   .inputSchema(uploadPlayerImageSchema, {
@@ -31,7 +33,7 @@ export const uploadPlayerImage = actionClient
     },
   })
   .action(async ({ parsedInput }) => {
-    const { playerId, url } = parsedInput;
+    const { playerId, mediaType, url } = parsedInput;
 
     const existingPlayer = await db.query.players.findFirst({
       where: eq(players.id, playerId),
@@ -43,7 +45,7 @@ export const uploadPlayerImage = actionClient
 
     await db.insert(playerMedia).values({
       playerId: existingPlayer.id,
-      mediaType: "image",
+      mediaType,
       url,
     });
 
@@ -68,7 +70,7 @@ export const deletePlayerImage = actionClient
       throw new Error("Image not found.");
     }
 
-    if (mediaToDelete.mediaType !== "image") {
+    if (!blobImageMediaTypes.includes(mediaToDelete.mediaType)) {
       throw new Error("Only images can be deleted with this action.");
     }
 

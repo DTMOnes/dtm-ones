@@ -55,6 +55,14 @@ export default function PlayerMedia({
     [player.playerMedia],
   );
 
+  const institutionalPictures = useMemo(
+    () =>
+      player.playerMedia.filter(
+        (m) => m.mediaType === "institutional_picture",
+      ),
+    [player.playerMedia],
+  );
+
   return (
     <div className="flex flex-col gap-10">
       <Card>
@@ -88,6 +96,51 @@ export default function PlayerMedia({
               {videos.map((m) => (
                 <li key={m.id}>
                   <PlayerVideoListItem url={m.url} mediaId={m.id} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Institutional Picture</CardTitle>
+          <CardDescription>
+            Upload the transparent-background player photo used on the landing
+            page.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <PlayerImageField
+            playerId={player.id}
+            mediaType="institutional_picture"
+            label="Institutional Picture"
+            onUploadSuccess={() => router.refresh()}
+          />
+          {institutionalPictures.length === 0 ? (
+            <Empty className="border border-dashed">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <ImageSquareIcon />
+                </EmptyMedia>
+                <EmptyTitle>No institutional picture yet</EmptyTitle>
+                <EmptyDescription>
+                  Add the cutout player image that will be used in landing page
+                  roster sections.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <ul className="p-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 border border-dashed">
+              {institutionalPictures.map((m) => (
+                <li key={m.id}>
+                  <PlayerImagePreview
+                    url={m.url}
+                    alt={`${player.fullName} institutional picture`}
+                    className="w-full"
+                    mediaId={m.id}
+                  />
                 </li>
               ))}
             </ul>

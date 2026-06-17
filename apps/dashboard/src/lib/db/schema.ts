@@ -182,6 +182,7 @@ export const playerCategoriesRelations = relations(
 
 export const playerMediaTypes = pgEnum("player_media_types", [
   "image",
+  "institutional_picture",
   "video",
 ]);
 

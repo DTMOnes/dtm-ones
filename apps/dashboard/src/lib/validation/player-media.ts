@@ -13,6 +13,7 @@ export const youtubeVideoUrlSchema = z
 
 export const uploadPlayerImageSchema = z.object({
   playerId: z.uuid(),
+  mediaType: z.enum(["image", "institutional_picture"]).default("image"),
   url: z.url(),
 });
 

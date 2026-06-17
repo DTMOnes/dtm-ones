@@ -22,9 +22,13 @@ import UploadImageButton from "./upload-image-button";
 
 export default function PlayerImageField({
   playerId,
+  mediaType = "image",
+  label = "Player Image",
   onUploadSuccess,
 }: {
   playerId: string;
+  mediaType?: "image" | "institutional_picture";
+  label?: string;
   onUploadSuccess?: () => void;
 }) {
   const router = useRouter();
@@ -52,7 +56,7 @@ export default function PlayerImageField({
         selected,
         `player-assets/${crypto.randomUUID()}`,
       );
-      await executeAsync({ playerId, url: blob.url });
+      await executeAsync({ playerId, mediaType, url: blob.url });
     } finally {
       setIsBlobUploading(false);
     }
@@ -60,7 +64,7 @@ export default function PlayerImageField({
 
   return (
     <ImageField
-      label="Player Image"
+      label={label}
       file={file}
       onFileChange={setFile}
       disabled={isUploading}

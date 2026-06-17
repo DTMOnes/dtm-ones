@@ -150,7 +150,11 @@ export const deletePlayer = authClient
     }
 
     const imageUrls = player.playerMedia
-      .filter((media) => media.mediaType === "image")
+      .filter(
+        (media) =>
+          media.mediaType === "image" ||
+          media.mediaType === "institutional_picture",
+      )
       .map((media) => media.url);
 
     await Promise.all(imageUrls.map((url) => del(url)));
