@@ -71,16 +71,6 @@
   }
 }
 
-.form {
-  width: 500px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 20px;
-}
-
 .button_container {
   display: flex;
   gap: 20px;
@@ -90,8 +80,52 @@
   @include type.button-main;
 }
 
-@media (max-width: 1280px) {
+@media (width < 1440px) {
+  .container {
+    padding: 60px 120px;
+  }
+}
+
+@media (width < 1280px) {
+  .container {
+    padding: 120px 120px;
+  }
+
   .content {
+    width: 100%;
     flex-direction: column;
+    align-items: center;
+    gap: 60px;
+  }
+
+  .wrapper_content {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+
+    .title,
+    .subtitle {
+      text-align: center;
+    }
+  }
+}
+
+@media (width < 768px) {
+  .container {
+    padding: 60px 0;
+  }
+
+  .wrapper_content {
+    .subtitle {
+      width: 70%;
+    }
+  }
+}
+
+@media (width < 420px) {
+  .wrapper_content {
+    .subtitle {
+      width: 85%;
+    }
   }
 }

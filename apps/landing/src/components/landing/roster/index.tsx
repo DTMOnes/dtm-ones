@@ -5,31 +5,12 @@ import Image from "next/image";
 // Styles
 import styles from "./styles.module.scss";
 
-const mockPlayers = [
-  {
-    number: 24,
-    name: "Christian Alaekwe",
-    category: "Point Guard",
-    league: "European League",
-    image: "/assets/images/christian-alaekwe.png",
-  },
-  {
-    number: 24,
-    name: "Christian Alaekwe",
-    category: "Point Guard",
-    league: "European League",
-    image: "/assets/images/christian-alaekwe.png",
-  },
-  {
-    number: 24,
-    name: "Christian Alaekwe",
-    category: "Point Guard",
-    league: "European League",
-    image: "/assets/images/christian-alaekwe.png",
-  },
-];
+// Types
+import type { Player } from "@/types/player";
 
-export default function Roster() {
+export default function Roster({ players }: { players: Player[] }) {
+  console.log(players);
+
   return (
     <section id="roster" className={styles.container} aria-label="Roster">
       <div className={styles.content}>
@@ -43,7 +24,7 @@ export default function Roster() {
         </Link>
 
         <div className={styles.cards_container}>
-          {mockPlayers.map((player) => (
+          {players.map((player) => (
             <div className={styles.card}>
               <div className={styles.image_container}>
                 <div className={styles.image_background}></div>

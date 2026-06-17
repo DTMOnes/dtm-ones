@@ -29,6 +29,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  background-color: var(--color-dark-gray);
 }
 
 /* ── Media ─────────────────────────────────────────────── */
@@ -144,10 +145,28 @@ textarea {
   --color-red: #ff0000;
 }
 
-@media (max-width: 1280px) {
+@media (width < 1280px) {
   :root {
     --anton-size-display: 72px;
     --anton-size-player: 24px;
     --anton-size-ui: 16px;
+  }
+}
+
+@media (width < 768px) {
+  :root {
+    --anton-size-display: 64px;
+    --anton-size-player: 24px;
+    --anton-size-ui: 16px;
+    --body-size: 14px;
+  }
+}
+
+@media (width < 520px) {
+  :root {
+    --anton-size-display: 48px;
+    --anton-size-player: 20px;
+    --anton-size-ui: 14px;
+    --body-size: 12px;
   }
 }

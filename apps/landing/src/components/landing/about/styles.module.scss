@@ -95,6 +95,46 @@
 
 .description {
   @include type.body-main;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   text-align: left;
+}
+
+@media (width < 1280px) {
+  .court {
+    -webkit-mask-size: auto 100%;
+    mask-size: auto 100%;
+    -webkit-mask-position: center top;
+    mask-position: center top;
+  }
+
+  .item {
+    gap: 50px;
+  }
+}
+
+@media (width < 768px) {
+  .item {
+    width: 85%;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .index {
+    text-align: left;
+  }
+
+  .item_content {
+    gap: 30px;
+  }
+}
+
+@media (width < 520px) {
+  .container {
+    padding: 200px 0;
+  }
+
+  .content {
+    gap: 350px;
+  }
 }

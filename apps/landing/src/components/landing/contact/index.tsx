@@ -35,20 +35,6 @@ export default function Contact() {
               basketball, careers, and opportunities.
             </p>
           </div>
-          <div className={styles.socials}>
-            <p className={styles.title}>Our Socials</p>
-            <div className={styles.links}>
-              {socials.map((social) => (
-                <Link
-                  key={social.name}
-                  href={social.href}
-                  className={styles.link}
-                >
-                  {social.name}
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
 
         <Form />

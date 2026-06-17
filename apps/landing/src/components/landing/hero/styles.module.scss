@@ -73,7 +73,8 @@
 
 .subtitle {
   @include type.body-main;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .button_container {
@@ -91,8 +92,14 @@
   z-index: 1;
 }
 
-@media (max-width: 1280px) {
+@media (width < 1280px) {
   .button_container {
     flex-direction: column;
+  }
+}
+
+@media (width < 600px) {
+  .subtitle {
+    width: 80%;
   }
 }

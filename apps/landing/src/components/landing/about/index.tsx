@@ -35,7 +35,7 @@ export default function About() {
     offset: ["start end", "end start"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "200%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "225%"]);
   const x = useTransform(scrollYProgress, [0, 1], ["90%", "0%"]);
   const rotate = useTransform(scrollYProgress, [0, 1], ["0deg", "180deg"]);
 

@@ -1,0 +1,41 @@
+<svg width="1440" height="2720" viewBox="0 0 1440 2720" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_238_143)">
+<path d="M120 168L120 2552C120 2556.42 123.582 2560 128 2560H1312C1316.42 2560 1320 2556.42 1320 2552L1320 168C1320 163.582 1316.42 160 1312 160H128C123.582 160 120 163.582 120 168Z" stroke="white" stroke-opacity="0.55" stroke-width="7"/>
+<path d="M120 1360H1320" stroke="white" stroke-opacity="0.55" stroke-width="7"/>
+<path d="M912 1360C912 1253.96 826.039 1168 720 1168C613.961 1168 528 1253.96 528 1360C528 1466.04 613.961 1552 720 1552C826.039 1552 912 1466.04 912 1360Z" stroke="white" stroke-opacity="0.4" stroke-width="7"/>
+<path d="M736 1360C736 1351.16 728.837 1344 720 1344C711.163 1344 704 1351.16 704 1360C704 1368.84 711.163 1376 720 1376C728.837 1376 736 1368.84 736 1360Z" fill="white" fill-opacity="0.4"/>
+<path d="M448 2040L448 2560H992V2040H448Z" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.35" stroke-width="7"/>
+<path d="M448 2560L448 2040" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M992 2560V2040" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M448 2040H992" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M448 2040C448 1967.86 476.657 1898.68 527.667 1847.67C578.677 1796.66 647.861 1768 720 1768C792.139 1768 861.323 1796.66 912.333 1847.67C963.343 1898.68 992 1967.86 992 2040" stroke="white" stroke-opacity="0.45" stroke-width="7" stroke-dasharray="5 4"/>
+<path d="M992 2040C992 2112.14 963.343 2181.32 912.333 2232.33C861.323 2283.34 792.139 2312 720 2312C647.861 2312 578.677 2283.34 527.667 2232.33C476.657 2181.32 448 2112.14 448 2040" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M620 2368C648.378 2345.28 683.647 2332.9 720 2332.9C756.353 2332.9 791.622 2345.28 820 2368" stroke="white" stroke-opacity="0.3" stroke-width="7"/>
+<path d="M652 2488H788" stroke="white" stroke-opacity="0.7" stroke-width="7"/>
+<path d="M748 2448C748 2432.54 735.464 2420 720 2420C704.536 2420 692 2432.54 692 2448C692 2463.46 704.536 2476 720 2476C735.464 2476 748 2463.46 748 2448Z" stroke="white" stroke-opacity="0.7" stroke-width="7"/>
+<path d="M360 2560V2340C467.984 2272.61 592.715 2236.89 720 2236.89C847.285 2236.89 972.016 2272.61 1080 2340V2560" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M360 2560V2340" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M1080 2560V2340" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M448 160L448 680H992V160H448Z" fill="white" fill-opacity="0.07" stroke="white" stroke-opacity="0.35" stroke-width="7"/>
+<path d="M448 680L448 160" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M992 680V160" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M448 680H992" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M448 680C448 752.139 476.657 821.323 527.667 872.333C578.677 923.343 647.861 952 720 952C792.139 952 861.323 923.343 912.333 872.333C963.343 821.323 992 752.139 992 680" stroke="white" stroke-opacity="0.45" stroke-width="7" stroke-dasharray="5 4"/>
+<path d="M992 680C992 607.861 963.343 538.677 912.333 487.667C861.323 436.657 792.139 408 720 408C647.861 408 578.677 436.657 527.667 487.667C476.657 538.677 448 607.861 448 680" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M620 352C648.378 374.721 683.647 387.1 720 387.1C756.353 387.1 791.622 374.721 820 352" stroke="white" stroke-opacity="0.3" stroke-width="7"/>
+<path d="M652 232H788" stroke="white" stroke-opacity="0.7" stroke-width="7"/>
+<path d="M748 272C748 256.536 735.464 244 720 244C704.536 244 692 256.536 692 272C692 287.464 704.536 300 720 300C735.464 300 748 287.464 748 272Z" stroke="white" stroke-opacity="0.7" stroke-width="7"/>
+<path d="M360 160V380C467.984 447.386 592.715 483.112 720 483.112C847.285 483.112 972.016 447.386 1080 380V160" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M360 380V160" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M1080 380V160" stroke="white" stroke-opacity="0.45" stroke-width="7"/>
+<path d="M608 2560V2520" stroke="white" stroke-opacity="0.3" stroke-width="7"/>
+<path d="M832 2560V2520" stroke="white" stroke-opacity="0.3" stroke-width="7"/>
+<path d="M608 200V160" stroke="white" stroke-opacity="0.3" stroke-width="7"/>
+<path d="M832 200V160" stroke="white" stroke-opacity="0.3" stroke-width="7"/>
+</g>
+<defs>
+<clipPath id="clip0_238_143">
+<rect width="2720" height="1440" fill="white" transform="matrix(0 -1 1 0 0 2720)"/>
+</clipPath>
+</defs>
+</svg>
