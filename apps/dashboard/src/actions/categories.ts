@@ -6,7 +6,7 @@ import { authClient } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 
 import { db } from "@/lib/db";
-import { categories, playerCategories } from "@/lib/db/schema";
+import { categories, playerCategories } from "@dtm/db/schema";
 import { and, eq } from "drizzle-orm";
 
 import {

@@ -4,7 +4,7 @@ import type {
   playerCategories,
   categories,
   playerMedia,
-} from "@/lib/db/schema";
+} from "@dtm/db/schema";
 
 export type Player = InferSelectModel<typeof players>;
 

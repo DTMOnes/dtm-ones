@@ -6,7 +6,7 @@ import UserProfileSections from "@/components/users/user-profile-sections";
 
 // Db + Drizzle
 import { db } from "@/lib/db";
-import { user } from "@/lib/db/schema";
+import { user } from "@dtm/db/schema";
 import { eq } from "drizzle-orm";
 
 // Lib

@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Components
 import EditPlayerForm from "@/components/players/edit-player-form";
 import DeletePlayerCard from "@/components/players/delete-player-card";
-import PlayerMedia from "@/components/players/player-media";
+import PlayerMedia from "@/components/players/media/player-media";
 
 export default function PlayerProfileTabs({
   player,

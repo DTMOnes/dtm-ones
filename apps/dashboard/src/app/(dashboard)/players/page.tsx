@@ -8,7 +8,7 @@ import SearchBar from "@/components/players/search-bar";
 
 // Db + Drizzle
 import { db } from "@/lib/db";
-import { players, playerCategories } from "@/lib/db/schema";
+import { players, playerCategories } from "@dtm/db/schema";
 import { and, desc, eq, exists, ilike } from "drizzle-orm";
 
 // Shadcn

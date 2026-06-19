@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 // Db + Drizzle
 import { db } from "@/lib/db";
-import { players } from "@/lib/db/schema";
+import { players } from "@dtm/db/schema";
 import { eq } from "drizzle-orm";
 
 // Components

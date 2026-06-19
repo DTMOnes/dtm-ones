@@ -6,7 +6,7 @@ import CreateUserDialog from "@/components/users/create-user-dialog";
 
 // Db + Drizzle
 import { db } from "@/lib/db";
-import { user } from "@/lib/db/schema";
+import { user } from "@dtm/db/schema";
 import { desc } from "drizzle-orm";
 
 // Shadcn

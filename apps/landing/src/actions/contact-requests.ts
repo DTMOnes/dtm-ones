@@ -8,7 +8,7 @@ import { flattenValidationErrors } from "next-safe-action";
 import { db } from "@/lib/db";
 
 // Schema
-import { contactRequest } from "@/lib/db/schema";
+import { contactRequest } from "@dtm/db/schema";
 
 // Drizzle
 import { eq } from "drizzle-orm";

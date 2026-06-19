@@ -2,6 +2,7 @@
 
 # dependencies (all workspaces — not only repo root)
 node_modules/
+.venv/
 .pnp
 .pnp.*
 .pnpm-store/

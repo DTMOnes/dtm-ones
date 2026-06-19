@@ -1,6 +1,6 @@
 // Db + Drizzle
 import { db } from "@/lib/db";
-import { user } from "@/lib/db/schema";
+import { user } from "@dtm/db/schema";
 import { count, eq } from "drizzle-orm";
 
 export async function countAdminUsers() {

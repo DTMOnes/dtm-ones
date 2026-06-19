@@ -13,7 +13,7 @@ import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
 
 // Schema
-import { players, playerCategories, categories } from "@/lib/db/schema";
+import { players, playerCategories, categories } from "@dtm/db/schema";
 
 // Validation Schema
 import {

@@ -8,7 +8,7 @@ import EditCategoryForm from "@/components/categories/edit-category-form";
 
 // Db + Drizzle
 import { db } from "@/lib/db";
-import { categories } from "@/lib/db/schema";
+import { categories } from "@dtm/db/schema";
 import { eq } from "drizzle-orm";
 
 export default async function Page({

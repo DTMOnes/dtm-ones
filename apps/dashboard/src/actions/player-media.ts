@@ -13,7 +13,7 @@ import { revalidatePath } from "next/cache";
 import { del } from "@vercel/blob";
 
 // Schema
-import { players, playerMedia } from "@/lib/db/schema";
+import { players, playerMedia } from "@dtm/db/schema";
 
 // Validation Schema
 import {

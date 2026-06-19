@@ -1,0 +1,23 @@
+{
+  "name": "@dtm/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:push": "drizzle-kit push --config drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.config.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2"
+  },
+  "devDependencies": {
+    "@dtm/typescript-config": "workspace:*",
+    "@next/env": "16.1.4",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^5"
+  }
+}

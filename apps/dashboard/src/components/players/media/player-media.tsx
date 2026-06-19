@@ -12,8 +12,8 @@ import type { PlayerWithRelations } from "@/types/players";
 // Components
 import PlayerImageField from "@/components/players/media/player-image-field";
 import PlayerVideoListItem from "@/components/players/media/player-video-list-item";
-import PlayerImagePreview from "@/components/players/player-image-preview";
-import PlayerVideoField from "@/components/players/player-video-field";
+import PlayerImagePreview from "@/components/players/media/player-image-preview";
+import PlayerVideoField from "@/components/players/media/player-video-field";
 import {
   Card,
   CardContent,
@@ -57,52 +57,12 @@ export default function PlayerMedia({
 
   const institutionalPictures = useMemo(
     () =>
-      player.playerMedia.filter(
-        (m) => m.mediaType === "institutional_picture",
-      ),
+      player.playerMedia.filter((m) => m.mediaType === "institutional_picture"),
     [player.playerMedia],
   );
 
   return (
     <div className="flex flex-col gap-10">
-      <Card>
-        <CardHeader>
-          <CardTitle>Presentation Videos</CardTitle>
-          <CardDescription>
-            Add YouTube links as this player&apos;s presentation videos. Paste
-            a URL and save to add more.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <PlayerVideoField
-            playerId={player.id}
-            onUploadSuccess={() => router.refresh()}
-          />
-          {videos.length === 0 ? (
-            <Empty className="border border-dashed">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <VideoCameraIcon />
-                </EmptyMedia>
-                <EmptyTitle>No videos yet</EmptyTitle>
-                <EmptyDescription>
-                  Paste a YouTube URL so visitors can watch short introductions
-                  on this profile.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          ) : (
-            <ul className="flex flex-col gap-2 p-4 border border-dashed">
-              {videos.map((m) => (
-                <li key={m.id}>
-                  <PlayerVideoListItem url={m.url} mediaId={m.id} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Institutional Picture</CardTitle>
@@ -115,8 +75,6 @@ export default function PlayerMedia({
           <PlayerImageField
             playerId={player.id}
             mediaType="institutional_picture"
-            label="Institutional Picture"
-            onUploadSuccess={() => router.refresh()}
           />
           {institutionalPictures.length === 0 ? (
             <Empty className="border border-dashed">
@@ -156,10 +114,7 @@ export default function PlayerMedia({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <PlayerImageField
-            playerId={player.id}
-            onUploadSuccess={() => router.refresh()}
-          />
+          <PlayerImageField playerId={player.id} />
           {images.length === 0 ? (
             <Empty className="border border-dashed">
               <EmptyHeader>
@@ -183,6 +138,44 @@ export default function PlayerMedia({
                     className="w-full"
                     mediaId={m.id}
                   />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Presentation Videos</CardTitle>
+          <CardDescription>
+            Add YouTube links as this player&apos;s presentation videos. Paste a
+            URL and save to add more.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <PlayerVideoField
+            playerId={player.id}
+            onUploadSuccess={() => router.refresh()}
+          />
+          {videos.length === 0 ? (
+            <Empty className="border border-dashed">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <VideoCameraIcon />
+                </EmptyMedia>
+                <EmptyTitle>No videos yet</EmptyTitle>
+                <EmptyDescription>
+                  Paste a YouTube URL so visitors can watch short introductions
+                  on this profile.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <ul className="flex flex-col gap-2 p-4 border border-dashed">
+              {videos.map((m) => (
+                <li key={m.id}>
+                  <PlayerVideoListItem url={m.url} mediaId={m.id} />
                 </li>
               ))}
             </ul>
