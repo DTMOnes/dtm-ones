@@ -7,19 +7,13 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { updatePlayer } from "@/actions/players";
-
 // Validation Schema
 import {
   updatePlayerSchema,
   type UpdatePlayerInput,
 } from "@/lib/validation/players";
 
-// Types
-import type { CategoryData } from "@/lib/validation/categories";
-import type { PlayerWithRelations } from "@/types/players";
+import type { ApiPlayer } from "@/lib/api/types";
 
 // Shadcn
 import {
@@ -32,6 +26,8 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useUpdatePlayerMutation } from "@/hooks/api/use-players";
 
 // Components
 import TextField from "@/components/form/text-field";
@@ -42,8 +38,8 @@ export default function EditPlayerForm({
   player,
   categories,
 }: {
-  player: PlayerWithRelations;
-  categories: CategoryData[];
+  player: ApiPlayer;
+  categories: Array<{ id: string; name: string }>;
 }) {
   const router = useRouter();
 
@@ -51,26 +47,16 @@ export default function EditPlayerForm({
     resolver: zodResolver(updatePlayerSchema),
     defaultValues: {
       id: player.id,
-      fullName: player.fullName,
-      dateOfBirth: player.dateOfBirth,
+      fullName: player.full_name,
+      dateOfBirth: player.date_of_birth,
       nationality: player.nationality,
       height: player.height,
-      lastClub: player.lastClub,
-      categoryIds: player.playerCategories.map(({ categoryId }) => categoryId),
+      lastClub: player.last_club,
+      categoryIds: player.categories.map((category) => category.id),
     },
   });
 
-  const { execute, isExecuting } = useAction(updatePlayer, {
-    onSuccess: ({ data }) => {
-      toast.success(data.message);
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error("Failed to update player.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: submitUpdate, isPending } = useUpdatePlayerMutation();
 
   return (
     <FormProvider {...methods}>
@@ -82,7 +68,20 @@ export default function EditPlayerForm({
           </CardDescription>
         </CardHeader>
         <form
-          onSubmit={methods.handleSubmit((data) => execute(data))}
+          onSubmit={methods.handleSubmit((data) =>
+            submitUpdate(data, {
+              onSuccess: () => {
+                toast.success("Player updated successfully.");
+                router.refresh();
+              },
+              onError: (error) => {
+                toast.error("Failed to update player.", {
+                  description:
+                    error instanceof ApiError ? error.message : undefined,
+                });
+              },
+            }),
+          )}
           noValidate
         >
           <CardContent className="pb-6">
@@ -91,43 +90,43 @@ export default function EditPlayerForm({
                 name="fullName"
                 label="Full name"
                 placeholder="John Doe"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <TextField
                 name="dateOfBirth"
                 label="Date of birth"
                 placeholder="DD/MM/YYYY"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <TextField
                 name="nationality"
                 label="Nationality"
                 placeholder="Argentina"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <TextField
                 name="height"
                 label="Height (cm)"
                 placeholder="185"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <TextField
                 name="lastClub"
                 label="Last club"
                 placeholder="Club name"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <OptionsField
                 name="categoryIds"
                 label="Categories"
                 options={categories}
                 emptyMessage="No categories created yet"
-                disabled={isExecuting}
+                disabled={isPending}
               />
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
-            <SubmitButton label="Save changes" isExecuting={isExecuting} />
+            <SubmitButton label="Save changes" isExecuting={isPending} />
           </CardFooter>
         </form>
       </Card>

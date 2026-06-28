@@ -1,13 +1,15 @@
 // Next
 import { notFound } from "next/navigation";
 
-// Db + Drizzle
-import { db } from "@/lib/db";
-import { players } from "@dtm/db/schema";
-import { eq } from "drizzle-orm";
-
 // Components
-import PlayerProfileTabs from "@/components/players/player-profile-tabs";
+import PlayerDetailView from "@/components/players/player-detail-view";
+
+// Lib
+import { ApiError } from "@/lib/api/errors";
+import {
+  getCategoriesServer,
+  getPlayerByIdServer,
+} from "@/lib/api/server-queries";
 
 export default async function Page({
   params,
@@ -16,34 +18,16 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  const player = await db.query.players.findFirst({
-    where: eq(players.id, id),
-    with: {
-      playerCategories: {
-        with: {
-          category: true,
-        },
-      },
-      playerMedia: true,
-    },
+  const [player, categories] = await Promise.all([
+    getPlayerByIdServer(id),
+    getCategoriesServer(""),
+  ]).catch((error: unknown) => {
+    if (error instanceof ApiError && error.status === 404) {
+      notFound();
+    }
+
+    throw error;
   });
 
-  if (!player) {
-    notFound();
-  }
-
-  const categories = await db.query.categories.findMany();
-
-  return (
-    <main className="p-10 flex flex-col gap-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold">{player.fullName}</h1>
-          <p className="text-sm text-muted-foreground">Ficha del jugador</p>
-        </div>
-      </div>
-
-      <PlayerProfileTabs player={player} categories={categories} />
-    </main>
-  );
+  return <PlayerDetailView player={player} categories={categories} />;
 }

@@ -3,40 +3,52 @@
 // Next
 import { useRouter } from "next/navigation";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { deletePlayerVideo } from "@/actions/player-media";
-
 // Shadcn
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useDeletePlayerMediaMutation } from "@/hooks/api/use-player-media";
 
 // Phosphor
 import { TrashIcon } from "@phosphor-icons/react";
 
-export default function DeletePlayerVideo({ id }: { id: string }) {
+export default function DeletePlayerVideo({
+  id,
+  playerId,
+}: {
+  id: string;
+  playerId: string;
+}) {
   const router = useRouter();
-
-  const { execute, isExecuting } = useAction(deletePlayerVideo, {
-    onSuccess: () => {
-      router.refresh();
-    },
-    onError: () => {
-      toast.error("There was an error deleting the video");
-    },
-  });
+  const { mutate: deleteMedia, isPending } = useDeletePlayerMediaMutation();
 
   return (
     <Button
       type="button"
       variant="destructive"
       size="icon"
-      disabled={isExecuting}
+      disabled={isPending}
       aria-label="Delete video"
-      onClick={() => execute({ id })}
+      onClick={() =>
+        deleteMedia(
+          { mediaId: id, playerId },
+          {
+            onSuccess: () => {
+              router.refresh();
+            },
+            onError: (error) => {
+              toast.error(
+                error instanceof ApiError
+                  ? error.message
+                  : "There was an error deleting the video",
+              );
+            },
+          },
+        )
+      }
     >
-      {isExecuting ? <Spinner /> : <TrashIcon className="size-4" />}
+      {isPending ? <Spinner /> : <TrashIcon className="size-4" />}
     </Button>
   );
 }

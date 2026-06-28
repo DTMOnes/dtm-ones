@@ -10,15 +10,12 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
 import { z } from "zod";
-
-// Actions
-import { createCategory } from "@/actions/categories";
 
 // Validation
 import { createCategorySchema } from "@/lib/validation/categories";
+import { ApiError } from "@/lib/api/errors";
+import { useCreateCategoryMutation } from "@/hooks/api/use-categories";
 
 // Components
 import SubmitButton from "@/components/form/submit-button";
@@ -52,18 +49,7 @@ export default function CreateCategoryDialog() {
   });
 
   const { handleSubmit, reset } = methods;
-
-  const { execute, isExecuting } = useAction(createCategory, {
-    onSuccess: ({ data }) => {
-      toast.success(data.message);
-      reset();
-      setOpen(false);
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError ?? "Could not create the category.");
-    },
-  });
+  const { mutate: submitCreateCategory, isPending } = useCreateCategoryMutation();
 
   useEffect(() => {
     if (!open) {
@@ -79,7 +65,7 @@ export default function CreateCategoryDialog() {
           New category
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={!isExecuting}>
+      <DialogContent showCloseButton={!isPending}>
         <DialogHeader>
           <DialogTitle>New category</DialogTitle>
           <DialogDescription>
@@ -89,7 +75,23 @@ export default function CreateCategoryDialog() {
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit((data) => execute(data))}
+            onSubmit={handleSubmit((data) =>
+              submitCreateCategory(data, {
+                onSuccess: () => {
+                  toast.success("Category created successfully.");
+                  reset();
+                  setOpen(false);
+                  router.refresh();
+                },
+                onError: (error) => {
+                  toast.error(
+                    error instanceof ApiError
+                      ? error.message
+                      : "Could not create the category.",
+                  );
+                },
+              }),
+            )}
             className="flex flex-col gap-4"
             noValidate
           >
@@ -97,18 +99,18 @@ export default function CreateCategoryDialog() {
               name="name"
               label="Name"
               placeholder="Ex. First division"
-              disabled={isExecuting}
+              disabled={isPending}
             />
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
-                disabled={isExecuting}
+                disabled={isPending}
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
-              <SubmitButton label="Save" isExecuting={isExecuting} />
+              <SubmitButton label="Save" isExecuting={isPending} />
             </DialogFooter>
           </form>
         </FormProvider>

@@ -6,10 +6,6 @@ import { useState } from "react";
 // Next
 import { useRouter } from "next/navigation";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { deleteCategory } from "@/actions/categories";
-
 // Shadcn
 import {
   AlertDialog,
@@ -31,6 +27,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useDeleteCategoryMutation } from "@/hooks/api/use-categories";
 
 type DeleteCategoryCardProps = {
   categoryId: string;
@@ -45,19 +43,7 @@ export default function DeleteCategoryCard({
 }: DeleteCategoryCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { execute, isExecuting } = useAction(deleteCategory, {
-    onSuccess: ({ data }) => {
-      toast.success(data?.message ?? "Categoría eliminada correctamente.");
-      setIsDeleteDialogOpen(false);
-      router.push("/categories");
-    },
-    onError: ({ error }) => {
-      toast.error("No se pudo eliminar la categoría.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: confirmDelete, isPending } = useDeleteCategoryMutation();
 
   return (
     <Card className="border-destructive ring-destructive/30">
@@ -78,13 +64,13 @@ export default function DeleteCategoryCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!isExecuting) {
+            if (!isPending) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" disabled={isExecuting}>
+            <Button type="button" variant="destructive" disabled={isPending}>
               Delete category
             </Button>
           </AlertDialogTrigger>
@@ -99,16 +85,30 @@ export default function DeleteCategoryCard({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isExecuting}>
+              <AlertDialogCancel disabled={isPending}>
                 Cancel
               </AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isExecuting}
-                onClick={() => execute({ id: categoryId })}
+                disabled={isPending}
+                onClick={() =>
+                  confirmDelete(categoryId, {
+                    onSuccess: (response) => {
+                      toast.success(response.message);
+                      setIsDeleteDialogOpen(false);
+                      router.push("/categories");
+                    },
+                    onError: (error) => {
+                      toast.error("No se pudo eliminar la categoría.", {
+                        description:
+                          error instanceof ApiError ? error.message : undefined,
+                      });
+                    },
+                  })
+                }
               >
-                {isExecuting ? "Deleting..." : "Confirm deletion"}
+                {isPending ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

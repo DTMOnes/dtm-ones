@@ -3,6 +3,8 @@
 # dependencies (all workspaces — not only repo root)
 node_modules/
 .venv/
+venv/
+env/
 .pnp
 .pnp.*
 .pnpm-store/
@@ -27,6 +29,21 @@ dist/
 build/
 *.tsbuildinfo
 
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.pyre/
+.coverage
+coverage.xml
+htmlcov/
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+
 # testing
 coverage/
 playwright-report/
@@ -36,6 +53,7 @@ test-results/
 .env
 .env.*
 !.env.example
+!.env.test.example
 
 # vercel
 .vercel
@@ -45,10 +63,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
+
+# caches
+.cache/
 
 # misc / OS / editors
 .DS_Store
 Thumbs.db
+Desktop.ini
 *.pem
 .eslintcache
 .idea/

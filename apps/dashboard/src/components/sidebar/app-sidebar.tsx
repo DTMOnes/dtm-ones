@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  EnvelopeSimpleIcon,
   FolderIcon,
   UserGearIcon,
   UsersIcon,
@@ -35,6 +36,11 @@ const playersItems: MenuItem[] = [
 ];
 
 const usersItems: MenuItem[] = [
+  {
+    title: "Contact Requests",
+    url: "/contact-requests",
+    icon: EnvelopeSimpleIcon,
+  },
   {
     title: "Users",
     url: "/users",

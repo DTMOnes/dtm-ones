@@ -6,10 +6,6 @@ import { useState } from "react";
 // Next
 import { useRouter } from "next/navigation";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { deleteUser } from "@/actions/users";
-
 // Shadcn
 import {
   AlertDialog,
@@ -31,6 +27,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useDeleteUserMutation } from "@/hooks/api/use-users";
 
 type DeleteUserCardProps = {
   userId: string;
@@ -47,21 +45,9 @@ export default function DeleteUserCard({
 }: DeleteUserCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { mutate: confirmDelete, isPending } = useDeleteUserMutation();
 
-  const { execute, isExecuting } = useAction(deleteUser, {
-    onSuccess: ({ data }) => {
-      toast.success(data?.message ?? "User deleted successfully.");
-      setIsDeleteDialogOpen(false);
-      router.push("/users");
-    },
-    onError: ({ error }) => {
-      toast.error("Could not delete user.", {
-        description: error.serverError,
-      });
-    },
-  });
-
-  const isDisabled = isExecuting || isOnlyAdmin;
+  const isDisabled = isPending || isOnlyAdmin;
 
   return (
     <Card className="border-destructive ring-destructive/30">
@@ -84,7 +70,7 @@ export default function DeleteUserCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!isExecuting) {
+            if (!isPending) {
               setIsDeleteDialogOpen(open);
             }
           }}
@@ -107,16 +93,30 @@ export default function DeleteUserCard({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isExecuting}>
+              <AlertDialogCancel disabled={isPending}>
                 Cancel
               </AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isExecuting}
-                onClick={() => execute({ id: userId })}
+                disabled={isPending}
+                onClick={() =>
+                  confirmDelete(userId, {
+                    onSuccess: (response) => {
+                      toast.success(response.message);
+                      setIsDeleteDialogOpen(false);
+                      router.push("/users");
+                    },
+                    onError: (error) => {
+                      toast.error("Could not delete user.", {
+                        description:
+                          error instanceof ApiError ? error.message : undefined,
+                      });
+                    },
+                  })
+                }
               >
-                {isExecuting ? "Deleting..." : "Confirm deletion"}
+                {isPending ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

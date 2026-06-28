@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
-import { createPlayer } from "@/actions/players";
 import {
   createPlayerSchema,
   type CreatePlayerInput,
 } from "@/lib/validation/players";
+import { ApiError } from "@/lib/api/errors";
+import { useCreatePlayerMutation } from "@/hooks/api/use-players";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -54,19 +54,7 @@ export default function CreatePlayerDialog({
 
   const { handleSubmit, reset } = methods;
 
-  const { execute, isExecuting } = useAction(createPlayer, {
-    onSuccess: ({ data }) => {
-      toast.success(data.message);
-      reset();
-      setOpen(false);
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error("Failed to create player.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: submitCreatePlayer, isPending } = useCreatePlayerMutation();
 
   useEffect(() => {
     if (!open) {
@@ -83,7 +71,7 @@ export default function CreatePlayerDialog({
         </Button>
       </DialogTrigger>
       <DialogContent
-        showCloseButton={!isExecuting}
+        showCloseButton={!isPending}
         className="flex max-h-[90vh] max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
       >
         <DialogHeader className="shrink-0 border-b px-6 py-4">
@@ -95,7 +83,22 @@ export default function CreatePlayerDialog({
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit((data) => execute(data))}
+            onSubmit={handleSubmit((data) =>
+              submitCreatePlayer(data, {
+                onSuccess: () => {
+                  toast.success("Player created successfully.");
+                  reset();
+                  setOpen(false);
+                  router.refresh();
+                },
+                onError: (error) => {
+                  toast.error("Failed to create player.", {
+                    description:
+                      error instanceof ApiError ? error.message : undefined,
+                  });
+                },
+              }),
+            )}
             className="flex min-h-0 flex-1 flex-col"
             noValidate
           >
@@ -105,38 +108,38 @@ export default function CreatePlayerDialog({
                   name="fullName"
                   label="Full name"
                   placeholder="John Doe"
-                  disabled={isExecuting}
+                  disabled={isPending}
                 />
                 <TextField
                   name="dateOfBirth"
                   label="Date of birth"
                   placeholder="DD/MM/YYYY"
-                  disabled={isExecuting}
+                  disabled={isPending}
                 />
                 <TextField
                   name="nationality"
                   label="Nationality"
                   placeholder="Argentina"
-                  disabled={isExecuting}
+                  disabled={isPending}
                 />
                 <TextField
                   name="height"
                   label="Height (cm)"
                   placeholder="185"
-                  disabled={isExecuting}
+                  disabled={isPending}
                 />
                 <TextField
                   name="lastClub"
                   label="Last club"
                   placeholder="Club name"
-                  disabled={isExecuting}
+                  disabled={isPending}
                 />
                 <OptionsField
                   name="categoryIds"
                   label="Categories"
                   options={categories}
                   emptyMessage="No categories created yet"
-                  disabled={isExecuting}
+                  disabled={isPending}
                 />
               </FieldGroup>
             </div>
@@ -144,10 +147,10 @@ export default function CreatePlayerDialog({
               <Button
                 type="submit"
                 variant="outline"
-                disabled={isExecuting}
+                disabled={isPending}
                 aria-label="submit"
               >
-                {isExecuting ? <Spinner /> : "Create player"}
+                {isPending ? <Spinner /> : "Create player"}
               </Button>
             </DialogFooter>
           </form>

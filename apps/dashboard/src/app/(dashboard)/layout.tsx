@@ -1,8 +1,6 @@
 // Next
 import { redirect } from "next/navigation";
 
-import { getSession } from "@/utils/get-session";
-
 // Components
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SiteHeader } from "@/components/sidebar/site-header";
@@ -10,16 +8,25 @@ import { SiteHeader } from "@/components/sidebar/site-header";
 // Shadcn
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
+// Lib
+import { serverApiFetch } from "@/lib/api/server-client";
+import type { ApiAuthSessionUser } from "@/lib/api/types";
+
+async function loadUser(): Promise<ApiAuthSessionUser> {
+  try {
+    return await serverApiFetch<ApiAuthSessionUser>("/auth/me");
+  } catch {
+    // Middleware should prevent this, but guard against an invalid session.
+    redirect("/auth/signin");
+  }
+}
+
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getSession();
-
-  if (!session?.user) {
-    redirect("/auth/signin");
-  }
+  const user = await loadUser();
 
   return (
     <SidebarProvider
@@ -30,11 +37,7 @@ export default async function Layout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar
-        variant="inset"
-        user={session.user}
-        isAdmin={session.user.role === "admin"}
-      />
+      <AppSidebar variant="inset" user={user} isAdmin={user.role === "admin"} />
       <SidebarInset>
         <SiteHeader />
         {children}

@@ -4,18 +4,12 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
-    DATABASE_URL: z.url(),
-    BLOB_READ_WRITE_TOKEN: z.string().min(32),
-    BETTER_AUTH_SECRET: z.string().min(32),
-    BETTER_AUTH_URL: z.url(),
-    /** Only required when running `pnpm db:seed` locally. */
-    DEV_SEED_ADMIN_EMAIL: z.email().optional(),
-    DEV_SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
-    DEV_SEED_ADMIN_NAME: z.string().min(1).optional(),
+    /** Server-side base URL for the FastAPI backend (BFF proxy + RSC fetches). */
+    API_URL: z.url().default("http://localhost:8000"),
   },
 
   client: {
-    NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
+    NEXT_PUBLIC_API_URL: z.url().default("http://localhost:8000"),
   },
 
   /**
@@ -23,7 +17,7 @@ export const env = createEnv({
    * Server variables are read from `process.env` at runtime (see env-nextjs).
    */
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 
   emptyStringAsUndefined: true,

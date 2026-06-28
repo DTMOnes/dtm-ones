@@ -1,14 +1,17 @@
 "use client";
 
+// React
+import { useState } from "react";
+
 // React Hook Form
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Icons
-import { CaretDownIcon } from "@phosphor-icons/react";
-
 // Zod
 import { z } from "zod";
+
+// Actions
+import { createContactRequest } from "@/actions/contact-requests";
 
 // Styles
 import styles from "./styles.module.scss";
@@ -24,6 +27,8 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function Form() {
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -32,14 +37,29 @@ export default function Form() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      reason: undefined,
       email: "",
       message: "",
     },
   });
 
   const onSubmit = async (data: FormValues) => {
-    console.log(data);
-    // execute({ email: data.email, message: data.message, reason: data.reason })
+    setSubmitError(null);
+    setSubmitMessage(null);
+
+    const result = await createContactRequest(data);
+
+    if (result?.serverError) {
+      setSubmitError(result.serverError);
+      return;
+    }
+
+    if (result?.validationErrors) {
+      setSubmitError("Please review the highlighted fields and try again.");
+      return;
+    }
+
+    setSubmitMessage(result?.data?.message ?? "Your message was sent successfully.");
     reset();
   };
 
@@ -67,6 +87,11 @@ export default function Form() {
             />
           </label>
         </div>
+        {errors.reason?.message ? (
+          <p className={styles.error} role="alert">
+            {errors.reason.message}
+          </p>
+        ) : null}
       </div>
 
       <label className={styles.field}>
@@ -106,6 +131,12 @@ export default function Form() {
       <button type="submit" disabled={isSubmitting} className={styles.button}>
         {isSubmitting ? "Sending…" : "Send message"}
       </button>
+      {submitError ? (
+        <p className={styles.error} role="alert">
+          {submitError}
+        </p>
+      ) : null}
+      {submitMessage ? <p className={styles.success}>{submitMessage}</p> : null}
     </form>
   );
 }

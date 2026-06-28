@@ -25,7 +25,7 @@ export default function Roster({ players }: { players: Player[] }) {
 
         <div className={styles.cards_container}>
           {players.map((player) => (
-            <div className={styles.card}>
+            <div className={styles.card} key={player.id}>
               <div className={styles.image_container}>
                 <div className={styles.image_background}></div>
                 <Image

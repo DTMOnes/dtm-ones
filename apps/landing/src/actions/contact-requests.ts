@@ -4,20 +4,11 @@
 import { actionClient } from "@/lib/safe-action";
 import { flattenValidationErrors } from "next-safe-action";
 
-// Database
-import { db } from "@/lib/db";
-
-// Schema
-import { contactRequest } from "@dtm/db/schema";
-
-// Drizzle
-import { eq } from "drizzle-orm";
-
 // Validation Schema
-import {
-  createContactRequestSchema,
-  getContactRequestSchema,
-} from "@/lib/validation/contact-requests";
+import { createContactRequestSchema } from "@/lib/validation/contact-requests";
+
+// API
+import { createContactRequest as createContactRequestRequest } from "@/lib/api/contact-requests";
 
 export const createContactRequest = actionClient
   .metadata({ actionName: "createContactRequest" })
@@ -27,37 +18,10 @@ export const createContactRequest = actionClient
     },
   })
   .action(async ({ parsedInput: data }) => {
-    await db.insert(contactRequest).values(data);
+    const response = await createContactRequestRequest(data);
 
     return {
       success: true,
-      message: "Tu mensaje se envió correctamente.",
+      message: response.message,
     };
   });
-/*
-export const deleteContactRequest = actionClient
-  .metadata({ actionName: "deleteContactRequest" })
-  .inputSchema(getContactRequestSchema, {
-    handleValidationErrorsShape: async (errors) => {
-      return flattenValidationErrors(errors).fieldErrors;
-    },
-  })
-  .action(async ({ parsedInput: { id } }) => {
-    const deleted = await db
-      .delete(contactRequest)
-      .where(eq(contactRequest.id, id))
-      .returning({ id: contactRequest.id });
-
-    if (deleted.length === 0) {
-      return {
-        success: false,
-        message: "No se encontró la solicitud de contacto.",
-      };
-    }
-
-    return {
-      success: true,
-      message: "Solicitud de contacto eliminada correctamente.",
-    };
-  });
-*/

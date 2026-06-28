@@ -1,12 +1,14 @@
 # DTM Ones
 
-Turborepo monorepo with three Next.js apps:
+Turborepo monorepo with FastAPI as the database-backed API and Next.js apps
+that consume it:
 
-| App | Package | Dev URL | Role |
-| --- | --- | --- | --- |
-| Landing | `@dtm/landing` | http://localhost:3000 | Public marketing site |
-| Dashboard | `@dtm/dashboard` | http://localhost:3001 | Admin panel & auth |
-| Landing 2 | `@dtm/landing2` | http://localhost:3002 | Alternate landing (v0 import) |
+| App       | Package          | Dev URL               | Role                          |
+| --------- | ---------------- | --------------------- | ----------------------------- |
+| Landing   | `@dtm/landing`   | http://localhost:3000 | Public marketing site         |
+| Dashboard | `@dtm/dashboard` | http://localhost:3001 | Admin panel                   |
+| Landing 2 | `@dtm/landing2`  | http://localhost:3002 | Alternate landing (v0 import) |
+| API       | `@dtm/api`       | http://localhost:8000 | FastAPI backend               |
 
 ## Setup
 
@@ -14,7 +16,10 @@ Turborepo monorepo with three Next.js apps:
 pnpm install
 ```
 
-Environment variables live in `.env` at the **repository root**. Both apps load them via `loadEnvConfig` in each `next.config.ts`. Keep that file complete for dashboard builds (auth, database, Supabase).
+Environment variables live in `.env` at the **repository root**. The API owns
+database access through `DATABASE_URL=postgresql://...`; the
+frontend apps use `API_URL` / `NEXT_PUBLIC_API_URL` and do not need direct
+database credentials.
 
 ## Scripts
 
@@ -22,10 +27,9 @@ Environment variables live in `.env` at the **repository root**. Both apps load 
 pnpm dev          # Run all apps (Turborepo)
 pnpm build        # Build all apps
 pnpm lint         # Lint all apps
+pnpm db:seed      # Seed dev admin (API)
 
-pnpm db:push      # Drizzle push (dashboard)
-pnpm db:studio    # Drizzle Studio (dashboard)
-pnpm db:seed      # Seed dev admin (dashboard)
+pnpm test:api:e2e # Run API e2e tests against a dedicated test Postgres database
 ```
 
 Run a single app:
@@ -36,16 +40,18 @@ pnpm --filter @dtm/dashboard dev
 pnpm --filter @dtm/landing2 dev
 ```
 
+API e2e test setup details live in `apps/api/README.md`.
+
 ## Structure
 
 ```
 apps/
+  api/         # FastAPI backend and database access
   landing/     # Public site (/, /contact, /roster)
   landing2/    # Alternate landing (single-page)
-  dashboard/   # Admin (/dashboard, /auth, /api/auth)
+  dashboard/   # Admin (/dashboard, /auth)
 packages/
   typescript-config/   # Shared TS configs
-supabase/              # Migrations & local Supabase
 ```
 
 ## Turborepo

@@ -7,10 +7,6 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { updateCategory } from "@/actions/categories";
-
 // Validation Schema
 import { updateCategorySchema } from "@/lib/validation/categories";
 import { z } from "zod";
@@ -26,19 +22,14 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useUpdateCategoryMutation } from "@/hooks/api/use-categories";
 
 // Components
 import TextField from "@/components/form/text-field";
 import SubmitButton from "@/components/form/submit-button";
 
 type EditCategoryFormValues = z.infer<typeof updateCategorySchema>;
-
-function formatDate(value: Date) {
-  return value.toLocaleString("es-ES", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-}
 
 export default function EditCategoryForm({
   category,
@@ -55,15 +46,7 @@ export default function EditCategoryForm({
     },
   });
 
-  const { execute, isExecuting } = useAction(updateCategory, {
-    onSuccess: ({ data }) => {
-      toast.success(data?.message);
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError ?? "Could not update the category.");
-    },
-  });
+  const { mutate: submitUpdate, isPending } = useUpdateCategoryMutation();
 
   return (
     <FormProvider {...methods}>
@@ -73,7 +56,21 @@ export default function EditCategoryForm({
           <CardDescription>Update the category name.</CardDescription>
         </CardHeader>
         <form
-          onSubmit={methods.handleSubmit((data) => execute(data))}
+          onSubmit={methods.handleSubmit((data) =>
+            submitUpdate(data, {
+              onSuccess: () => {
+                toast.success("Category updated successfully.");
+                router.refresh();
+              },
+              onError: (error) => {
+                toast.error(
+                  error instanceof ApiError
+                    ? error.message
+                    : "Could not update the category.",
+                );
+              },
+            }),
+          )}
           noValidate
         >
           <CardContent className="pb-6">
@@ -83,12 +80,12 @@ export default function EditCategoryForm({
                 name="name"
                 label="Nombre"
                 placeholder="Ej. Primera división"
-                disabled={isExecuting}
+                disabled={isPending}
               />
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
-            <SubmitButton label="Guardar cambios" isExecuting={isExecuting} />
+            <SubmitButton label="Guardar cambios" isExecuting={isPending} />
           </CardFooter>
         </form>
       </Card>

@@ -14,6 +14,7 @@ export default function PlayerImagePreview({
   width = 320,
   height = 200,
   mediaId,
+  playerId,
 }: {
   url: string;
   alt?: string;
@@ -21,6 +22,7 @@ export default function PlayerImagePreview({
   width?: number;
   height?: number;
   mediaId?: string;
+  playerId: string;
 }) {
   return (
     <div
@@ -32,7 +34,7 @@ export default function PlayerImagePreview({
     >
       {mediaId ? (
         <div className="absolute top-2 right-2 z-10">
-          <DeletePlayerImage id={mediaId} />
+          <DeletePlayerImage id={mediaId} playerId={playerId} />
         </div>
       ) : null}
       <Image

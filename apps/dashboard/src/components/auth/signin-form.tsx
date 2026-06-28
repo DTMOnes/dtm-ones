@@ -7,10 +7,6 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { signIn } from "@/actions/auth";
-
 // Zod
 import { z } from "zod";
 
@@ -33,22 +29,15 @@ import { toast } from "sonner";
 // Components
 import TextField from "@/components/form/text-field";
 import PasswordField from "@/components/form/password-field";
+import { ApiError } from "@/lib/api/errors";
+import { useSignInMutation } from "@/hooks/api/use-auth";
 
 type FormValues = z.infer<typeof schema>;
 
 export function SignInForm() {
   const router = useRouter();
 
-  const { execute, isExecuting } = useAction(signIn, {
-    onSuccess: ({ data }) => {
-      toast.success(data?.message ?? "Signed in successfully");
-      router.push("/");
-      router.refresh();
-    },
-    onError: ({ error: actionError }) => {
-      toast.error(actionError.serverError ?? "Failed to sign in");
-    },
-  });
+  const { mutate: signIn, isPending } = useSignInMutation();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema as never),
@@ -61,7 +50,18 @@ export function SignInForm() {
   const { handleSubmit } = methods;
 
   const onSubmit = (data: FormValues) => {
-    execute(data);
+    signIn(data, {
+      onSuccess: () => {
+        toast.success("Signed in successfully");
+        router.push("/");
+        router.refresh();
+      },
+      onError: (error) => {
+        toast.error(
+          error instanceof ApiError ? error.message : "Failed to sign in",
+        );
+      },
+    });
   };
 
   return (
@@ -85,8 +85,8 @@ export function SignInForm() {
           <Separator />
 
           <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={isExecuting}>
-              {isExecuting ? "Signing in..." : "Sign In"}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Signing in..." : "Sign In"}
             </Button>
           </CardFooter>
         </form>

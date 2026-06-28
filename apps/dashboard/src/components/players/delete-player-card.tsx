@@ -6,10 +6,6 @@ import { useState } from "react";
 // Next
 import { useRouter } from "next/navigation";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { deletePlayer } from "@/actions/players";
-
 // Shadcn
 import {
   AlertDialog,
@@ -31,6 +27,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useDeletePlayerMutation } from "@/hooks/api/use-players";
 
 type DeletePlayerCardProps = {
   playerId: string;
@@ -43,19 +41,7 @@ export default function DeletePlayerCard({
 }: DeletePlayerCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const { execute, isExecuting } = useAction(deletePlayer, {
-    onSuccess: ({ data }) => {
-      toast.success(data.message);
-      setIsDeleteDialogOpen(false);
-      router.push("/players");
-    },
-    onError: ({ error }) => {
-      toast.error("Failed to delete player.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: confirmDelete, isPending } = useDeletePlayerMutation();
 
   return (
     <Card className="border-destructive ring-destructive/30">
@@ -76,13 +62,13 @@ export default function DeletePlayerCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!isExecuting) {
+            if (!isPending) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" disabled={isExecuting}>
+            <Button type="button" variant="destructive" disabled={isPending}>
               Delete player
             </Button>
           </AlertDialogTrigger>
@@ -95,16 +81,30 @@ export default function DeletePlayerCard({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isExecuting}>
+              <AlertDialogCancel disabled={isPending}>
                 Cancel
               </AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isExecuting}
-                onClick={() => execute({ id: playerId })}
+                disabled={isPending}
+                onClick={() =>
+                  confirmDelete(playerId, {
+                    onSuccess: (response) => {
+                      toast.success(response.message);
+                      setIsDeleteDialogOpen(false);
+                      router.push("/players");
+                    },
+                    onError: (error) => {
+                      toast.error("Failed to delete player.", {
+                        description:
+                          error instanceof ApiError ? error.message : undefined,
+                      });
+                    },
+                  })
+                }
               >
-                {isExecuting ? "Deleting..." : "Confirm deletion"}
+                {isPending ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

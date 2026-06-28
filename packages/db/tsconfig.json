@@ -1,7 +1,0 @@
-{
-  "extends": "@dtm/typescript-config/base.json",
-  "compilerOptions": {
-    "rootDir": "src"
-  },
-  "include": ["src/**/*.ts"]
-}

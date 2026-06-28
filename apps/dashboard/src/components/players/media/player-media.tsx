@@ -1,13 +1,10 @@
 "use client";
 
-// Next
-import { useRouter } from "next/navigation";
-
 // React
 import { useMemo } from "react";
 
 // Types
-import type { PlayerWithRelations } from "@/types/players";
+import type { ApiPlayer } from "@/lib/api/types";
 
 // Components
 import PlayerImageField from "@/components/players/media/player-image-field";
@@ -35,30 +32,28 @@ import { ImageSquareIcon, VideoCameraIcon } from "@phosphor-icons/react";
 export default function PlayerMedia({
   player,
 }: {
-  player: PlayerWithRelations;
+  player: ApiPlayer;
 }) {
-  const router = useRouter();
-
   const videos = useMemo(
     () =>
-      player.playerMedia
-        .filter((m) => m.mediaType === "video")
+      player.media
+        .filter((m) => m.media_type === "video")
         .sort(
           (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
         ),
-    [player.playerMedia],
+    [player.media],
   );
 
   const images = useMemo(
-    () => player.playerMedia.filter((m) => m.mediaType === "image"),
-    [player.playerMedia],
+    () => player.media.filter((m) => m.media_type === "image"),
+    [player.media],
   );
 
   const institutionalPictures = useMemo(
     () =>
-      player.playerMedia.filter((m) => m.mediaType === "institutional_picture"),
-    [player.playerMedia],
+      player.media.filter((m) => m.media_type === "institutional_picture"),
+    [player.media],
   );
 
   return (
@@ -95,9 +90,10 @@ export default function PlayerMedia({
                 <li key={m.id}>
                   <PlayerImagePreview
                     url={m.url}
-                    alt={`${player.fullName} institutional picture`}
+                    alt={`${player.full_name} institutional picture`}
                     className="w-full"
                     mediaId={m.id}
+                    playerId={player.id}
                   />
                 </li>
               ))}
@@ -137,6 +133,7 @@ export default function PlayerMedia({
                     alt=""
                     className="w-full"
                     mediaId={m.id}
+                    playerId={player.id}
                   />
                 </li>
               ))}
@@ -154,10 +151,7 @@ export default function PlayerMedia({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <PlayerVideoField
-            playerId={player.id}
-            onUploadSuccess={() => router.refresh()}
-          />
+          <PlayerVideoField playerId={player.id} />
           {videos.length === 0 ? (
             <Empty className="border border-dashed">
               <EmptyHeader>
@@ -175,7 +169,11 @@ export default function PlayerMedia({
             <ul className="flex flex-col gap-2 p-4 border border-dashed">
               {videos.map((m) => (
                 <li key={m.id}>
-                  <PlayerVideoListItem url={m.url} mediaId={m.id} />
+                  <PlayerVideoListItem
+                    url={m.url}
+                    mediaId={m.id}
+                    playerId={player.id}
+                  />
                 </li>
               ))}
             </ul>

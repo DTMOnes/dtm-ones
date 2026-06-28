@@ -1,14 +1,15 @@
 "use client";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { uploadPlayerImage } from "@/actions/player-media";
+// Next
+import { useRouter } from "next/navigation";
 
 // Shadcn
 import { toast } from "sonner";
 
 // Components
 import { ImageUpload } from "@/components/media/image-upload";
+import { ApiError } from "@/lib/api/errors";
+import { useUploadPlayerImageMutation } from "@/hooks/api/use-player-media";
 
 export default function PlayerImageField({
   playerId,
@@ -19,20 +20,23 @@ export default function PlayerImageField({
   mediaType?: "image" | "institutional_picture";
   label?: string;
 }) {
-  const { executeAsync } = useAction(uploadPlayerImage, {
-    onSuccess: ({ data }: { data: { message: string } }) => {
-      toast.success(data.message);
-    },
-    onError: () => {
-      toast.error("There was an error processing the uploaded file");
-    },
-  });
+  const router = useRouter();
+  const { mutateAsync: uploadImage } = useUploadPlayerImageMutation();
 
   return (
     <ImageUpload
-      pathPrefix="player-assets"
-      onUploaded={async (url) => {
-        await executeAsync({ playerId, mediaType, url });
+      onSubmitFile={async (file) => {
+        try {
+          await uploadImage({ playerId, mediaType, file });
+          toast.success("Media added successfully.");
+          router.refresh();
+        } catch (error) {
+          toast.error(
+            error instanceof ApiError
+              ? error.message
+              : "There was an error processing the uploaded file",
+          );
+        }
       }}
     >
       <ImageUpload.Label>{label}</ImageUpload.Label>

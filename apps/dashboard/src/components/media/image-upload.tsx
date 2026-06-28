@@ -10,9 +10,6 @@ import {
   type ReactNode,
 } from "react";
 
-// Hooks
-import { useBlobUpload } from "@/hooks/use-blob-upload";
-
 // Shadcn
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,13 +65,11 @@ function useImageUpload() {
 }
 
 function ImageUpload({
-  pathPrefix,
-  onUploaded,
+  onSubmitFile,
   maxBytes = MAX_BYTES,
   children,
 }: {
-  pathPrefix: string;
-  onUploaded: (url: string) => Promise<void>;
+  onSubmitFile: (file: File) => Promise<void>;
   maxBytes?: number;
   children: ReactNode;
 }) {
@@ -82,15 +77,19 @@ function ImageUpload({
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const { upload, isUploading } = useBlobUpload({ pathPrefix, onUploaded });
+  const [isUploading, setIsUploading] = useState(false);
 
   const submit = async () => {
     if (!file) return;
-    await upload(file);
-    setFile(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
+    setIsUploading(true);
+    try {
+      await onSubmitFile(file);
+      setFile(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    } finally {
+      setIsUploading(false);
     }
   };
 

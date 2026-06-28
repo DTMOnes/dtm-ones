@@ -12,8 +12,8 @@ type UserProfileSectionsProps = {
     email: string;
     name: string | null;
     role: string | null;
-    createdAt: Date;
-    updatedAt: Date;
+    created_at: Date | string;
+    updated_at: Date | string;
   };
   isOnlyAdmin: boolean;
 };

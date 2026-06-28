@@ -7,10 +7,6 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { uploadPlayerVideo } from "@/actions/player-media";
-
 // Validation Schema
 import { playerVideoFormSchema } from "@/lib/validation/player-media";
 
@@ -20,6 +16,8 @@ import { z } from "zod";
 // Shadcn
 import { FieldDescription, FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useUploadPlayerVideoMutation } from "@/hooks/api/use-player-media";
 
 // Components
 import TextField from "@/components/form/text-field";
@@ -32,10 +30,8 @@ type FormValues = z.infer<typeof playerVideoFormSchema>;
 
 export default function PlayerVideoField({
   playerId,
-  onUploadSuccess,
 }: {
   playerId: string;
-  onUploadSuccess?: () => void;
 }) {
   const router = useRouter();
 
@@ -44,20 +40,21 @@ export default function PlayerVideoField({
     defaultValues: { url: "" },
   });
 
-  const { executeAsync, isExecuting } = useAction(uploadPlayerVideo, {
-    onSuccess: ({ data }: { data: { message: string } }) => {
-      toast.success(data.message);
-      methods.reset();
-      router.refresh();
-      onUploadSuccess?.();
-    },
-    onError: () => {
-      toast.error("There was an error saving the video link");
-    },
-  });
+  const { mutateAsync: uploadVideo, isPending } = useUploadPlayerVideoMutation();
 
   const onSubmit = methods.handleSubmit(async ({ url }) => {
-    await executeAsync({ playerId, url });
+    try {
+      await uploadVideo({ playerId, url });
+      toast.success("Video added successfully.");
+      methods.reset();
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof ApiError
+          ? error.message
+          : "There was an error saving the video link",
+      );
+    }
   });
 
   return (
@@ -70,9 +67,10 @@ export default function PlayerVideoField({
                 name="url"
                 label="YouTube URL"
                 placeholder="https://www.youtube.com/watch?v=..."
+                disabled={isPending}
               />
             </div>
-            <SubmitButton label="Save" isExecuting={isExecuting} />
+            <SubmitButton label="Save" isExecuting={isPending} />
           </div>
           <FieldDescription className="flex items-center gap-1 text-sm text-muted-foreground">
             <InfoIcon />

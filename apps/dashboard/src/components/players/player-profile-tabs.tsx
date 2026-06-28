@@ -1,8 +1,7 @@
 "use client";
 
 // Types
-import type { PlayerWithRelations } from "@/types/players";
-import type { CategoryData } from "@/lib/validation/categories";
+import type { ApiPlayer } from "@/lib/api/types";
 
 // Shadcn
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,8 +15,8 @@ export default function PlayerProfileTabs({
   player,
   categories,
 }: {
-  player: PlayerWithRelations;
-  categories: CategoryData[];
+  player: ApiPlayer;
+  categories: Array<{ id: string; name: string }>;
 }) {
   return (
     <Tabs defaultValue="general-info" className="flex w-full flex-col gap-6">
@@ -27,7 +26,7 @@ export default function PlayerProfileTabs({
       </TabsList>
       <TabsContent value="general-info" className="flex flex-col gap-6">
         <EditPlayerForm player={player} categories={categories} />
-        <DeletePlayerCard playerId={player.id} fullName={player.fullName} />
+        <DeletePlayerCard playerId={player.id} fullName={player.full_name} />
       </TabsContent>
       <TabsContent value="player-media">
         <PlayerMedia player={player} />

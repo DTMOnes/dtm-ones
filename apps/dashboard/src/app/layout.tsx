@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Figtree, Geist } from "next/font/google";
+import { Bebas_Neue, Geist } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
 
 // Shadcn
 import { Toaster } from "@/components/ui/sonner";
@@ -30,8 +31,10 @@ export default function RootLayout({
       className={cn("dark", bebas_neue.variable, "font-sans", geist.variable)}
     >
       <body className="antialiased">
-        {children}
-        <Toaster />
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

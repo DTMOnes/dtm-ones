@@ -22,9 +22,11 @@ import DeletePlayerVideo from "@/components/players/delete-player-video";
 export default function PlayerVideoListItem({
   url,
   mediaId,
+  playerId,
 }: {
   url: string;
   mediaId: string;
+  playerId: string;
 }) {
   const videoId = parseYouTubeVideoId(url);
 
@@ -47,15 +49,15 @@ export default function PlayerVideoListItem({
             rel="noopener noreferrer"
             className="truncate hover:underline"
           >
-            {url}
-          </a>
-        </ItemTitle>
+              {url}
+            </a>
+          </ItemTitle>
         {videoId ? (
           <ItemDescription>YouTube video</ItemDescription>
         ) : null}
       </ItemContent>
       <ItemActions>
-        <DeletePlayerVideo id={mediaId} />
+        <DeletePlayerVideo id={mediaId} playerId={playerId} />
       </ItemActions>
     </Item>
   );

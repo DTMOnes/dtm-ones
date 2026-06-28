@@ -7,10 +7,6 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { updateUserGeneral } from "@/actions/users";
-
 // Validation Schema
 import { updateUserGeneralSchema } from "@/lib/validation/users";
 import { z } from "zod";
@@ -26,6 +22,8 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useUpdateUserGeneralMutation } from "@/hooks/api/use-users";
 
 // Components
 import TextField from "@/components/form/text-field";
@@ -39,8 +37,8 @@ type EditUserGeneralFormProps = {
     email: string;
     name: string | null;
     role?: string | null;
-    createdAt: string | Date;
-    updatedAt: string | Date;
+    created_at: string | Date;
+    updated_at: string | Date;
   };
 };
 
@@ -73,17 +71,7 @@ export default function EditUserGeneralForm({ user }: EditUserGeneralFormProps) 
     },
   });
 
-  const { execute, isExecuting } = useAction(updateUserGeneral, {
-    onSuccess: ({ data }) => {
-      toast.success(data?.message ?? "Profile updated successfully.");
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error("Could not update profile.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: submitUpdate, isPending } = useUpdateUserGeneralMutation();
 
   return (
     <FormProvider {...methods}>
@@ -95,7 +83,20 @@ export default function EditUserGeneralForm({ user }: EditUserGeneralFormProps) 
           </CardDescription>
         </CardHeader>
         <form
-          onSubmit={methods.handleSubmit((data) => execute(data))}
+          onSubmit={methods.handleSubmit((data) =>
+            submitUpdate(data, {
+              onSuccess: () => {
+                toast.success("Profile updated successfully.");
+                router.refresh();
+              },
+              onError: (error) => {
+                toast.error("Could not update profile.", {
+                  description:
+                    error instanceof ApiError ? error.message : undefined,
+                });
+              },
+            }),
+          )}
           noValidate
         >
           <CardContent className="pb-6">
@@ -105,23 +106,23 @@ export default function EditUserGeneralForm({ user }: EditUserGeneralFormProps) 
                 name="name"
                 label="Name"
                 placeholder="Full name"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <TextField
                 name="email"
                 label="Email"
                 placeholder="user@email.com"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <p className="text-muted-foreground text-xs">
                 Current role: {roleLabel(user.role)} · Joined:{" "}
-                {formatDate(user.createdAt)} · Last updated:{" "}
-                {formatDate(user.updatedAt)}
+                {formatDate(user.created_at)} · Last updated:{" "}
+                {formatDate(user.updated_at)}
               </p>
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
-            <SubmitButton label="Save changes" isExecuting={isExecuting} />
+            <SubmitButton label="Save changes" isExecuting={isPending} />
           </CardFooter>
         </form>
       </Card>

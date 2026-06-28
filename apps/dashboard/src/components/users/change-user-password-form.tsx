@@ -7,10 +7,6 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Next Safe Action
-import { useAction } from "next-safe-action/hooks";
-import { changeUserPassword } from "@/actions/users";
-
 // Validation Schema
 import { changeUserPasswordSchema } from "@/lib/validation/users";
 import { z } from "zod";
@@ -26,6 +22,8 @@ import {
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
 import { toast } from "sonner";
+import { ApiError } from "@/lib/api/errors";
+import { useChangeUserPasswordMutation } from "@/hooks/api/use-users";
 
 // Components
 import PasswordField from "@/components/form/password-field";
@@ -51,18 +49,7 @@ export default function ChangeUserPasswordForm({
     },
   });
 
-  const { execute, isExecuting } = useAction(changeUserPassword, {
-    onSuccess: ({ data }) => {
-      toast.success(data?.message ?? "Password updated successfully.");
-      methods.reset({ userId, password: "", confirmPassword: "" });
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error("Could not update password.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: submitPassword, isPending } = useChangeUserPasswordMutation();
 
   return (
     <FormProvider {...methods}>
@@ -74,7 +61,21 @@ export default function ChangeUserPasswordForm({
           </CardDescription>
         </CardHeader>
         <form
-          onSubmit={methods.handleSubmit((data) => execute(data))}
+          onSubmit={methods.handleSubmit((data) =>
+            submitPassword(data, {
+              onSuccess: (response) => {
+                toast.success(response.message);
+                methods.reset({ userId, password: "", confirmPassword: "" });
+                router.refresh();
+              },
+              onError: (error) => {
+                toast.error("Could not update password.", {
+                  description:
+                    error instanceof ApiError ? error.message : undefined,
+                });
+              },
+            }),
+          )}
           noValidate
         >
           <CardContent className="pb-6">
@@ -83,19 +84,19 @@ export default function ChangeUserPasswordForm({
               <PasswordField
                 name="password"
                 label="New password"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <PasswordField
                 name="confirmPassword"
                 label="Confirm new password"
-                disabled={isExecuting}
+                disabled={isPending}
               />
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
             <SubmitButton
               label="Update password"
-              isExecuting={isExecuting}
+              isExecuting={isPending}
             />
           </CardFooter>
         </form>

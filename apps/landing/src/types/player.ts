@@ -1,8 +1,8 @@
 export type Player = {
   id: string;
-  fullName: string;
+  full_name: string;
   height: string;
-  dateOfBirth: string;
+  date_of_birth: string;
   nationality: string;
-  lastClub: string;
+  last_club: string;
 };

@@ -9,11 +9,11 @@ import {
 } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
 import { z } from "zod";
 
-import { createUser } from "@/actions/users";
 import { createUserSchema } from "@/lib/validation/users";
+import { ApiError } from "@/lib/api/errors";
+import { useCreateUserMutation } from "@/hooks/api/use-users";
 
 import PasswordField from "@/components/form/password-field";
 import TextField from "@/components/form/text-field";
@@ -84,28 +84,7 @@ export default function CreateUserDialog() {
     formState: { errors },
   } = methods;
 
-  const { execute, isExecuting } = useAction(createUser, {
-    onSuccess: ({ data }) => {
-      if (data?.success) {
-        toast.success(data.message);
-        reset();
-        setOpen(false);
-        router.refresh();
-      }
-    },
-    onError: ({ error }) => {
-      setFieldErrors(setError, error.validationErrors);
-      if (
-        error.validationErrors &&
-        Object.keys(error.validationErrors).length > 0
-      ) {
-        return;
-      }
-      toast.error("Could not create user.", {
-        description: error.serverError,
-      });
-    },
-  });
+  const { mutate: submitCreateUser, isPending } = useCreateUserMutation();
 
   useEffect(() => {
     if (!open) {
@@ -123,7 +102,7 @@ export default function CreateUserDialog() {
           New user
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={!isExecuting}>
+      <DialogContent showCloseButton={!isPending}>
         <DialogHeader>
           <DialogTitle>New user</DialogTitle>
           <DialogDescription>
@@ -133,7 +112,33 @@ export default function CreateUserDialog() {
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit((data) => execute(data))}
+            onSubmit={handleSubmit((data) =>
+              submitCreateUser(data, {
+                onSuccess: () => {
+                  toast.success("User created successfully.");
+                  reset();
+                  setOpen(false);
+                  router.refresh();
+                },
+                onError: (error) => {
+                  if (error instanceof ApiError) {
+                    setFieldErrors(setError, error.fieldErrors);
+                    if (
+                      error.fieldErrors &&
+                      Object.keys(error.fieldErrors).length > 0
+                    ) {
+                      return;
+                    }
+                    toast.error("Could not create user.", {
+                      description: error.message,
+                    });
+                    return;
+                  }
+
+                  toast.error("Could not create user.");
+                },
+              }),
+            )}
             className="flex flex-col gap-4"
             noValidate
           >
@@ -142,7 +147,7 @@ export default function CreateUserDialog() {
                 name="name"
                 label="Name"
                 placeholder="Full name"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <Field className="gap-2">
                 <FieldLabel htmlFor="create-user-email">Email</FieldLabel>
@@ -151,7 +156,7 @@ export default function CreateUserDialog() {
                   type="email"
                   autoComplete="email"
                   placeholder="user@email.com"
-                  disabled={isExecuting}
+                  disabled={isPending}
                   aria-invalid={!!emailError}
                   {...register("email")}
                 />
@@ -162,7 +167,7 @@ export default function CreateUserDialog() {
               <PasswordField
                 name="password"
                 label="Password"
-                disabled={isExecuting}
+                disabled={isPending}
               />
               <Field className="gap-2">
                 <FieldLabel htmlFor="create-user-role">Role</FieldLabel>
@@ -173,7 +178,7 @@ export default function CreateUserDialog() {
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={isExecuting}
+                      disabled={isPending}
                     >
                       <SelectTrigger
                         id="create-user-role"
@@ -201,13 +206,13 @@ export default function CreateUserDialog() {
                 type="button"
                 variant="outline"
                 className="flex-1 sm:flex-initial"
-                disabled={isExecuting}
+                disabled={isPending}
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create user" isExecuting={isExecuting} />
+                <SubmitButton label="Create user" isExecuting={isPending} />
               </div>
             </DialogFooter>
           </form>

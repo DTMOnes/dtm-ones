@@ -35,8 +35,8 @@ import { UserIcon } from "@phosphor-icons/react";
 
 type Player = {
   id: string;
-  fullName: string;
-  lastClub: string;
+  full_name: string;
+  last_club: string;
 };
 
 type CategoryPlayersProps = {
@@ -84,11 +84,11 @@ export default function CategoryPlayers({
                       href={`/players/${player.id}`}
                       className="hover:underline"
                     >
-                      {player.fullName}
+                      {player.full_name}
                     </Link>
                   </ItemTitle>
                   <ItemDescription>
-                    Last club: {player.lastClub}
+                    Last club: {player.last_club}
                   </ItemDescription>
                 </ItemContent>
                 <ItemActions className="gap-2 justify-end sm:shrink-0">

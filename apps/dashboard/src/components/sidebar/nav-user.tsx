@@ -3,9 +3,6 @@
 import { useRouter } from "next/navigation";
 import { DotsThreeVerticalIcon, SignOutIcon } from "@phosphor-icons/react";
 
-// Better Auth
-import { authClient } from "@/lib/auth/client";
-
 // Components
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -22,6 +19,7 @@ import {
 
 // Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSignOutMutation } from "@/hooks/api/use-auth";
 
 export type NavUserData = {
   name?: string | null;
@@ -37,9 +35,10 @@ function displayName(user: NavUserData): string {
 export function NavUser({ user }: { user: NavUserData }) {
   const router = useRouter();
   const isMobile = useIsMobile();
+  const { mutateAsync: signOut } = useSignOutMutation();
 
   const handleSignOut = async () => {
-    await authClient.signOut();
+    await signOut();
     router.push("/auth/signin");
     router.refresh();
   };

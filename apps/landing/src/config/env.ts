@@ -4,8 +4,8 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
-    DATABASE_URL: z.url(),
-    BLOB_READ_WRITE_TOKEN: z.string().min(32),
+    /** Server-side base URL for the FastAPI backend. */
+    API_URL: z.url().default("http://localhost:8000"),
   },
 
   /**
