@@ -9,9 +9,7 @@ from sqlalchemy import select
 # Local
 from core.dependencies.auth import CurrentUser
 from core.dependencies.db import DbSession
-from models import PlayerMedia
-from schemas.common import MessageResponse
-from schemas.player_media import CreatePlayerVideoInput, PlayerMediaRead
+from models import MessageResponse, PlayerMedia, PlayerMediaRead, PlayerMediaVideoCreate
 from services import blob
 from services.players import find_player
 
@@ -81,7 +79,7 @@ async def upload_player_image(
 )
 async def add_player_video(
     player_id: uuid.UUID,
-    payload: CreatePlayerVideoInput,
+    payload: PlayerMediaVideoCreate,
     db: DbSession,
     _: CurrentUser,
 ) -> PlayerMediaRead:

@@ -1,18 +1,24 @@
-// Lib
+import { DEFAULT_ACCESS_TOKEN_COOKIE } from "@insforge/sdk/ssr/middleware";
+import { cookies } from "next/headers";
+
 import { env } from "@/config/env";
-import { getAccessToken } from "@/lib/api/cookies";
 import { buildApiError } from "@/lib/api/errors";
 
 /**
- * Server-side fetch for Server Components / Server Actions. Reads the access
- * token from httpOnly cookies and calls FastAPI directly with a Bearer header.
+ * Server-side fetch for legacy FastAPI data calls until those surfaces move to
+ * InsForge. Reads the InsForge access token cookie for the Bearer header.
  *
- * Note: this does NOT refresh tokens (Server Components cannot set cookies).
- * `proxy.ts` refreshes proactively before requests reach the RSC tree.
+ * Note: FastAPI will reject InsForge JWTs. Callers that still hit FastAPI will
+ * fail until their feature step migrates to InsForge.
  */
 type ServerFetchOptions = Omit<RequestInit, "body"> & {
   body?: Record<string, unknown> | null;
 };
+
+async function getAccessToken(): Promise<string | null> {
+  const store = await cookies();
+  return store.get(DEFAULT_ACCESS_TOKEN_COOKIE)?.value ?? null;
+}
 
 export async function serverApiFetch<T>(
   path: string,

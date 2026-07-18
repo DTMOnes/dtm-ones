@@ -17,6 +17,7 @@ dependencies = [
     "pyjwt>=2.13.0",
     "alembic>=1.18.4",
     "vercel>=0.5.9",
+    "sqlmodel>=0.0.39",
 ]
 
 [dependency-groups]

@@ -8,19 +8,23 @@ import {
   UsersIcon,
 } from "@phosphor-icons/react";
 
-// Shadcn
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-
-// Components
 import { NavGroup, type MenuItem } from "@/components/sidebar/nav-group";
 import { NavUser, type NavUserData } from "@/components/sidebar/nav-user";
+
+const contactsItems: MenuItem[] = [
+  {
+    title: "Contacts",
+    url: "/contacts",
+    icon: EnvelopeSimpleIcon,
+  },
+];
 
 const playersItems: MenuItem[] = [
   {
@@ -37,11 +41,6 @@ const playersItems: MenuItem[] = [
 
 const usersItems: MenuItem[] = [
   {
-    title: "Contact Requests",
-    url: "/contact-requests",
-    icon: EnvelopeSimpleIcon,
-  },
-  {
     title: "Users",
     url: "/users",
     icon: UserGearIcon,
@@ -50,35 +49,30 @@ const usersItems: MenuItem[] = [
 
 export function AppSidebar({
   user,
-  isAdmin,
+  isOwner,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   user: NavUserData;
-  isAdmin: boolean;
+  isOwner: boolean;
 }) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <div className="px-2 py-2">
-          <span className="[font-family:var(--font-bebas-neue)] text-3xl">
-            DTM-ONES
-          </span>
+          <span className="text-lg font-semibold tracking-tight">DTM Ones</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
+        <NavGroup label="Inbox" items={contactsItems} />
         <NavGroup label="Players Content" items={playersItems} />
-        {isAdmin ? (
+        {isOwner ? (
           <NavGroup label="Administration" items={usersItems} />
         ) : null}
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={user} />
+      </SidebarFooter>
       <SidebarRail />
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <NavUser user={user} />
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
     </Sidebar>
   );
 }

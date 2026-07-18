@@ -1,9 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { DotsThreeVerticalIcon, SignOutIcon } from "@phosphor-icons/react";
+import {
+  DotsThreeVerticalIcon,
+  SignOutIcon,
+  UserIcon,
+} from "@phosphor-icons/react";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
 
-// Components
+import { signOutAction } from "@/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -16,31 +22,46 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-// Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSignOutMutation } from "@/hooks/api/use-auth";
+import type { DashboardRole } from "@/lib/auth/types";
 
 export type NavUserData = {
+  email: string;
+  role: DashboardRole;
   name?: string | null;
-  email?: string | null;
 };
 
 function displayName(user: NavUserData): string {
   const trimmed = user.name?.trim();
   if (trimmed) return trimmed;
-  return user.email?.split("@")[0] ?? "User";
+  return user.email.split("@")[0] ?? "User";
+}
+
+function roleLabel(role: DashboardRole): string {
+  return role === "owner" ? "Owner" : "Staff";
 }
 
 export function NavUser({ user }: { user: NavUserData }) {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const { mutateAsync: signOut } = useSignOutMutation();
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/auth/signin");
-    router.refresh();
+  const { execute, isPending } = useAction(signOutAction, {
+    onSuccess: () => {
+      router.push("/signin");
+      router.refresh();
+    },
+    onError: ({ error }) => {
+      toast.error(
+        error.serverError?.message ??
+          "Signed out locally. Please sign in again if needed.",
+      );
+      router.push("/signin");
+      router.refresh();
+    },
+  });
+
+  const handleSignOut = () => {
+    execute();
   };
 
   return (
@@ -52,10 +73,11 @@ export function NavUser({ user }: { user: NavUserData }) {
               size="lg"
               tooltip={displayName(user)}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              disabled={isPending}
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarFallback className="rounded-lg">
-                  {displayName(user).slice(0, 2).toUpperCase()}
+              <Avatar className="size-8 overflow-hidden rounded-full grayscale">
+                <AvatarFallback className="overflow-hidden rounded-full">
+                  <UserIcon className="size-4" weight="bold" aria-hidden />
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -63,7 +85,7 @@ export function NavUser({ user }: { user: NavUserData }) {
                   {displayName(user)}
                 </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
+                  {roleLabel(user.role)} · {user.email}
                 </span>
               </div>
               <DotsThreeVerticalIcon className="ml-auto size-4" />
@@ -75,9 +97,9 @@ export function NavUser({ user }: { user: NavUserData }) {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuItem onClick={() => void handleSignOut()}>
+            <DropdownMenuItem onClick={handleSignOut} disabled={isPending}>
               <SignOutIcon className="size-4" />
-              Cerrar sesión
+              Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

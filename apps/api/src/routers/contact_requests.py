@@ -8,9 +8,12 @@ from sqlalchemy import desc, select
 # Local
 from core.dependencies.auth import AdminUser
 from core.dependencies.db import DbSession
-from models import ContactRequest
-from schemas.common import MessageResponse
-from schemas.contact_requests import ContactRequestRead, CreateContactRequestInput
+from models import (
+    ContactRequest,
+    ContactRequestCreate,
+    ContactRequestRead,
+    MessageResponse,
+)
 
 router = APIRouter(prefix="/contact-requests", tags=["contact-requests"])
 
@@ -29,7 +32,7 @@ async def get_all_contact_requests(
 
 @router.post("", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 async def create_contact_request(
-    payload: CreateContactRequestInput, db: DbSession
+    payload: ContactRequestCreate, db: DbSession
 ) -> MessageResponse:
     contact_request = ContactRequest(
         reason=payload.reason,

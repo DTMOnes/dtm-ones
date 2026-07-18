@@ -12,14 +12,15 @@ from core.security import (
     refresh_token_expires_at,
     verify_password,
 )
-from models import RefreshToken, User
-from schemas.auth import (
+from models import (
     LoginInput,
     LogoutInput,
     LogoutResponse,
+    RefreshToken,
     RefreshTokenInput,
     SessionUser,
     TokenResponse,
+    User,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])

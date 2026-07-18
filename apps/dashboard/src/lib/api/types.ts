@@ -57,20 +57,3 @@ export type ApiCategoryDetail = ApiCategory & {
   players: ApiPlayerSummary[];
 };
 
-export type ApiContactRequest = {
-  id: string;
-  reason: "hire_services" | "seek_representation";
-  email: string;
-  message: string;
-  created_at: string;
-};
-
-export type ApiAuthSessionUser = ApiUser;
-
-export type ApiTokenResponse = {
-  access_token: string;
-  refresh_token: string;
-  token_type: "bearer";
-  expires_in: number;
-  user: ApiAuthSessionUser;
-};

@@ -5,7 +5,7 @@ export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
     /** Server-side base URL for the FastAPI backend. */
-    API_URL: z.url().default("http://localhost:8000"),
+    API_URL: z.url(),
   },
 
   /**

@@ -1,0 +1,93 @@
+@use "styles/typography" as type;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.searchField {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.label,
+.legend {
+  @include type.anton-ui;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: 1px solid var(--color-white);
+  border-radius: 4px;
+  color: var(--color-white);
+
+  @include type.anton-ui;
+  text-transform: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 2px;
+  }
+}
+
+.categories {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.categoryOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.categoryLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+
+  @include type.anton-ui;
+  text-transform: none;
+}
+
+.categoryCount {
+  @include type.anton-ui;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+.clearButton {
+  align-self: flex-start;
+  padding: 8px 16px;
+  border: 1px solid var(--color-white);
+  border-radius: 4px;
+  color: var(--color-white);
+
+  @include type.anton-ui;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 2px;
+  }
+}
+
+@media (width < 768px) {
+  .root {
+    gap: var(--spacing-sm);
+  }
+}

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 # Local
-from models import Player, PlayerCategory
+from models import Player
 
 
 async def find_player(db: AsyncSession, player_id: uuid.UUID) -> Player:
@@ -16,10 +16,8 @@ async def find_player(db: AsyncSession, player_id: uuid.UUID) -> Player:
         select(Player)
         .where(Player.id == player_id)
         .options(
-            selectinload(Player.player_categories).selectinload(
-                PlayerCategory.category
-            ),
-            selectinload(Player.player_media),
+            selectinload(Player.categories),
+            selectinload(Player.media),
         )
         .execution_options(populate_existing=True)
     )

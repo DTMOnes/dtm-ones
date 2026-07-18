@@ -9,8 +9,6 @@ function normalizePlayersFilters(filters: PlayersFilters) {
 }
 
 export const queryKeys = {
-  authMe: ["auth", "me"] as const,
-
   players: {
     all: ["players"] as const,
     list: (filters: PlayersFilters) =>
@@ -28,11 +26,5 @@ export const queryKeys = {
     all: ["users"] as const,
     list: () => ["users", "list"] as const,
     detail: (id: string) => ["users", "detail", id] as const,
-  },
-
-  contactRequests: {
-    all: ["contact-requests"] as const,
-    list: () => ["contact-requests", "list"] as const,
-    detail: (id: string) => ["contact-requests", "detail", id] as const,
   },
 };

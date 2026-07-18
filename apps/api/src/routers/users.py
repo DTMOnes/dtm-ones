@@ -11,15 +11,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.dependencies.auth import AdminUser
 from core.dependencies.db import DbSession
 from core.security import hash_password
-from models import User
-from schemas.common import SuccessMessageResponse
-from schemas.users import (
-    ChangeUserPasswordInput,
-    CreateUserInput,
-    SetUserRoleInput,
-    UpdateUserGeneralInput,
+from models import (
+    SuccessMessageResponse,
+    User,
+    UserCreate,
     UserDetail,
+    UserPasswordChange,
     UserRead,
+    UserRoleUpdate,
+    UserUpdate,
 )
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -73,7 +73,7 @@ async def get_user(user_id: str, db: DbSession, _: AdminUser) -> UserDetail:
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user(
-    payload: CreateUserInput, db: DbSession, _: AdminUser
+    payload: UserCreate, db: DbSession, _: AdminUser
 ) -> UserRead:
     existing = (
         await db.execute(
@@ -113,7 +113,7 @@ async def create_user(
 @router.patch("/{user_id}", response_model=UserRead)
 async def update_user_general(
     user_id: str,
-    payload: UpdateUserGeneralInput,
+    payload: UserUpdate,
     db: DbSession,
     _: AdminUser,
 ) -> UserRead:
@@ -138,7 +138,7 @@ async def update_user_general(
 @router.patch("/{user_id}/password", response_model=SuccessMessageResponse)
 async def change_user_password(
     user_id: str,
-    payload: ChangeUserPasswordInput,
+    payload: UserPasswordChange,
     db: DbSession,
     _: AdminUser,
 ) -> SuccessMessageResponse:
@@ -153,7 +153,7 @@ async def change_user_password(
 @router.patch("/{user_id}/role", response_model=SuccessMessageResponse)
 async def set_user_role(
     user_id: str,
-    payload: SetUserRoleInput,
+    payload: UserRoleUpdate,
     db: DbSession,
     _: AdminUser,
 ) -> SuccessMessageResponse:

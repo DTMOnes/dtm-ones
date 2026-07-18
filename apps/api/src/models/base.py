@@ -1,6 +1,6 @@
 # Third-party
-from sqlalchemy.orm import DeclarativeBase
+from sqlmodel import SQLModel
 
 
-class Base(DeclarativeBase):
-    """Declarative base for API ORM models."""
+class Base(SQLModel):
+    """Shared metadata base for table models."""

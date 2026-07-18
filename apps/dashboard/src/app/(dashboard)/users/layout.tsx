@@ -1,24 +1,16 @@
-// Next
 import { redirect } from "next/navigation";
 
-// Lib
-import { serverApiFetch } from "@/lib/api/server-client";
-import type { ApiAuthSessionUser } from "@/lib/api/types";
+import { getSession } from "@/utils/auth/get-session";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  let user: ApiAuthSessionUser;
-  try {
-    user = await serverApiFetch<ApiAuthSessionUser>("/auth/me");
-  } catch {
-    redirect("/auth/signin");
-  }
+  const session = await getSession();
 
-  if (user.role !== "admin") {
-    redirect("/players");
+  if (session.status !== "authenticated" || session.user.role !== "owner") {
+    redirect("/contacts");
   }
 
   return children;

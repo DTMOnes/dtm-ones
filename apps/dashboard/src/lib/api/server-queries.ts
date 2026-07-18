@@ -4,7 +4,6 @@ import { serverApiFetch } from "@/lib/api/server-client";
 import type {
   ApiCategoryDetail,
   ApiCategoryWithCount,
-  ApiContactRequest,
   ApiPlayer,
   ApiUser,
   ApiUserDetail,
@@ -39,13 +38,4 @@ export function getUsersServer() {
 
 export function getUserByIdServer(userId: string) {
   return serverApiFetch<ApiUserDetail>(`/users/${userId}`);
-}
-
-export function getContactRequestsServer() {
-  return serverApiFetch<ApiContactRequest[]>("/contact-requests");
-}
-
-export async function getContactRequestByIdServer(requestId: string) {
-  const requests = await getContactRequestsServer();
-  return requests.find((request) => request.id === requestId) ?? null;
 }

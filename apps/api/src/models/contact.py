@@ -1,17 +1,40 @@
 # Stdlib
 import uuid
 from datetime import datetime
+from typing import Literal
 
 # Third-party
-from sqlalchemy import CheckConstraint, DateTime, Text, text
+from pydantic import ConfigDict, EmailStr
+from sqlalchemy import CheckConstraint, Column, DateTime, Text, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlmodel import Field, SQLModel
 
 # Local
 from models.base import Base
 
+ContactRequestReason = Literal["hire_services", "seek_representation"]
 
-class ContactRequest(Base):
+
+class ContactRequestBase(SQLModel):
+    reason: ContactRequestReason
+    email: str
+    message: str
+
+
+class ContactRequestCreate(SQLModel):
+    reason: ContactRequestReason
+    email: EmailStr
+    message: str = Field(min_length=1, max_length=5000)
+
+
+class ContactRequestRead(ContactRequestBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    created_at: datetime
+
+
+class ContactRequest(ContactRequestBase, Base, table=True):
     __tablename__ = "contact_request"
     __table_args__ = (
         CheckConstraint(
@@ -20,15 +43,21 @@ class ContactRequest(Base):
         ),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()")
+    id: uuid.UUID = Field(
+        sa_column=Column(
+            UUID(as_uuid=True),
+            primary_key=True,
+            server_default=text("gen_random_uuid()"),
+        )
     )
-    reason: Mapped[str] = mapped_column(Text, nullable=False)
-    email: Mapped[str] = mapped_column(Text, nullable=False)
-    message: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        "created_at",
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=text("now()"),
+    reason: str = Field(sa_column=Column(Text, nullable=False))
+    email: str = Field(sa_column=Column(Text, nullable=False))
+    message: str = Field(sa_column=Column(Text, nullable=False))
+    created_at: datetime = Field(
+        sa_column=Column(
+            "created_at",
+            DateTime(timezone=True),
+            nullable=False,
+            server_default=text("now()"),
+        )
     )

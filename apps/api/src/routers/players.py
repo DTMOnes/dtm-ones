@@ -11,10 +11,15 @@ from sqlalchemy.orm import selectinload
 # Local
 from core.dependencies.auth import CurrentUser
 from core.dependencies.db import DbSession
-from models import Category, Player, PlayerCategory
-from schemas.common import MessageResponse
-from schemas.players import CreatePlayerInput, PlayerRead, UpdatePlayerInput
-from serializers.players import serialize_player
+from models import (
+    Category,
+    MessageResponse,
+    Player,
+    PlayerCategory,
+    PlayerCreate,
+    PlayerRead,
+    PlayerUpdate,
+)
 from services import blob
 from services.categories import find_many_categories
 from services.players import find_player
@@ -31,8 +36,8 @@ async def get_all_players(
     c: Annotated[list[str] | None, Query()] = None,
 ) -> list[PlayerRead]:
     stmt = select(Player).options(
-        selectinload(Player.player_categories).selectinload(PlayerCategory.category),
-        selectinload(Player.player_media),
+        selectinload(Player.categories),
+        selectinload(Player.media),
     )
 
     if q:
@@ -59,18 +64,18 @@ async def get_all_players(
     result = await db.execute(stmt)
     players = result.scalars().unique().all()
 
-    return [serialize_player(player) for player in players]
+    return [PlayerRead.model_validate(player) for player in players]
 
 
 @router.get("/{player_id}", response_model=PlayerRead)
 async def get_player(player_id: uuid.UUID, db: DbSession) -> PlayerRead:
     player = await find_player(db, player_id)
-    return serialize_player(player)
+    return PlayerRead.model_validate(player)
 
 
 @router.post("", response_model=PlayerRead, status_code=status.HTTP_201_CREATED)
 async def create_player(
-    payload: CreatePlayerInput, db: DbSession, _: CurrentUser
+    payload: PlayerCreate, db: DbSession, _: CurrentUser
 ) -> PlayerRead:
     categories = await find_many_categories(db, payload.category_ids)
     if len(payload.category_ids) != len(categories):
@@ -99,13 +104,13 @@ async def create_player(
 
     created_player = await find_player(db, player.id)
 
-    return serialize_player(created_player)
+    return PlayerRead.model_validate(created_player)
 
 
 @router.patch("/{player_id}", response_model=PlayerRead)
 async def update_player(
     player_id: uuid.UUID,
-    payload: UpdatePlayerInput,
+    payload: PlayerUpdate,
     db: DbSession,
     _: CurrentUser,
 ) -> PlayerRead:
@@ -125,15 +130,11 @@ async def update_player(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Category not found."
             )
 
-        for link in list(player.player_categories):
-            await db.delete(link)
-        await db.flush()
-        for category_id in payload.category_ids:
-            db.add(PlayerCategory(player_id=player.id, category_id=category_id))
+        player.categories = categories
 
     await db.commit()
 
-    return serialize_player(await find_player(db, player.id))
+    return PlayerRead.model_validate(await find_player(db, player.id))
 
 
 @router.delete("/{player_id}", response_model=MessageResponse)
@@ -143,9 +144,7 @@ async def delete_player(
     player = await find_player(db, player_id)
 
     image_urls = [
-        media.url
-        for media in player.player_media
-        if media.media_type in _BLOB_IMAGE_TYPES
+        media.url for media in player.media if media.media_type in _BLOB_IMAGE_TYPES
     ]
 
     if image_urls:

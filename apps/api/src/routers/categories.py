@@ -11,15 +11,16 @@ from sqlalchemy.orm import selectinload
 # Local
 from core.dependencies.auth import CurrentUser
 from core.dependencies.db import DbSession
-from models import Category, PlayerCategory
-from schemas.categories import (
+from models import (
+    Category,
+    CategoryCreate,
+    CategoryDetail,
     CategoryRead,
+    CategoryUpdate,
     CategoryWithCount,
-    CreateCategoryInput,
-    UpdateCategoryInput,
+    PlayerCategory,
+    SuccessMessageResponse,
 )
-from schemas.common import SuccessMessageResponse
-from schemas.players import CategoryDetail, PlayerSummary
 from services.categories import find_category
 
 router = APIRouter(prefix="/categories", tags=["categories"])
@@ -36,7 +37,7 @@ async def list_categories(
                 select(Category)
                 .where(Category.name.ilike(f"%{(q or '').strip()}%"))
                 .order_by(desc(Category.created_at))
-                .options(selectinload(Category.player_categories))
+                .options(selectinload(Category.players))
             )
         )
         .scalars()
@@ -49,7 +50,7 @@ async def list_categories(
             name=category.name,
             created_at=category.created_at,
             updated_at=category.updated_at,
-            player_count=len(category.player_categories),
+            player_count=len(category.players),
         )
         for category in categories
     ]
@@ -61,11 +62,7 @@ async def get_category(category_id: uuid.UUID, db: DbSession) -> CategoryDetail:
         await db.execute(
             select(Category)
             .where(Category.id == category_id)
-            .options(
-                selectinload(Category.player_categories).selectinload(
-                    PlayerCategory.player
-                )
-            )
+            .options(selectinload(Category.players))
         )
     ).scalar_one_or_none()
 
@@ -74,21 +71,12 @@ async def get_category(category_id: uuid.UUID, db: DbSession) -> CategoryDetail:
             status_code=status.HTTP_404_NOT_FOUND, detail="Category not found."
         )
 
-    return CategoryDetail(
-        id=category.id,
-        name=category.name,
-        created_at=category.created_at,
-        updated_at=category.updated_at,
-        players=[
-            PlayerSummary.model_validate(link.player)
-            for link in category.player_categories
-        ],
-    )
+    return CategoryDetail.model_validate(category)
 
 
 @router.post("", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
 async def create_category(
-    payload: CreateCategoryInput, db: DbSession, _: CurrentUser
+    payload: CategoryCreate, db: DbSession, _: CurrentUser
 ) -> CategoryRead:
     category = Category(name=payload.name)
     db.add(category)
@@ -100,7 +88,7 @@ async def create_category(
 @router.patch("/{category_id}", response_model=CategoryRead)
 async def update_category(
     category_id: uuid.UUID,
-    payload: UpdateCategoryInput,
+    payload: CategoryUpdate,
     db: DbSession,
     _: CurrentUser,
 ) -> CategoryRead:
