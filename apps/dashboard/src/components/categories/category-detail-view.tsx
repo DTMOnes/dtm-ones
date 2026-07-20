@@ -1,17 +1,14 @@
 "use client";
 
-// Components
 import CategoryPlayers from "@/components/categories/category-players";
 import DeleteCategoryCard from "@/components/categories/delete-category-card";
 import EditCategoryForm from "@/components/categories/edit-category-form";
-
-// Types
-import type { ApiCategoryDetail } from "@/lib/api/types";
+import type { CategoryDetail } from "@/types/category";
 
 export default function CategoryDetailView({
   category,
 }: {
-  category: ApiCategoryDetail;
+  category: CategoryDetail;
 }) {
   return (
     <main className="p-10 flex flex-col gap-8">

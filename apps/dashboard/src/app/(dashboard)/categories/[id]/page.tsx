@@ -1,12 +1,7 @@
-// Next
 import { notFound } from "next/navigation";
 
-// Components
 import CategoryDetailView from "@/components/categories/category-detail-view";
-
-// Lib
-import { ApiError } from "@/lib/api/errors";
-import { getCategoryByIdServer } from "@/lib/api/server-queries";
+import { getCategoryById } from "@/lib/categories/queries";
 
 export default async function Page({
   params,
@@ -14,14 +9,11 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const category = await getCategoryById(id);
 
-  const category = await getCategoryByIdServer(id).catch((error: unknown) => {
-    if (error instanceof ApiError && error.status === 404) {
-      notFound();
-    }
-
-    throw error;
-  });
+  if (!category) {
+    notFound();
+  }
 
   return <CategoryDetailView category={category} />;
 }

@@ -1,12 +1,10 @@
 "use client";
 
-// React
 import { useState } from "react";
 
-// Next
 import { useRouter } from "next/navigation";
 
-// Shadcn
+import { removePlayerFromCategoryAction } from "@/actions/categories/removePlayerFromCategory";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,10 +16,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useRemovePlayerFromCategoryMutation } from "@/hooks/api/use-categories";
 
-// Phosphor
 import { TrashIcon } from "@phosphor-icons/react";
 
 type DeletePlayerButtonProps = {
@@ -38,7 +33,30 @@ export default function DeletePlayerButton({
 }: DeletePlayerButtonProps) {
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { mutate: removePlayer, isPending } = useRemovePlayerFromCategoryMutation();
+  const [pending, setPending] = useState(false);
+
+  async function onConfirmRemove(): Promise<void> {
+    setPending(true);
+    try {
+      const result = await removePlayerFromCategoryAction({
+        categoryId,
+        playerId: player.id,
+      });
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Player removed from category.");
+      setIsDialogOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error("[DeletePlayerButton]", error);
+      toast.error("Could not remove the player.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <>
@@ -46,7 +64,7 @@ export default function DeletePlayerButton({
         type="button"
         variant="destructive"
         size="icon"
-        disabled={isPending}
+        disabled={pending}
         onClick={() => setIsDialogOpen(true)}
       >
         <TrashIcon className="size-4" />
@@ -54,7 +72,7 @@ export default function DeletePlayerButton({
       <AlertDialog
         open={isDialogOpen}
         onOpenChange={(open) => {
-          if (!isPending) {
+          if (!pending) {
             setIsDialogOpen(open);
           }
         }}
@@ -68,31 +86,16 @@ export default function DeletePlayerButton({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
             <Button
               type="button"
               variant="destructive"
-              disabled={isPending}
-              onClick={() =>
-                removePlayer(
-                  { categoryId, playerId: player.id },
-                  {
-                    onSuccess: (response) => {
-                      toast.success(response.message);
-                      setIsDialogOpen(false);
-                      router.refresh();
-                    },
-                    onError: (error) => {
-                      toast.error("No se pudo quitar al jugador.", {
-                        description:
-                          error instanceof ApiError ? error.message : undefined,
-                      });
-                    },
-                  },
-                )
-              }
+              disabled={pending}
+              onClick={() => {
+                void onConfirmRemove();
+              }}
             >
-              {isPending ? "Removing..." : "Confirm"}
+              {pending ? "Removing..." : "Confirm"}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

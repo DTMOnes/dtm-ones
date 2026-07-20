@@ -1,27 +1,17 @@
 "use client";
 
-// React
 import { useEffect, useState } from "react";
 
-// Next
 import { useRouter } from "next/navigation";
 
-// React Hook Form
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { z } from "zod";
 
-// Validation
-import { createCategorySchema } from "@/lib/validation/categories";
-import { ApiError } from "@/lib/api/errors";
-import { useCreateCategoryMutation } from "@/hooks/api/use-categories";
-
-// Components
+import { createCategoryAction } from "@/actions/categories/createCategory";
 import SubmitButton from "@/components/form/submit-button";
 import TextField from "@/components/form/text-field";
-
-// Shadcn
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,9 +22,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { createCategorySchema } from "@/lib/validation/categories";
 import { toast } from "sonner";
 
-// Phosphor
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 type FormValues = z.infer<typeof createCategorySchema>;
@@ -42,6 +32,7 @@ type FormValues = z.infer<typeof createCategorySchema>;
 export default function CreateCategoryDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(createCategorySchema),
@@ -49,13 +40,33 @@ export default function CreateCategoryDialog() {
   });
 
   const { handleSubmit, reset } = methods;
-  const { mutate: submitCreateCategory, isPending } = useCreateCategoryMutation();
 
   useEffect(() => {
     if (!open) {
       reset();
     }
   }, [open, reset]);
+
+  async function onSubmit(data: FormValues): Promise<void> {
+    setPending(true);
+    try {
+      const result = await createCategoryAction(data);
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Category created successfully.");
+      reset();
+      setOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error("[CreateCategoryDialog]", error);
+      toast.error("Could not create the category.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -65,7 +76,7 @@ export default function CreateCategoryDialog() {
           New category
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={!isPending}>
+      <DialogContent showCloseButton={!pending}>
         <DialogHeader>
           <DialogTitle>New category</DialogTitle>
           <DialogDescription>
@@ -75,23 +86,7 @@ export default function CreateCategoryDialog() {
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit((data) =>
-              submitCreateCategory(data, {
-                onSuccess: () => {
-                  toast.success("Category created successfully.");
-                  reset();
-                  setOpen(false);
-                  router.refresh();
-                },
-                onError: (error) => {
-                  toast.error(
-                    error instanceof ApiError
-                      ? error.message
-                      : "Could not create the category.",
-                  );
-                },
-              }),
-            )}
+            onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
             noValidate
           >
@@ -99,18 +94,18 @@ export default function CreateCategoryDialog() {
               name="name"
               label="Name"
               placeholder="Ex. First division"
-              disabled={isPending}
+              disabled={pending}
             />
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
-                disabled={isPending}
+                disabled={pending}
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
-              <SubmitButton label="Save" isExecuting={isPending} />
+              <SubmitButton label="Save" isExecuting={pending} />
             </DialogFooter>
           </form>
         </FormProvider>

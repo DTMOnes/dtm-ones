@@ -1,14 +1,9 @@
 "use client";
 
-// Next
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-// Components
 import CreateCategoryDialog from "@/components/categories/create-category-dialog";
 import SearchBar from "@/components/players/search-bar";
-
-// Shadcn
 import {
   Empty,
   EmptyDescription,
@@ -23,17 +18,17 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { Spinner } from "@/components/ui/spinner";
-import { useCategoriesQuery } from "@/hooks/api/use-categories";
+import type { CategoryWithCount } from "@/types/category";
 
-// Phosphor
-import { TagSimpleIcon, WarningCircleIcon } from "@phosphor-icons/react/ssr";
+import { TagSimpleIcon } from "@phosphor-icons/react/ssr";
 
-export default function CategoriesListView() {
-  const searchParams = useSearchParams();
-  const q = searchParams.get("q") ?? "";
-  const { data: allCategories = [], isLoading, isError } = useCategoriesQuery(q);
+type CategoriesListViewProps = {
+  categories: CategoryWithCount[];
+};
 
+export default function CategoriesListView({
+  categories,
+}: CategoriesListViewProps) {
   return (
     <main className="w-full h-full p-10 flex flex-col gap-10">
       <h1 className="text-2xl font-bold">Categories</h1>
@@ -44,23 +39,7 @@ export default function CategoriesListView() {
       </div>
 
       <ItemGroup className="w-full h-full p-4 flex flex-col gap-4 rounded-lg border border-border bg-background shadox-xs dark:border-input dark:bg-input/30">
-        {isLoading ? (
-          <div className="flex min-h-40 items-center justify-center">
-            <Spinner />
-          </div>
-        ) : isError ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <WarningCircleIcon />
-              </EmptyMedia>
-              <EmptyTitle>Could not load categories</EmptyTitle>
-              <EmptyDescription>
-                Something went wrong while fetching categories. Please try again.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : allCategories.length === 0 ? (
+        {categories.length === 0 ? (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -74,7 +53,7 @@ export default function CategoriesListView() {
             </EmptyHeader>
           </Empty>
         ) : (
-          allCategories.map((category) => (
+          categories.map((category) => (
             <Item key={category.id} variant="muted" asChild>
               <Link
                 href={`/categories/${category.id}`}

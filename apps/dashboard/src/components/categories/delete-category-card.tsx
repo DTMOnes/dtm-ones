@@ -1,12 +1,10 @@
 "use client";
 
-// React
 import { useState } from "react";
 
-// Next
 import { useRouter } from "next/navigation";
 
-// Shadcn
+import { deleteCategoryAction } from "@/actions/categories/deleteCategory";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -27,8 +25,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useDeleteCategoryMutation } from "@/hooks/api/use-categories";
 
 type DeleteCategoryCardProps = {
   categoryId: string;
@@ -43,7 +39,27 @@ export default function DeleteCategoryCard({
 }: DeleteCategoryCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { mutate: confirmDelete, isPending } = useDeleteCategoryMutation();
+  const [pending, setPending] = useState(false);
+
+  async function onConfirmDelete(): Promise<void> {
+    setPending(true);
+    try {
+      const result = await deleteCategoryAction({ id: categoryId });
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Category deleted successfully.");
+      setIsDeleteDialogOpen(false);
+      router.push("/categories");
+    } catch (error) {
+      console.error("[DeleteCategoryCard]", error);
+      toast.error("Could not delete the category.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Card className="border-destructive ring-destructive/30">
@@ -64,13 +80,13 @@ export default function DeleteCategoryCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!isPending) {
+            if (!pending) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" disabled={isPending}>
+            <Button type="button" variant="destructive" disabled={pending}>
               Delete category
             </Button>
           </AlertDialogTrigger>
@@ -80,35 +96,20 @@ export default function DeleteCategoryCard({
               <AlertDialogDescription>
                 This action cannot be undone. The category &quot;
                 {categoryName}&quot; will be deleted and unassigned{" "}
-                {playerCount} player{playerCount === 1 ? "" : "s"}.{playerCount}{" "}
-                player{playerCount === 1 ? "" : "s"}.
+                {playerCount} player{playerCount === 1 ? "" : "s"}.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isPending}
-                onClick={() =>
-                  confirmDelete(categoryId, {
-                    onSuccess: (response) => {
-                      toast.success(response.message);
-                      setIsDeleteDialogOpen(false);
-                      router.push("/categories");
-                    },
-                    onError: (error) => {
-                      toast.error("No se pudo eliminar la categoría.", {
-                        description:
-                          error instanceof ApiError ? error.message : undefined,
-                      });
-                    },
-                  })
-                }
+                disabled={pending}
+                onClick={() => {
+                  void onConfirmDelete();
+                }}
               >
-                {isPending ? "Deleting..." : "Confirm deletion"}
+                {pending ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
