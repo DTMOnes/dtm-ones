@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  createPlayerSchema,
-  type CreatePlayerInput,
-} from "@/lib/validation/players";
-import { ApiError } from "@/lib/api/errors";
-import { useCreatePlayerMutation } from "@/hooks/api/use-players";
 
+import { createPlayerAction } from "@/actions/players/createPlayer";
+import OptionsField from "@/components/form/options-field";
+import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,13 +22,12 @@ import {
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import {
+  createPlayerSchema,
+  type CreatePlayerInput,
+} from "@/lib/validation/players";
 import { toast } from "sonner";
 
-// Components
-import TextField from "@/components/form/text-field";
-import OptionsField from "@/components/form/options-field";
-
-// Icons
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 export default function CreatePlayerDialog({
@@ -39,28 +37,46 @@ export default function CreatePlayerDialog({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<CreatePlayerInput>({
     resolver: zodResolver(createPlayerSchema),
     defaultValues: {
       fullName: "",
-      height: "",
-      dateOfBirth: "",
+      heightCm: "",
       nationality: "",
-      lastClub: "",
       categoryIds: [],
     },
   });
 
   const { handleSubmit, reset } = methods;
 
-  const { mutate: submitCreatePlayer, isPending } = useCreatePlayerMutation();
-
   useEffect(() => {
     if (!open) {
       reset();
     }
   }, [open, reset]);
+
+  async function onSubmit(data: CreatePlayerInput): Promise<void> {
+    setPending(true);
+    try {
+      const result = await createPlayerAction(data);
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Player created successfully.");
+      reset();
+      setOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error("[CreatePlayerDialog]", error);
+      toast.error("Could not create the player.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,7 +87,7 @@ export default function CreatePlayerDialog({
         </Button>
       </DialogTrigger>
       <DialogContent
-        showCloseButton={!isPending}
+        showCloseButton={!pending}
         className="flex max-h-[90vh] max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
       >
         <DialogHeader className="shrink-0 border-b px-6 py-4">
@@ -83,22 +99,7 @@ export default function CreatePlayerDialog({
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit((data) =>
-              submitCreatePlayer(data, {
-                onSuccess: () => {
-                  toast.success("Player created successfully.");
-                  reset();
-                  setOpen(false);
-                  router.refresh();
-                },
-                onError: (error) => {
-                  toast.error("Failed to create player.", {
-                    description:
-                      error instanceof ApiError ? error.message : undefined,
-                  });
-                },
-              }),
-            )}
+            onSubmit={handleSubmit(onSubmit)}
             className="flex min-h-0 flex-1 flex-col"
             noValidate
           >
@@ -108,38 +109,26 @@ export default function CreatePlayerDialog({
                   name="fullName"
                   label="Full name"
                   placeholder="John Doe"
-                  disabled={isPending}
-                />
-                <TextField
-                  name="dateOfBirth"
-                  label="Date of birth"
-                  placeholder="DD/MM/YYYY"
-                  disabled={isPending}
+                  disabled={pending}
                 />
                 <TextField
                   name="nationality"
                   label="Nationality"
                   placeholder="Argentina"
-                  disabled={isPending}
+                  disabled={pending}
                 />
                 <TextField
-                  name="height"
+                  name="heightCm"
                   label="Height (cm)"
                   placeholder="185"
-                  disabled={isPending}
-                />
-                <TextField
-                  name="lastClub"
-                  label="Last club"
-                  placeholder="Club name"
-                  disabled={isPending}
+                  disabled={pending}
                 />
                 <OptionsField
                   name="categoryIds"
                   label="Categories"
                   options={categories}
                   emptyMessage="No categories created yet"
-                  disabled={isPending}
+                  disabled={pending}
                 />
               </FieldGroup>
             </div>
@@ -147,10 +136,10 @@ export default function CreatePlayerDialog({
               <Button
                 type="submit"
                 variant="outline"
-                disabled={isPending}
+                disabled={pending}
                 aria-label="submit"
               >
-                {isPending ? <Spinner /> : "Create player"}
+                {pending ? <Spinner /> : "Create player"}
               </Button>
             </DialogFooter>
           </form>

@@ -1,26 +1,10 @@
 "use client";
 
-// Next
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-// Components
 import CreatePlayerDialog from "@/components/players/create-player-dialog";
 import FilterButton from "@/components/players/filter-button";
 import SearchBar from "@/components/players/search-bar";
-import { normalizePlayerCategoryIds } from "@/components/players/players-search";
-import { Spinner } from "@/components/ui/spinner";
-import { useCategoriesQuery } from "@/hooks/api/use-categories";
-import { usePlayersQuery } from "@/hooks/api/use-players";
-
-// Shadcn
-import {
-  ItemGroup,
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item";
 import { Badge } from "@/components/ui/badge";
 import {
   Empty,
@@ -29,22 +13,31 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemTitle,
+} from "@/components/ui/item";
+import type { CategoryWithCount } from "@/types/category";
+import type { PlayerListItem } from "@/types/player";
 
-// Phosphor
-import { FolderOpenIcon, WarningCircleIcon } from "@phosphor-icons/react/ssr";
+import { FolderOpenIcon } from "@phosphor-icons/react/ssr";
 
-export default function PlayersListView() {
-  const searchParams = useSearchParams();
-  const q = searchParams.get("q") ?? "";
-  const categoriesArray = normalizePlayerCategoryIds(searchParams.getAll("c"));
+type PlayersListViewProps = {
+  players: PlayerListItem[];
+  categories: CategoryWithCount[];
+};
 
-  const { data: allCategories = [], isLoading: categoriesLoading } =
-    useCategoriesQuery("");
-  const {
-    data: allPlayers = [],
-    isLoading: playersLoading,
-    isError,
-  } = usePlayersQuery({ q, c: categoriesArray });
+export default function PlayersListView({
+  players,
+  categories,
+}: PlayersListViewProps) {
+  const categoryOptions = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+  }));
 
   return (
     <main className="w-full h-full p-10 flex flex-col gap-10">
@@ -54,29 +47,13 @@ export default function PlayersListView() {
         <SearchBar />
 
         <div className="flex items-center gap-2">
-          <FilterButton categories={allCategories} />
-          <CreatePlayerDialog categories={allCategories} />
+          <FilterButton categories={categoryOptions} />
+          <CreatePlayerDialog categories={categoryOptions} />
         </div>
       </div>
 
       <ItemGroup className="w-full h-full p-4 flex flex-col gap-4 rounded-lg border border-border bg-background shadox-xs dark:border-input dark:bg-input/30">
-        {playersLoading || categoriesLoading ? (
-          <div className="flex min-h-40 items-center justify-center">
-            <Spinner />
-          </div>
-        ) : isError ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <WarningCircleIcon />
-              </EmptyMedia>
-              <EmptyTitle>Could not load players</EmptyTitle>
-              <EmptyDescription>
-                Something went wrong while fetching players. Please try again.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : allPlayers.length === 0 ? (
+        {players.length === 0 ? (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -89,7 +66,7 @@ export default function PlayersListView() {
             </EmptyHeader>
           </Empty>
         ) : (
-          allPlayers.map((player) => (
+          players.map((player) => (
             <Item key={player.id} variant="muted" asChild>
               <Link
                 href={`/players/${player.id}`}
@@ -98,8 +75,8 @@ export default function PlayersListView() {
                 <ItemContent>
                   <ItemTitle>{player.full_name}</ItemTitle>
                   <ItemDescription>
-                    Last club: {player.last_club} - Birth date:{" "}
-                    {player.date_of_birth}
+                    {player.height_cm} cm · {player.nationality} ·{" "}
+                    {player.status === "published" ? "Published" : "Draft"}
                   </ItemDescription>
                 </ItemContent>
                 <div className="flex flex-wrap items-center justify-end gap-2">

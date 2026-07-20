@@ -1,41 +1,50 @@
 "use client";
 
-// Next
 import { useRouter } from "next/navigation";
 
-// Shadcn
-import { toast } from "sonner";
-
-// Components
+import { uploadGalleryImageAction } from "@/actions/players/galleryImage";
+import { uploadPresentationImageAction } from "@/actions/players/presentationImage";
 import { ImageUpload } from "@/components/media/image-upload";
-import { ApiError } from "@/lib/api/errors";
-import { useUploadPlayerImageMutation } from "@/hooks/api/use-player-media";
+import { toast } from "sonner";
 
 export default function PlayerImageField({
   playerId,
-  mediaType = "image",
+  kind,
   label = "Player Image",
 }: {
   playerId: string;
-  mediaType?: "image" | "institutional_picture";
+  kind: "presentation" | "gallery";
   label?: string;
 }) {
   const router = useRouter();
-  const { mutateAsync: uploadImage } = useUploadPlayerImageMutation();
 
   return (
     <ImageUpload
       onSubmitFile={async (file) => {
+        const formData = new FormData();
+        formData.set("playerId", playerId);
+        formData.set("file", file);
+
         try {
-          await uploadImage({ playerId, mediaType, file });
-          toast.success("Media added successfully.");
+          const result =
+            kind === "presentation"
+              ? await uploadPresentationImageAction(formData)
+              : await uploadGalleryImageAction(formData);
+
+          if (result.error) {
+            toast.error(result.error.message);
+            return;
+          }
+
+          toast.success(
+            kind === "presentation"
+              ? "Institutional picture updated."
+              : "Gallery image added.",
+          );
           router.refresh();
         } catch (error) {
-          toast.error(
-            error instanceof ApiError
-              ? error.message
-              : "There was an error processing the uploaded file",
-          );
+          console.error("[PlayerImageField]", error);
+          toast.error("There was an error processing the uploaded file");
         }
       }}
     >

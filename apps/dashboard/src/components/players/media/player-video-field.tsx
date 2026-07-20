@@ -1,29 +1,21 @@
 "use client";
 
-// Next
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
-// React Hook Form
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Validation Schema
-import { playerVideoFormSchema } from "@/lib/validation/player-media";
-
-// Zod
 import { z } from "zod";
 
-// Shadcn
-import { FieldDescription, FieldGroup } from "@/components/ui/field";
-import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useUploadPlayerVideoMutation } from "@/hooks/api/use-player-media";
-
-// Components
-import TextField from "@/components/form/text-field";
+import { addPlayerVideoAction } from "@/actions/players/playerVideo";
 import SubmitButton from "@/components/form/submit-button";
+import TextField from "@/components/form/text-field";
+import { FieldDescription, FieldGroup } from "@/components/ui/field";
+import { playerVideoFormSchema } from "@/lib/validation/player-media";
+import { toast } from "sonner";
 
-// Phosphor
 import { InfoIcon } from "@phosphor-icons/react";
 
 type FormValues = z.infer<typeof playerVideoFormSchema>;
@@ -34,26 +26,33 @@ export default function PlayerVideoField({
   playerId: string;
 }) {
   const router = useRouter();
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(playerVideoFormSchema),
     defaultValues: { url: "" },
   });
 
-  const { mutateAsync: uploadVideo, isPending } = useUploadPlayerVideoMutation();
-
   const onSubmit = methods.handleSubmit(async ({ url }) => {
+    setPending(true);
     try {
-      await uploadVideo({ playerId, url });
+      const result = await addPlayerVideoAction({
+        playerId,
+        youtube_url: url,
+      });
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
       toast.success("Video added successfully.");
       methods.reset();
       router.refresh();
     } catch (error) {
-      toast.error(
-        error instanceof ApiError
-          ? error.message
-          : "There was an error saving the video link",
-      );
+      console.error("[PlayerVideoField]", error);
+      toast.error("There was an error saving the video link");
+    } finally {
+      setPending(false);
     }
   });
 
@@ -67,10 +66,10 @@ export default function PlayerVideoField({
                 name="url"
                 label="YouTube URL"
                 placeholder="https://www.youtube.com/watch?v=..."
-                disabled={isPending}
+                disabled={pending}
               />
             </div>
-            <SubmitButton label="Save" isExecuting={isPending} />
+            <SubmitButton label="Save" isExecuting={pending} />
           </div>
           <FieldDescription className="flex items-center gap-1 text-sm text-muted-foreground">
             <InfoIcon />

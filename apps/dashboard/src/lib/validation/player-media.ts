@@ -1,35 +1,28 @@
-// Zod
+import { parseYouTubeVideoId } from "@/lib/youtube";
 import { z } from "zod";
 
-// Utils
-import { parseYouTubeVideoId } from "@/lib/youtube";
+export const ALLOWED_IMAGE_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+] as const;
+
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export const youtubeVideoUrlSchema = z
   .string()
   .url()
   .refine((url) => parseYouTubeVideoId(url) !== null, {
-    message: "Introduce una URL válida de YouTube.",
+    message: "Enter a valid YouTube URL.",
   });
 
-export const uploadPlayerImageSchema = z.object({
-  playerId: z.uuid(),
-  mediaType: z.enum(["image", "institutional_picture"]).default("image"),
-  url: z.url(),
-});
-
-export const uploadPlayerVideoSchema = z.object({
-  playerId: z.uuid(),
-  url: youtubeVideoUrlSchema,
-});
-
-export const deletePlayerImageSchema = z.object({
-  id: z.uuid(),
-});
-
-export const deletePlayerVideoSchema = z.object({
-  id: z.uuid(),
+export const addPlayerVideoSchema = z.object({
+  playerId: z.uuid({ message: "Invalid player ID." }),
+  youtube_url: youtubeVideoUrlSchema,
 });
 
 export const playerVideoFormSchema = z.object({
   url: youtubeVideoUrlSchema,
 });
+
+export type AddPlayerVideoInput = z.infer<typeof addPlayerVideoSchema>;

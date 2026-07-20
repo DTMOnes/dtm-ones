@@ -35,6 +35,8 @@ Read in this exact order before any implementation:
 - If the same problem persists after one corrective prompt —
   stop immediately and run /recover
 - Server Actions return InsForge shaped `{ data, error }`. Never add `next-safe-action`
+- Dashboard Contacts, Categories, and Players load via InsForge server queries and mutate via plain Server Actions under `actions/`; no TanStack Query on those surfaces. Users still uses TanStack until the purge follow up.
+- Dashboard `next.config` allows `https://*.insforge.app/api/storage/**` for Next.js `Image` on player media URLs
 
 ## Available Skills
 

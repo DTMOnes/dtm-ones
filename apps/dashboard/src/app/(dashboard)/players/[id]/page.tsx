@@ -1,15 +1,8 @@
-// Next
 import { notFound } from "next/navigation";
 
-// Components
 import PlayerDetailView from "@/components/players/player-detail-view";
-
-// Lib
-import { ApiError } from "@/lib/api/errors";
-import {
-  getCategoriesServer,
-  getPlayerByIdServer,
-} from "@/lib/api/server-queries";
+import { listCategories } from "@/lib/categories/queries";
+import { getPlayerById } from "@/lib/players/queries";
 
 export default async function Page({
   params,
@@ -19,15 +12,13 @@ export default async function Page({
   const { id } = await params;
 
   const [player, categories] = await Promise.all([
-    getPlayerByIdServer(id),
-    getCategoriesServer(""),
-  ]).catch((error: unknown) => {
-    if (error instanceof ApiError && error.status === 404) {
-      notFound();
-    }
+    getPlayerById(id),
+    listCategories(""),
+  ]);
 
-    throw error;
-  });
+  if (!player) {
+    notFound();
+  }
 
   return <PlayerDetailView player={player} categories={categories} />;
 }

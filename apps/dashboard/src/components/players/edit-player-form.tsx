@@ -1,21 +1,16 @@
 "use client";
 
-// Next
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
-// React Hook Form
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Validation Schema
-import {
-  updatePlayerSchema,
-  type UpdatePlayerInput,
-} from "@/lib/validation/players";
-
-import type { ApiPlayer } from "@/lib/api/types";
-
-// Shadcn
+import { updatePlayerAction } from "@/actions/players/updatePlayer";
+import OptionsField from "@/components/form/options-field";
+import SubmitButton from "@/components/form/submit-button";
+import TextField from "@/components/form/text-field";
 import {
   Card,
   CardContent,
@@ -24,39 +19,55 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FieldGroup } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  updatePlayerSchema,
+  type UpdatePlayerInput,
+} from "@/lib/validation/players";
+import type { PlayerDetail } from "@/types/player";
 import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useUpdatePlayerMutation } from "@/hooks/api/use-players";
-
-// Components
-import TextField from "@/components/form/text-field";
-import OptionsField from "@/components/form/options-field";
-import SubmitButton from "@/components/form/submit-button";
 
 export default function EditPlayerForm({
   player,
   categories,
 }: {
-  player: ApiPlayer;
+  player: PlayerDetail;
   categories: Array<{ id: string; name: string }>;
 }) {
   const router = useRouter();
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<UpdatePlayerInput>({
     resolver: zodResolver(updatePlayerSchema),
     defaultValues: {
       id: player.id,
       fullName: player.full_name,
-      dateOfBirth: player.date_of_birth,
       nationality: player.nationality,
-      height: player.height,
-      lastClub: player.last_club,
+      heightCm: String(player.height_cm),
+      status: player.status,
       categoryIds: player.categories.map((category) => category.id),
     },
   });
 
-  const { mutate: submitUpdate, isPending } = useUpdatePlayerMutation();
+  async function onSubmit(data: UpdatePlayerInput): Promise<void> {
+    setPending(true);
+    try {
+      const result = await updatePlayerAction(data);
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Player updated successfully.");
+      router.refresh();
+    } catch (error) {
+      console.error("[EditPlayerForm]", error);
+      toast.error("Could not update the player.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <FormProvider {...methods}>
@@ -67,66 +78,73 @@ export default function EditPlayerForm({
             Update the player&apos;s profile details and category assignments.
           </CardDescription>
         </CardHeader>
-        <form
-          onSubmit={methods.handleSubmit((data) =>
-            submitUpdate(data, {
-              onSuccess: () => {
-                toast.success("Player updated successfully.");
-                router.refresh();
-              },
-              onError: (error) => {
-                toast.error("Failed to update player.", {
-                  description:
-                    error instanceof ApiError ? error.message : undefined,
-                });
-              },
-            }),
-          )}
-          noValidate
-        >
+        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
           <CardContent className="pb-6">
             <FieldGroup className="gap-6">
               <TextField
                 name="fullName"
                 label="Full name"
                 placeholder="John Doe"
-                disabled={isPending}
-              />
-              <TextField
-                name="dateOfBirth"
-                label="Date of birth"
-                placeholder="DD/MM/YYYY"
-                disabled={isPending}
+                disabled={pending}
               />
               <TextField
                 name="nationality"
                 label="Nationality"
                 placeholder="Argentina"
-                disabled={isPending}
+                disabled={pending}
               />
               <TextField
-                name="height"
+                name="heightCm"
                 label="Height (cm)"
                 placeholder="185"
-                disabled={isPending}
+                disabled={pending}
               />
-              <TextField
-                name="lastClub"
-                label="Last club"
-                placeholder="Club name"
-                disabled={isPending}
-              />
+              <Field className="flex flex-col gap-2">
+                <FieldLabel>Status</FieldLabel>
+                <Controller
+                  name="status"
+                  control={methods.control}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <ToggleGroup
+                        type="single"
+                        size="sm"
+                        variant="outline"
+                        spacing={2}
+                        className="flex flex-wrap gap-2"
+                        disabled={pending}
+                        value={field.value}
+                        onValueChange={(value) => {
+                          if (value === "draft" || value === "published") {
+                            field.onChange(value);
+                          }
+                        }}
+                      >
+                        <ToggleGroupItem value="draft">Draft</ToggleGroupItem>
+                        <ToggleGroupItem value="published">
+                          Published
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                      {fieldState.error?.message ? (
+                        <FieldError
+                          errors={[{ message: fieldState.error.message }]}
+                        />
+                      ) : null}
+                    </>
+                  )}
+                />
+              </Field>
               <OptionsField
                 name="categoryIds"
                 label="Categories"
                 options={categories}
                 emptyMessage="No categories created yet"
-                disabled={isPending}
+                disabled={pending}
               />
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
-            <SubmitButton label="Save changes" isExecuting={isPending} />
+            <SubmitButton label="Save changes" isExecuting={pending} />
           </CardFooter>
         </form>
       </Card>

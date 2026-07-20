@@ -1,12 +1,10 @@
 "use client";
 
-// React
 import { useState } from "react";
 
-// Next
 import { useRouter } from "next/navigation";
 
-// Shadcn
+import { softDeletePlayerAction } from "@/actions/players/softDeletePlayer";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -27,8 +25,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useDeletePlayerMutation } from "@/hooks/api/use-players";
 
 type DeletePlayerCardProps = {
   playerId: string;
@@ -41,15 +37,35 @@ export default function DeletePlayerCard({
 }: DeletePlayerCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { mutate: confirmDelete, isPending } = useDeletePlayerMutation();
+  const [pending, setPending] = useState(false);
+
+  async function confirmSoftDelete(): Promise<void> {
+    setPending(true);
+    try {
+      const result = await softDeletePlayerAction({ id: playerId });
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Player removed from the roster.");
+      setIsDeleteDialogOpen(false);
+      router.push("/players");
+    } catch (error) {
+      console.error("[DeletePlayerCard]", error);
+      toast.error("Could not remove the player.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Card className="border-destructive ring-destructive/30">
       <CardHeader className="border-b border-destructive/20">
-        <CardTitle>Delete player</CardTitle>
+        <CardTitle>Remove player</CardTitle>
         <CardDescription>
-          Permanently remove this player and all associated media from the
-          database. This action cannot be undone.
+          Soft delete hides this player from the roster and public site. Media
+          files stay in place. This is not a permanent delete.
         </CardDescription>
       </CardHeader>
       <CardContent className="py-6">
@@ -62,49 +78,36 @@ export default function DeletePlayerCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!isPending) {
+            if (!pending) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" disabled={isPending}>
-              Delete player
+            <Button type="button" variant="destructive" disabled={pending}>
+              Remove player
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete player</AlertDialogTitle>
+              <AlertDialogTitle>Remove player</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. All data for {fullName} will be
-                permanently deleted.
+                {fullName} will be soft deleted and hidden from the roster. You
+                can restore them later with a follow up tool. Media files are
+                kept.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isPending}
-                onClick={() =>
-                  confirmDelete(playerId, {
-                    onSuccess: (response) => {
-                      toast.success(response.message);
-                      setIsDeleteDialogOpen(false);
-                      router.push("/players");
-                    },
-                    onError: (error) => {
-                      toast.error("Failed to delete player.", {
-                        description:
-                          error instanceof ApiError ? error.message : undefined,
-                      });
-                    },
-                  })
-                }
+                disabled={pending}
+                onClick={() => {
+                  void confirmSoftDelete();
+                }}
               >
-                {isPending ? "Deleting..." : "Confirm deletion"}
+                {pending ? "Removing..." : "Confirm removal"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

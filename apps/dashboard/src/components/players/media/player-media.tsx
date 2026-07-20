@@ -1,16 +1,9 @@
 "use client";
 
-// React
-import { useMemo } from "react";
-
-// Types
-import type { ApiPlayer } from "@/lib/api/types";
-
-// Components
 import PlayerImageField from "@/components/players/media/player-image-field";
-import PlayerVideoListItem from "@/components/players/media/player-video-list-item";
 import PlayerImagePreview from "@/components/players/media/player-image-preview";
 import PlayerVideoField from "@/components/players/media/player-video-field";
+import PlayerVideoListItem from "@/components/players/media/player-video-list-item";
 import {
   Card,
   CardContent,
@@ -25,37 +18,15 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import type { PlayerDetail } from "@/types/player";
 
-// Phosphor
 import { ImageSquareIcon, VideoCameraIcon } from "@phosphor-icons/react";
 
 export default function PlayerMedia({
   player,
 }: {
-  player: ApiPlayer;
+  player: PlayerDetail;
 }) {
-  const videos = useMemo(
-    () =>
-      player.media
-        .filter((m) => m.media_type === "video")
-        .sort(
-          (a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-        ),
-    [player.media],
-  );
-
-  const images = useMemo(
-    () => player.media.filter((m) => m.media_type === "image"),
-    [player.media],
-  );
-
-  const institutionalPictures = useMemo(
-    () =>
-      player.media.filter((m) => m.media_type === "institutional_picture"),
-    [player.media],
-  );
-
   return (
     <div className="flex flex-col gap-10">
       <Card>
@@ -67,11 +38,8 @@ export default function PlayerMedia({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <PlayerImageField
-            playerId={player.id}
-            mediaType="institutional_picture"
-          />
-          {institutionalPictures.length === 0 ? (
+          <PlayerImageField playerId={player.id} kind="presentation" />
+          {!player.presentation_image_url ? (
             <Empty className="border border-dashed">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -86,17 +54,15 @@ export default function PlayerMedia({
             </Empty>
           ) : (
             <ul className="p-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 border border-dashed">
-              {institutionalPictures.map((m) => (
-                <li key={m.id}>
-                  <PlayerImagePreview
-                    url={m.url}
-                    alt={`${player.full_name} institutional picture`}
-                    className="w-full"
-                    mediaId={m.id}
-                    playerId={player.id}
-                  />
-                </li>
-              ))}
+              <li>
+                <PlayerImagePreview
+                  url={player.presentation_image_url}
+                  alt={`${player.full_name} institutional picture`}
+                  className="w-full"
+                  playerId={player.id}
+                  kind="presentation"
+                />
+              </li>
             </ul>
           )}
         </CardContent>
@@ -110,8 +76,8 @@ export default function PlayerMedia({
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <PlayerImageField playerId={player.id} />
-          {images.length === 0 ? (
+          <PlayerImageField playerId={player.id} kind="gallery" />
+          {player.gallery_images.length === 0 ? (
             <Empty className="border border-dashed">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -126,14 +92,15 @@ export default function PlayerMedia({
             </Empty>
           ) : (
             <ul className="p-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 border border-dashed">
-              {images.map((m) => (
-                <li key={m.id}>
+              {player.gallery_images.map((image) => (
+                <li key={image.id}>
                   <PlayerImagePreview
-                    url={m.url}
+                    url={image.url}
                     alt=""
                     className="w-full"
-                    mediaId={m.id}
                     playerId={player.id}
+                    kind="gallery"
+                    imageId={image.id}
                   />
                 </li>
               ))}
@@ -152,7 +119,7 @@ export default function PlayerMedia({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <PlayerVideoField playerId={player.id} />
-          {videos.length === 0 ? (
+          {player.videos.length === 0 ? (
             <Empty className="border border-dashed">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
@@ -167,11 +134,11 @@ export default function PlayerMedia({
             </Empty>
           ) : (
             <ul className="flex flex-col gap-2 p-4 border border-dashed">
-              {videos.map((m) => (
-                <li key={m.id}>
+              {player.videos.map((video) => (
+                <li key={video.id}>
                   <PlayerVideoListItem
-                    url={m.url}
-                    mediaId={m.id}
+                    url={video.youtube_url}
+                    videoId={video.id}
                     playerId={player.id}
                   />
                 </li>

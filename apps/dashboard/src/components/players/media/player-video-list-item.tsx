@@ -1,12 +1,6 @@
 "use client";
 
-// Utils
-import {
-  getYouTubeThumbnailUrl,
-  parseYouTubeVideoId,
-} from "@/lib/youtube";
-
-// Shadcn
+import DeletePlayerVideo from "@/components/players/delete-player-video";
 import {
   Item,
   ItemActions,
@@ -15,27 +9,28 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-
-// Components
-import DeletePlayerVideo from "@/components/players/delete-player-video";
+import {
+  getYouTubeThumbnailUrl,
+  parseYouTubeVideoId,
+} from "@/lib/youtube";
 
 export default function PlayerVideoListItem({
   url,
-  mediaId,
+  videoId,
   playerId,
 }: {
   url: string;
-  mediaId: string;
+  videoId: string;
   playerId: string;
 }) {
-  const videoId = parseYouTubeVideoId(url);
+  const parsedVideoId = parseYouTubeVideoId(url);
 
   return (
     <Item variant="outline" className="items-center">
-      {videoId ? (
+      {parsedVideoId ? (
         <ItemMedia variant="image">
           <img
-            src={getYouTubeThumbnailUrl(videoId)}
+            src={getYouTubeThumbnailUrl(parsedVideoId)}
             alt=""
             className="size-full object-cover"
           />
@@ -49,15 +44,15 @@ export default function PlayerVideoListItem({
             rel="noopener noreferrer"
             className="truncate hover:underline"
           >
-              {url}
-            </a>
-          </ItemTitle>
-        {videoId ? (
+            {url}
+          </a>
+        </ItemTitle>
+        {parsedVideoId ? (
           <ItemDescription>YouTube video</ItemDescription>
         ) : null}
       </ItemContent>
       <ItemActions>
-        <DeletePlayerVideo id={mediaId} playerId={playerId} />
+        <DeletePlayerVideo id={videoId} playerId={playerId} />
       </ItemActions>
     </Item>
   );
