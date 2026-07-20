@@ -1,9 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAction } from "next-safe-action/hooks";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -21,13 +21,11 @@ import {
 import TextField from "@/components/form/text-field";
 import PasswordField from "@/components/form/password-field";
 
-const FALLBACK_ERROR_MESSAGE =
-  "Sign in could not be validated. Please check your details and try again.";
-
 type FormValues = z.infer<typeof schema>;
 
 export function SignInForm() {
   const router = useRouter();
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema as never),
@@ -37,23 +35,28 @@ export function SignInForm() {
     },
   });
 
-  const { execute, isPending } = useAction(signInAction, {
-    onSuccess: ({ data }) => {
-      if (!data) return;
+  async function onSubmit(values: FormValues) {
+    setPending(true);
+    try {
+      const { data, error } = await signInAction(values);
+
+      if (error) {
+        methods.setValue("password", "");
+        toast.error(error.message);
+        return;
+      }
+
+      if (!data) {
+        return;
+      }
 
       toast.success("Signed in successfully");
       router.push("/contacts");
       router.refresh();
-    },
-    onError: ({ error }) => {
-      methods.setValue("password", "");
-      toast.error(error.serverError?.message ?? FALLBACK_ERROR_MESSAGE);
-    },
-  });
-
-  const onSubmit = (values: FormValues) => {
-    execute(values);
-  };
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Card className="gap-6">
@@ -80,9 +83,9 @@ export function SignInForm() {
           type="submit"
           form="signin-form"
           className="w-full"
-          disabled={isPending}
+          disabled={pending}
         >
-          {isPending ? "Signing in..." : "Sign In"}
+          {pending ? "Signing in..." : "Sign In"}
         </Button>
       </CardFooter>
     </Card>

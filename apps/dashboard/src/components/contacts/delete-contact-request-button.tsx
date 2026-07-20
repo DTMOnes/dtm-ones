@@ -1,11 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
-import { toast } from "sonner";
+import { useState } from "react";
 
-import { deleteContactAction } from "@/actions/contacts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,42 +14,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-const FALLBACK_ERROR_MESSAGE =
-  "The contact request could not be validated. Please try again.";
-
 type DeleteContactRequestButtonProps = {
-  id: string;
+  pending: boolean;
   disabled?: boolean;
-  onPendingChange?: (pending: boolean) => void;
+  onDelete: () => Promise<boolean>;
 };
 
 export function DeleteContactRequestButton({
-  id,
+  pending,
   disabled = false,
-  onPendingChange,
+  onDelete,
 }: DeleteContactRequestButtonProps) {
-  const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const remove = useAction(deleteContactAction, {
-    onSuccess: ({ data }) => {
-      if (!data) return;
-
-      setConfirmOpen(false);
-      toast.success("Contact request deleted");
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError?.message ?? FALLBACK_ERROR_MESSAGE);
-    },
-  });
-
-  const isDeleting = remove.isPending;
-  const isDisabled = disabled || isDeleting;
-
-  useEffect(() => {
-    onPendingChange?.(isDeleting);
-  }, [isDeleting, onPendingChange]);
+  const isDisabled = disabled || pending;
 
   return (
     <>
@@ -69,7 +42,7 @@ export function DeleteContactRequestButton({
       <AlertDialog
         open={confirmOpen}
         onOpenChange={(nextOpen) => {
-          if (!isDeleting) {
+          if (!pending) {
             setConfirmOpen(nextOpen);
           }
         }}
@@ -83,16 +56,20 @@ export function DeleteContactRequestButton({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
-              disabled={isDeleting}
+              disabled={pending}
               onClick={(event) => {
                 event.preventDefault();
-                remove.execute({ id });
+                void onDelete().then((succeeded) => {
+                  if (succeeded) {
+                    setConfirmOpen(false);
+                  }
+                });
               }}
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {pending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

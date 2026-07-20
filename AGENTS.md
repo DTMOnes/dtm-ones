@@ -34,6 +34,7 @@ Read in this exact order before any implementation:
   then read `context/library-docs.md` for project-specific rules
 - If the same problem persists after one corrective prompt —
   stop immediately and run /recover
+- Server Actions return InsForge shaped `{ data, error }`. Never add `next-safe-action`
 
 ## Available Skills
 

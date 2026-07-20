@@ -1,27 +1,37 @@
 "use server";
 
-// Safe Action
-import { actionClient } from "@/lib/safe-action";
-import { flattenValidationErrors } from "next-safe-action";
-
-// Validation Schema
+import {
+  UNAVAILABLE,
+  type ActionResult,
+} from "@/lib/action-result";
+import { createContactRequest as createContactRequestRequest } from "@/lib/api/contact-requests";
 import { createContactRequestSchema } from "@/lib/validation/contact-requests";
 
-// API
-import { createContactRequest as createContactRequestRequest } from "@/lib/api/contact-requests";
-
-export const createContactRequest = actionClient
-  .metadata({ actionName: "createContactRequest" })
-  .inputSchema(createContactRequestSchema, {
-    handleValidationErrorsShape: async (errors) => {
-      return flattenValidationErrors(errors).fieldErrors;
-    },
-  })
-  .action(async ({ parsedInput: data }) => {
-    const response = await createContactRequestRequest(data);
-
+export async function createContactRequest(input: {
+  reason: "hire_services" | "seek_representation";
+  email: string;
+  message: string;
+}): Promise<ActionResult<{ success: true; message: string }>> {
+  const parsed = createContactRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    const fieldErrors = parsed.error.flatten().fieldErrors;
     return {
-      success: true,
-      message: response.message,
+      data: null,
+      error: {
+        message: "Please review the highlighted fields and try again.",
+        fieldErrors: fieldErrors as Record<string, string[]>,
+      },
     };
-  });
+  }
+
+  try {
+    const response = await createContactRequestRequest(parsed.data);
+    return {
+      data: { success: true, message: response.message },
+      error: null,
+    };
+  } catch (error) {
+    console.error("[createContactRequest]", error);
+    return { data: null, error: { message: UNAVAILABLE } };
+  }
+}

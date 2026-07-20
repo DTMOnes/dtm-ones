@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useOptimistic, useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { EnvelopeSimpleIcon } from "@phosphor-icons/react";
-import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { markContactReadAction } from "@/actions/contacts";
+import { markContactReadAction } from "@/actions/contacts/markContactRead";
 import { ContactRequestCard } from "@/components/contacts/contact-request-card";
 import { ContactRequestDialog } from "@/components/contacts/contact-request-dialog";
-import { ContactRequestFilter as ContactRequestFilterControl } from "@/components/contacts/contact-request-filter";
+import {
+  ContactRequestFilter as ContactRequestFilterControl,
+  isContactsInboxFilter,
+} from "@/components/contacts/contact-request-filter";
 import {
   Empty,
   EmptyDescription,
@@ -22,11 +24,31 @@ import type {
   ContactsInboxFilter,
 } from "@/types/contact-request";
 
-const FALLBACK_ERROR_MESSAGE =
-  "The contact request could not be validated. Please try again.";
-
 type ContactsInboxProps = {
-  initialRequests: ContactRequest[];
+  requests: ContactRequest[];
+};
+
+const EMPTY_COPY: Record<
+  ContactsInboxFilter,
+  { title: string; description: string }
+> = {
+  active: {
+    title: "No active contact requests",
+    description:
+      "New and read messages appear here. Check Archived to see older requests.",
+  },
+  new: {
+    title: "No new contact requests",
+    description: "Incoming messages from the public form will show up here.",
+  },
+  read: {
+    title: "No read contact requests",
+    description: "Requests you open move here until they are archived.",
+  },
+  archived: {
+    title: "No archived contact requests",
+    description: "Archived messages are kept here until you delete them.",
+  },
 };
 
 function filterRequests(
@@ -42,86 +64,95 @@ function filterRequests(
   return requests.filter((request) => request.status === filter);
 }
 
-function emptyCopy(filter: ContactsInboxFilter): {
-  title: string;
-  description: string;
-} {
-  if (filter === "active") {
-    return {
-      title: "No active contact requests",
-      description:
-        "New and read messages appear here. Check Archived to see older requests.",
-    };
-  }
-
-  if (filter === "new") {
-    return {
-      title: "No new contact requests",
-      description: "Incoming messages from the public form will show up here.",
-    };
-  }
-
-  if (filter === "read") {
-    return {
-      title: "No read contact requests",
-      description: "Requests you open move here until they are archived.",
-    };
-  }
-
-  return {
-    title: "No archived contact requests",
-    description: "Archived messages are kept here until you delete them.",
-  };
-}
-
-export function ContactsInbox({ initialRequests }: ContactsInboxProps) {
+export function ContactsInbox({ requests }: ContactsInboxProps) {
   const router = useRouter();
-  const [requests, setRequests] = useState<ContactRequest[]>(initialRequests);
-  const [filter, setFilter] = useState<ContactsInboxFilter>("active");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [, startTransition] = useTransition();
 
-  useEffect(() => {
-    setRequests(initialRequests);
-  }, [initialRequests]);
+  const rawFilter = searchParams.get("filter");
+  const filter: ContactsInboxFilter =
+    rawFilter !== null && isContactsInboxFilter(rawFilter)
+      ? rawFilter
+      : "active";
 
-  const visibleRequests = useMemo(
-    () => filterRequests(requests, filter),
-    [filter, requests],
+  const [optimisticRequests, setOptimisticStatus] = useOptimistic(
+    requests,
+    (
+      current: ContactRequest[],
+      update: { id: string; status: "read" },
+    ): ContactRequest[] =>
+      current.map((row) =>
+        row.id === update.id ? { ...row, status: update.status } : row,
+      ),
   );
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [displayRequest, setDisplayRequest] = useState<ContactRequest | null>(
+    null,
+  );
+
+  const visibleRequests = filterRequests(optimisticRequests, filter);
 
   const selectedRequest =
     selectedId === null
       ? null
-      : (requests.find((request) => request.id === selectedId) ?? null);
+      : (optimisticRequests.find((request) => request.id === selectedId) ??
+        null);
 
-  const empty = emptyCopy(filter);
-
-  const markRead = useAction(markContactReadAction, {
-    onSuccess: ({ data }) => {
-      if (!data) return;
-
-      setRequests((current) =>
-        current.map((row) =>
-          row.id === data.request.id ? data.request : row,
-        ),
-      );
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError?.message ?? FALLBACK_ERROR_MESSAGE);
-    },
-  });
-
-  function openRequest(request: ContactRequest) {
-    setSelectedId(request.id);
-
-    if (request.status === "new" && !markRead.isPending) {
-      markRead.execute({ id: request.id });
+  if (selectedRequest !== null) {
+    if (
+      displayRequest === null ||
+      displayRequest.id !== selectedRequest.id ||
+      displayRequest.status !== selectedRequest.status
+    ) {
+      setDisplayRequest(selectedRequest);
     }
   }
 
+  const empty = EMPTY_COPY[filter];
+
+  function setFilter(next: ContactsInboxFilter): void {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (next === "active") {
+      params.delete("filter");
+    } else {
+      params.set("filter", next);
+    }
+
+    const query = params.toString();
+    router.replace(query.length > 0 ? `${pathname}?${query}` : pathname);
+  }
+
+  function openRequest(request: ContactRequest): void {
+    setSelectedId(request.id);
+
+    if (request.status !== "new") {
+      return;
+    }
+
+    startTransition(async () => {
+      setOptimisticStatus({ id: request.id, status: "read" });
+
+      try {
+        const { error } = await markContactReadAction({ id: request.id });
+
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+
+        router.refresh();
+      } catch (error) {
+        console.error("[ContactsInbox/markRead]", error);
+        toast.error("Something went wrong. Please try again.");
+      }
+    });
+  }
+
   return (
-    <main className="flex h-full w-full flex-col gap-8 p-6 md:p-10">
+    <div className="flex h-full w-full flex-col gap-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold">Contacts</h1>
@@ -157,15 +188,14 @@ export function ContactsInbox({ initialRequests }: ContactsInboxProps) {
       </div>
 
       <ContactRequestDialog
-        key={selectedRequest?.id ?? "closed"}
-        request={selectedRequest}
-        open={selectedRequest !== null}
+        request={displayRequest}
+        open={selectedId !== null}
         onOpenChange={(open) => {
-          if (!open && !markRead.isPending) {
+          if (!open) {
             setSelectedId(null);
           }
         }}
       />
-    </main>
+    </div>
   );
 }

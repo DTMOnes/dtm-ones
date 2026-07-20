@@ -33,6 +33,7 @@ export default function Form() {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -47,19 +48,25 @@ export default function Form() {
     setSubmitError(null);
     setSubmitMessage(null);
 
-    const result = await createContactRequest(data);
+    const { data: result, error } = await createContactRequest(data);
 
-    if (result?.serverError) {
-      setSubmitError(result.serverError);
+    if (error) {
+      if (error.fieldErrors) {
+        for (const [field, messages] of Object.entries(error.fieldErrors)) {
+          const message = messages?.[0];
+          if (
+            message &&
+            (field === "reason" || field === "email" || field === "message")
+          ) {
+            setError(field, { message });
+          }
+        }
+      }
+      setSubmitError(error.message);
       return;
     }
 
-    if (result?.validationErrors) {
-      setSubmitError("Please review the highlighted fields and try again.");
-      return;
-    }
-
-    setSubmitMessage(result?.data?.message ?? "Your message was sent successfully.");
+    setSubmitMessage(result.message ?? "Your message was sent successfully.");
     reset();
   };
 

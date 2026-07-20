@@ -8,12 +8,21 @@ type ContactRequestFilterProps = {
   onChange: (value: ContactsInboxFilter) => void;
 };
 
-const FILTER_OPTIONS: { value: ContactsInboxFilter; label: string }[] = [
+export const FILTER_OPTIONS: {
+  value: ContactsInboxFilter;
+  label: string;
+}[] = [
   { value: "active", label: "Active" },
   { value: "new", label: "New" },
   { value: "read", label: "Read" },
   { value: "archived", label: "Archived" },
 ];
+
+export function isContactsInboxFilter(
+  value: string,
+): value is ContactsInboxFilter {
+  return FILTER_OPTIONS.some((option) => option.value === value);
+}
 
 export function ContactRequestFilter({
   value,
@@ -24,12 +33,7 @@ export function ContactRequestFilter({
       type="single"
       value={value}
       onValueChange={(next) => {
-        if (
-          next === "active" ||
-          next === "new" ||
-          next === "read" ||
-          next === "archived"
-        ) {
+        if (isContactsInboxFilter(next)) {
           onChange(next);
         }
       }}

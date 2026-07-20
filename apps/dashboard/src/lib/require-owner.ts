@@ -1,0 +1,20 @@
+import { FORBIDDEN, type ActionResult } from "@/lib/action-result";
+import {
+  requireStaff,
+  type StaffUser,
+} from "@/lib/require-staff";
+
+export async function requireOwner(): Promise<
+  ActionResult<{ user: StaffUser }>
+> {
+  const gate = await requireStaff();
+  if (gate.error) {
+    return gate;
+  }
+
+  if (gate.data.user.metadata?.role !== "owner") {
+    return { data: null, error: { message: FORBIDDEN } };
+  }
+
+  return gate;
+}

@@ -1,70 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
-import { toast } from "sonner";
-
-import {
-  archiveContactAction,
-  unarchiveContactAction,
-} from "@/actions/contacts";
 import { Button } from "@/components/ui/button";
 import type { ContactRequestStatus } from "@/types/contact-request";
 
-const FALLBACK_ERROR_MESSAGE =
-  "The contact request could not be validated. Please try again.";
-
 type ArchiveContactRequestButtonProps = {
-  id: string;
   status: ContactRequestStatus;
-  onSuccess: () => void;
+  pending: boolean;
   disabled?: boolean;
-  onPendingChange?: (pending: boolean) => void;
+  onArchive: () => void;
+  onUnarchive: () => void;
 };
 
 export function ArchiveContactRequestButton({
-  id,
   status,
-  onSuccess,
+  pending,
   disabled = false,
-  onPendingChange,
+  onArchive,
+  onUnarchive,
 }: ArchiveContactRequestButtonProps) {
-  const router = useRouter();
   const isArchived = status === "archived";
-
-  const archive = useAction(archiveContactAction, {
-    onSuccess: ({ data }) => {
-      if (!data) return;
-
-      toast.success("Contact request archived");
-      onSuccess();
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError?.message ?? FALLBACK_ERROR_MESSAGE);
-    },
-  });
-
-  const unarchive = useAction(unarchiveContactAction, {
-    onSuccess: ({ data }) => {
-      if (!data) return;
-
-      toast.success("Contact request moved back to Read");
-      onSuccess();
-      router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(error.serverError?.message ?? FALLBACK_ERROR_MESSAGE);
-    },
-  });
-
-  const isPending = archive.isPending || unarchive.isPending;
-  const isDisabled = disabled || isPending;
-
-  useEffect(() => {
-    onPendingChange?.(isPending);
-  }, [isPending, onPendingChange]);
+  const isDisabled = disabled || pending;
 
   if (isArchived) {
     return (
@@ -72,11 +27,9 @@ export function ArchiveContactRequestButton({
         type="button"
         variant="outline"
         disabled={isDisabled}
-        onClick={() => {
-          unarchive.execute({ id });
-        }}
+        onClick={onUnarchive}
       >
-        {unarchive.isPending ? "Unarchiving..." : "Unarchive"}
+        {pending ? "Unarchiving..." : "Unarchive"}
       </Button>
     );
   }
@@ -86,11 +39,9 @@ export function ArchiveContactRequestButton({
       type="button"
       variant="outline"
       disabled={isDisabled}
-      onClick={() => {
-        archive.execute({ id });
-      }}
+      onClick={onArchive}
     >
-      {archive.isPending ? "Archiving..." : "Archive"}
+      {pending ? "Archiving..." : "Archive"}
     </Button>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   DotsThreeVerticalIcon,
   SignOutIcon,
   UserIcon,
 } from "@phosphor-icons/react";
-import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { signOutAction } from "@/actions/auth";
@@ -44,25 +44,23 @@ function roleLabel(role: DashboardRole): string {
 export function NavUser({ user }: { user: NavUserData }) {
   const router = useRouter();
   const isMobile = useIsMobile();
+  const [pending, setPending] = useState(false);
 
-  const { execute, isPending } = useAction(signOutAction, {
-    onSuccess: () => {
+  async function handleSignOut() {
+    setPending(true);
+    try {
+      const { error } = await signOutAction();
+
+      if (error) {
+        toast.error(error.message);
+      }
+
       router.push("/signin");
       router.refresh();
-    },
-    onError: ({ error }) => {
-      toast.error(
-        error.serverError?.message ??
-          "Signed out locally. Please sign in again if needed.",
-      );
-      router.push("/signin");
-      router.refresh();
-    },
-  });
-
-  const handleSignOut = () => {
-    execute();
-  };
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -73,7 +71,7 @@ export function NavUser({ user }: { user: NavUserData }) {
               size="lg"
               tooltip={displayName(user)}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              disabled={isPending}
+              disabled={pending}
             >
               <Avatar className="size-8 overflow-hidden rounded-full grayscale">
                 <AvatarFallback className="overflow-hidden rounded-full">
@@ -97,7 +95,12 @@ export function NavUser({ user }: { user: NavUserData }) {
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuItem onClick={handleSignOut} disabled={isPending}>
+            <DropdownMenuItem
+              onClick={() => {
+                void handleSignOut();
+              }}
+              disabled={pending}
+            >
               <SignOutIcon className="size-4" />
               Sign out
             </DropdownMenuItem>

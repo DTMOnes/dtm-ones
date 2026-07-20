@@ -9,7 +9,7 @@ export default async function Layout({
 }) {
   const session = await getSession();
 
-  if (session.status !== "authenticated" || session.user.role !== "owner") {
+  if (!session || session.user.role !== "owner") {
     redirect("/contacts");
   }
 

@@ -2,7 +2,11 @@ import { ContactsInbox } from "@/components/contacts/contacts-inbox";
 import { listContactRequests } from "@/lib/contacts/queries";
 
 export default async function Page() {
-  const initialRequests = await listContactRequests();
+  const requests = await listContactRequests();
 
-  return <ContactsInbox initialRequests={initialRequests} />;
+  return (
+    <main className="flex h-full w-full flex-col gap-8 p-6 md:p-10">
+      <ContactsInbox requests={requests} />
+    </main>
+  );
 }

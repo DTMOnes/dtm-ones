@@ -1,33 +1,29 @@
 import { z } from "zod";
 
-import type { DashboardUser } from "@/lib/auth/types";
 import { createInsforgeServer } from "@/lib/insforge-server";
+import type { Session } from "@/types/auth/session";
 
 const metadataRoleSchema = z.object({
-  role: z.string(),
+  role: z.enum(["owner", "staff"]),
 });
 
-export type Session =
-  | { status: "unauthenticated" }
-  | { status: "forbidden" }
-  | { status: "authenticated"; user: DashboardUser };
-
-export async function getSession(): Promise<Session> {
+export async function getSession(): Promise<Session | null> {
   const insforge = await createInsforgeServer();
   const { data, error } = await insforge.auth.getCurrentUser();
 
   if (error) {
-    throw error;
+    console.error("[get-session]", error);
+    return null;
   }
 
   const user = data.user;
   if (!user) {
-    throw Error("Unauthenticated");
+    return null;
   }
 
   const parsed = metadataRoleSchema.safeParse(user.metadata ?? {});
   if (!parsed.success || !user.email) {
-    throw Error("Forbidden");
+    return null;
   }
 
   return {
