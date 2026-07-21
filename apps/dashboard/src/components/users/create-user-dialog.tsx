@@ -1,21 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
 import {
   Controller,
   FormProvider,
   useForm,
   type UseFormSetError,
 } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { createUserSchema } from "@/lib/validation/users";
-import { ApiError } from "@/lib/api/errors";
-import { useCreateUserMutation } from "@/hooks/api/use-users";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
+import { toast } from "sonner";
 
+import { createUserAction } from "@/actions/users/createUser";
 import PasswordField from "@/components/form/password-field";
+import SubmitButton from "@/components/form/submit-button";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,29 +44,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import SubmitButton from "@/components/form/submit-button";
-
-import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
-import { toast } from "sonner";
+import { createUserSchema } from "@/lib/validation/users";
 
 type FormValues = z.infer<typeof createUserSchema>;
 
 function setFieldErrors(
   setError: UseFormSetError<FormValues>,
-  validationErrors: Record<string, unknown> | undefined,
-) {
-  if (!validationErrors) return;
+  fieldErrors: Record<string, string[]> | undefined,
+): void {
+  if (!fieldErrors) {
+    return;
+  }
+
   (["name", "email", "password", "role"] as const).forEach((field) => {
-    const messages = validationErrors[field];
-    if (Array.isArray(messages) && messages[0]) {
-      setError(field, { message: String(messages[0]) });
+    const messages = fieldErrors[field];
+    if (messages?.[0]) {
+      setError(field, { message: messages[0] });
     }
   });
 }
 
-export default function CreateUserDialog() {
+export function CreateUserDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(createUserSchema as never),
@@ -71,7 +75,7 @@ export default function CreateUserDialog() {
       name: "",
       email: "",
       password: "",
-      role: "user",
+      role: "staff",
     },
   });
 
@@ -84,8 +88,6 @@ export default function CreateUserDialog() {
     formState: { errors },
   } = methods;
 
-  const { mutate: submitCreateUser, isPending } = useCreateUserMutation();
-
   useEffect(() => {
     if (!open) {
       reset();
@@ -93,6 +95,34 @@ export default function CreateUserDialog() {
   }, [open, reset]);
 
   const emailError = errors.email?.message;
+
+  async function onSubmit(data: FormValues): Promise<void> {
+    setPending(true);
+    try {
+      const result = await createUserAction(data);
+      if (result.error) {
+        setFieldErrors(setError, result.error.fieldErrors);
+        if (
+          result.error.fieldErrors &&
+          Object.keys(result.error.fieldErrors).length > 0
+        ) {
+          return;
+        }
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("User created successfully.");
+      reset();
+      setOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error("[CreateUserDialog]", error);
+      toast.error("Could not create user.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -102,7 +132,7 @@ export default function CreateUserDialog() {
           New user
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={!isPending}>
+      <DialogContent showCloseButton={!pending}>
         <DialogHeader>
           <DialogTitle>New user</DialogTitle>
           <DialogDescription>
@@ -112,33 +142,7 @@ export default function CreateUserDialog() {
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit((data) =>
-              submitCreateUser(data, {
-                onSuccess: () => {
-                  toast.success("User created successfully.");
-                  reset();
-                  setOpen(false);
-                  router.refresh();
-                },
-                onError: (error) => {
-                  if (error instanceof ApiError) {
-                    setFieldErrors(setError, error.fieldErrors);
-                    if (
-                      error.fieldErrors &&
-                      Object.keys(error.fieldErrors).length > 0
-                    ) {
-                      return;
-                    }
-                    toast.error("Could not create user.", {
-                      description: error.message,
-                    });
-                    return;
-                  }
-
-                  toast.error("Could not create user.");
-                },
-              }),
-            )}
+            onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
             noValidate
           >
@@ -147,7 +151,7 @@ export default function CreateUserDialog() {
                 name="name"
                 label="Name"
                 placeholder="Full name"
-                disabled={isPending}
+                disabled={pending}
               />
               <Field className="gap-2">
                 <FieldLabel htmlFor="create-user-email">Email</FieldLabel>
@@ -156,7 +160,7 @@ export default function CreateUserDialog() {
                   type="email"
                   autoComplete="email"
                   placeholder="user@email.com"
-                  disabled={isPending}
+                  disabled={pending}
                   aria-invalid={!!emailError}
                   {...register("email")}
                 />
@@ -167,7 +171,7 @@ export default function CreateUserDialog() {
               <PasswordField
                 name="password"
                 label="Password"
-                disabled={isPending}
+                disabled={pending}
               />
               <Field className="gap-2">
                 <FieldLabel htmlFor="create-user-role">Role</FieldLabel>
@@ -178,7 +182,7 @@ export default function CreateUserDialog() {
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={isPending}
+                      disabled={pending}
                     >
                       <SelectTrigger
                         id="create-user-role"
@@ -188,8 +192,8 @@ export default function CreateUserDialog() {
                         <SelectValue placeholder="Role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="user">User</SelectItem>
-                        <SelectItem value="admin">Administrator</SelectItem>
+                        <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="owner">Owner</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -206,13 +210,13 @@ export default function CreateUserDialog() {
                 type="button"
                 variant="outline"
                 className="flex-1 sm:flex-initial"
-                disabled={isPending}
+                disabled={pending}
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create user" isExecuting={isPending} />
+                <SubmitButton label="Create user" isExecuting={pending} />
               </div>
             </DialogFooter>
           </form>

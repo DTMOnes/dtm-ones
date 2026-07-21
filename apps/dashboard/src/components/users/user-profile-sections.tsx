@@ -1,41 +1,35 @@
 "use client";
 
-// Components
-import ChangeUserPasswordForm from "@/components/users/change-user-password-form";
-import ChangeUserRoleForm from "@/components/users/change-user-role-form";
-import DeleteUserCard from "@/components/users/delete-user-card";
-import EditUserGeneralForm from "@/components/users/edit-user-general-form";
+import { ChangeUserRoleForm } from "@/components/users/change-user-role-form";
+import { DeleteUserCard } from "@/components/users/delete-user-card";
+import type { DashboardRole } from "@/lib/auth/types";
 
 type UserProfileSectionsProps = {
   user: {
     id: string;
     email: string;
-    name: string | null;
-    role: string | null;
-    created_at: Date | string;
-    updated_at: Date | string;
+    name: string;
+    role: DashboardRole;
   };
-  isOnlyAdmin: boolean;
+  isOnlyOwner: boolean;
 };
 
-export default function UserProfileSections({
+export function UserProfileSections({
   user,
-  isOnlyAdmin,
+  isOnlyOwner,
 }: UserProfileSectionsProps) {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6">
-      <EditUserGeneralForm user={user} />
-      <ChangeUserPasswordForm userId={user.id} />
       <ChangeUserRoleForm
         userId={user.id}
         currentRole={user.role}
-        isOnlyAdmin={isOnlyAdmin}
+        isOnlyOwner={isOnlyOwner}
       />
       <DeleteUserCard
         userId={user.id}
         userEmail={user.email}
-        userName={user.name ?? "Unnamed user"}
-        isOnlyAdmin={isOnlyAdmin}
+        userName={user.name}
+        isOnlyOwner={isOnlyOwner}
       />
     </div>
   );

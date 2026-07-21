@@ -4,14 +4,15 @@ import {
   UNAVAILABLE,
   type ActionResult,
 } from "@/lib/action-result";
-import { createContactRequest as createContactRequestRequest } from "@/lib/api/contact-requests";
-import { createContactRequestSchema } from "@/lib/validation/contact-requests";
+import { createInsforgeServer } from "@/lib/insforge-server";
+import {
+  createContactRequestSchema,
+  type CreateContactRequest,
+} from "@/lib/validation/contact-requests";
 
-export async function createContactRequest(input: {
-  reason: "hire_services" | "seek_representation";
-  email: string;
-  message: string;
-}): Promise<ActionResult<{ success: true; message: string }>> {
+export async function createContactRequest(
+  input: CreateContactRequest,
+): Promise<ActionResult<{ success: true; message: string }>> {
   const parsed = createContactRequestSchema.safeParse(input);
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors;
@@ -24,14 +25,26 @@ export async function createContactRequest(input: {
     };
   }
 
-  try {
-    const response = await createContactRequestRequest(parsed.data);
-    return {
-      data: { success: true, message: response.message },
-      error: null,
-    };
-  } catch (error) {
+  const insforge = createInsforgeServer();
+  const { error } = await insforge.database.from("contact_requests").insert([
+    {
+      type: parsed.data.type,
+      email: parsed.data.email,
+      phone: parsed.data.phone,
+      message: parsed.data.message,
+    },
+  ]);
+
+  if (error) {
     console.error("[createContactRequest]", error);
     return { data: null, error: { message: UNAVAILABLE } };
   }
+
+  return {
+    data: {
+      success: true,
+      message: "Your message was sent successfully.",
+    },
+    error: null,
+  };
 }

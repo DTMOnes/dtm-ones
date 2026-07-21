@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 import { signInAction } from "@/actions/auth";
+import { NOT_AUTHORIZED } from "@/lib/action-result";
 import { signInSchema as schema } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +24,11 @@ import PasswordField from "@/components/form/password-field";
 
 type FormValues = z.infer<typeof schema>;
 
-export function SignInForm() {
+export function SignInForm({
+  showDenied = false,
+}: {
+  showDenied?: boolean;
+}) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -34,6 +39,13 @@ export function SignInForm() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (!showDenied) {
+      return;
+    }
+    toast.error(NOT_AUTHORIZED);
+  }, [showDenied]);
 
   async function onSubmit(values: FormValues) {
     setPending(true);

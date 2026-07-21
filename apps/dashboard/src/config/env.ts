@@ -4,14 +4,21 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
-    /** Server-side base URL for the legacy FastAPI backend (data calls until migrated). */
+    /**
+     * Legacy FastAPI base URL for leftover BFF helpers until that purge lands.
+     * Not required in `.env` — defaults locally.
+     */
     API_URL: z.url().default("http://localhost:8000"),
+    DATABASE_URL: z.string().min(1),
+    BETTER_AUTH_SECRET: z.string().min(1),
+    BETTER_AUTH_URL: z.url(),
+    INSFORGE_JWT_SECRET: z.string().min(1),
   },
 
   client: {
-    NEXT_PUBLIC_API_URL: z.url().default("http://localhost:8000"),
     NEXT_PUBLIC_INSFORGE_URL: z.url(),
     NEXT_PUBLIC_INSFORGE_ANON_KEY: z.string().min(1),
+    NEXT_PUBLIC_BETTER_AUTH_URL: z.url(),
   },
 
   /**
@@ -19,9 +26,9 @@ export const env = createEnv({
    * Server variables are read from `process.env` at runtime (see env-nextjs).
    */
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_INSFORGE_URL: process.env.NEXT_PUBLIC_INSFORGE_URL,
     NEXT_PUBLIC_INSFORGE_ANON_KEY: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY,
+    NEXT_PUBLIC_BETTER_AUTH_URL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
   },
 
   emptyStringAsUndefined: true,

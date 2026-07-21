@@ -1,27 +1,29 @@
-import { cookies } from "next/headers";
-import { createAuthActions, createServerClient } from "@insforge/sdk/ssr";
+import { createClient, type InsForgeClient } from "@insforge/sdk";
 
 import { env } from "@/config/env";
+import { auth } from "@/lib/auth";
+import { signBridgeAccessToken } from "@/lib/insforge-bridge";
+import { headers } from "next/headers";
 
-function insforgeConfig() {
-  return {
+export function createInsforgeServerWithUserId(userId: string): InsForgeClient {
+  return createClient({
     baseUrl: env.NEXT_PUBLIC_INSFORGE_URL,
     anonKey: env.NEXT_PUBLIC_INSFORGE_ANON_KEY,
-  };
-}
-
-export async function createInsforgeServer() {
-  const cookieStore = await cookies();
-  return createServerClient({
-    ...insforgeConfig(),
-    cookies: cookieStore,
+    accessToken: signBridgeAccessToken(userId),
   });
 }
 
-export async function createInsforgeAuthActions() {
-  const cookieStore = await cookies();
-  return createAuthActions({
-    ...insforgeConfig(),
-    cookies: cookieStore,
+export async function createInsforgeServer(): Promise<InsForgeClient> {
+  const session = await auth.api.getSession({
+    headers: await headers(),
   });
+
+  if (!session?.user) {
+    return createClient({
+      baseUrl: env.NEXT_PUBLIC_INSFORGE_URL,
+      anonKey: env.NEXT_PUBLIC_INSFORGE_ANON_KEY,
+    });
+  }
+
+  return createInsforgeServerWithUserId(session.user.id);
 }

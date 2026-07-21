@@ -1,30 +1,17 @@
 "use client";
 
-// React
 import { useState } from "react";
 
-// React Hook Form
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// Zod
-import { z } from "zod";
-
-// Actions
 import { createContactRequest } from "@/actions/contact-requests";
+import {
+  createContactRequestSchema,
+  type CreateContactRequest,
+} from "@/lib/validation/contact-requests";
 
-// Styles
 import styles from "./styles.module.scss";
-
-const schema = z.object({
-  reason: z.enum(["hire_services", "seek_representation"], {
-    message: "Please select an option",
-  }),
-  email: z.email("Invalid email"),
-  message: z.string().min(1, "Message is required").max(5000),
-});
-
-type FormValues = z.infer<typeof schema>;
 
 export default function Form() {
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -35,16 +22,16 @@ export default function Form() {
     reset,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+  } = useForm<CreateContactRequest>({
+    resolver: zodResolver(createContactRequestSchema as never),
     defaultValues: {
-      reason: undefined,
       email: "",
+      phone: "",
       message: "",
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: CreateContactRequest) => {
     setSubmitError(null);
     setSubmitMessage(null);
 
@@ -56,7 +43,10 @@ export default function Form() {
           const message = messages?.[0];
           if (
             message &&
-            (field === "reason" || field === "email" || field === "message")
+            (field === "type" ||
+              field === "email" ||
+              field === "phone" ||
+              field === "message")
           ) {
             setError(field, { message });
           }
@@ -73,30 +63,32 @@ export default function Form() {
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className={styles.field}>
-        <span className={styles.label}>Reason for contact</span>
+        <span className={styles.label}>I am a</span>
         <div className={styles.options_container}>
-          <label className={styles.option} htmlFor="hire-services">
-            <span>Hire services</span>
+          <label className={styles.option} htmlFor="contact-type-player">
+            <span>Player</span>
             <input
-              id="hire-services"
+              id="contact-type-player"
               type="radio"
-              value="hire_services"
-              {...register("reason")}
+              value="player"
+              disabled={isSubmitting}
+              {...register("type")}
             />
           </label>
-          <label className={styles.option} htmlFor="seek-representation">
-            <span>Seek representation</span>
+          <label className={styles.option} htmlFor="contact-type-recruiter">
+            <span>Recruiter</span>
             <input
-              id="seek-representation"
+              id="contact-type-recruiter"
               type="radio"
-              value="seek_representation"
-              {...register("reason")}
+              value="recruiter"
+              disabled={isSubmitting}
+              {...register("type")}
             />
           </label>
         </div>
-        {errors.reason?.message ? (
+        {errors.type?.message ? (
           <p className={styles.error} role="alert">
-            {errors.reason.message}
+            {errors.type.message}
           </p>
         ) : null}
       </div>
@@ -114,6 +106,23 @@ export default function Form() {
         {errors.email?.message ? (
           <p className={styles.error} role="alert">
             {errors.email.message}
+          </p>
+        ) : null}
+      </label>
+
+      <label className={styles.field}>
+        <span className={styles.label}>Phone</span>
+        <input
+          type="tel"
+          placeholder="Your phone number"
+          aria-invalid={!!errors.phone}
+          disabled={isSubmitting}
+          {...register("phone")}
+          className={styles.input}
+        />
+        {errors.phone?.message ? (
+          <p className={styles.error} role="alert">
+            {errors.phone.message}
           </p>
         ) : null}
       </label>

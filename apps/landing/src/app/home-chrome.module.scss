@@ -1,0 +1,46 @@
+@use "styles/typography" as type;
+
+.page {
+  width: 100%;
+  min-height: 100dvh;
+  padding: var(--spacing-lg) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background-color: var(--color-dark-gray);
+  color: var(--color-white);
+  text-align: center;
+}
+
+.title {
+  @include type.anton-player;
+}
+
+.message {
+  @include type.body-main;
+  max-width: 28rem;
+  opacity: 0.8;
+}
+
+.retry {
+  @include type.button-main;
+  margin-top: var(--spacing-sm);
+  padding: 12px 20px;
+  color: var(--color-white);
+  background: none;
+  border: 1px solid var(--color-white);
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 2px;
+  }
+}
+
+.loading {
+  min-height: 100dvh;
+  background-color: var(--color-dark-gray);
+}

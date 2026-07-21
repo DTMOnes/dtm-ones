@@ -1,12 +1,12 @@
 "use client";
 
-// React
 import { useState } from "react";
 
-// Next
 import { useRouter } from "next/navigation";
 
-// Shadcn
+import { toast } from "sonner";
+
+import { deleteUserAction } from "@/actions/users/deleteUser";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -26,36 +26,53 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useDeleteUserMutation } from "@/hooks/api/use-users";
 
 type DeleteUserCardProps = {
   userId: string;
   userEmail: string;
   userName: string;
-  isOnlyAdmin: boolean;
+  isOnlyOwner: boolean;
 };
 
-export default function DeleteUserCard({
+export function DeleteUserCard({
   userId,
   userEmail,
   userName,
-  isOnlyAdmin,
+  isOnlyOwner,
 }: DeleteUserCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { mutate: confirmDelete, isPending } = useDeleteUserMutation();
+  const [pending, setPending] = useState(false);
 
-  const isDisabled = isPending || isOnlyAdmin;
+  const isDisabled = pending || isOnlyOwner;
+
+  async function onConfirmDelete(): Promise<void> {
+    setPending(true);
+    try {
+      const result = await deleteUserAction({ id: userId });
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("User deleted successfully.");
+      setIsDeleteDialogOpen(false);
+      router.push("/users");
+    } catch (error) {
+      console.error("[DeleteUserCard]", error);
+      toast.error("Could not delete user.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <Card className="border-destructive ring-destructive/30">
       <CardHeader className="border-b border-destructive/20">
         <CardTitle>Delete user</CardTitle>
         <CardDescription>
-          {isOnlyAdmin
-            ? "You cannot delete the only administrator. Promote another user or create a new administrator before removing this account."
+          {isOnlyOwner
+            ? "You cannot delete the only owner. Promote another user or create a new owner before removing this account."
             : "Permanently remove this account from the system. This action cannot be undone."}
         </CardDescription>
       </CardHeader>
@@ -70,17 +87,13 @@ export default function DeleteUserCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!isPending) {
+            if (!pending) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={isDisabled}
-            >
+            <Button type="button" variant="destructive" disabled={isDisabled}>
               Delete user
             </Button>
           </AlertDialogTrigger>
@@ -93,30 +106,14 @@ export default function DeleteUserCard({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>
-                Cancel
-              </AlertDialogCancel>
+              <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={isPending}
-                onClick={() =>
-                  confirmDelete(userId, {
-                    onSuccess: (response) => {
-                      toast.success(response.message);
-                      setIsDeleteDialogOpen(false);
-                      router.push("/users");
-                    },
-                    onError: (error) => {
-                      toast.error("Could not delete user.", {
-                        description:
-                          error instanceof ApiError ? error.message : undefined,
-                      });
-                    },
-                  })
-                }
+                disabled={pending}
+                onClick={onConfirmDelete}
               >
-                {isPending ? "Deleting..." : "Confirm deletion"}
+                {pending ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

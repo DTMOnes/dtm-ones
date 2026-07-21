@@ -35,7 +35,9 @@ Read in this exact order before any implementation:
 - If the same problem persists after one corrective prompt —
   stop immediately and run /recover
 - Server Actions return InsForge shaped `{ data, error }`. Never add `next-safe-action`
-- Dashboard Contacts, Categories, and Players load via InsForge server queries and mutate via plain Server Actions under `actions/`; no TanStack Query on those surfaces. Users still uses TanStack until the purge follow up.
+- Dashboard Contacts, Categories, Players, and Users load via server queries and mutate via plain Server Actions under `actions/`; no TanStack Query on those surfaces. Repo wide TanStack and BFF purge remains a follow up while shared providers may still wrap QueryClient.
+- Dashboard staff identity is Better Auth on InsForge Postgres (`better_auth` schema) with an HS256 `/api/insforge-token` bridge for InsForge SDK and RLS. App roles come from `public.users.role` (`owner` / `staff`). Do not use InsForge Auth SSR cookies for dashboard login.
+- Owner Users admin ops use Better Auth `auth.api` (`createUser`, `setRole`, `removeUser`) on the server with the acting Owner session headers; keep plugin role `admin`/`user` aligned with app `owner`/`staff`. Do not add an InsForge `admin-users` edge function for this.
 - Dashboard `next.config` allows `https://*.insforge.app/api/storage/**` for Next.js `Image` on player media URLs
 
 ## Available Skills
@@ -182,12 +184,11 @@ Payments currently has TypeScript SDK docs only. Use the Payments API reference 
 - **EXTRA IMPORTANT**: Use Tailwind CSS 3.4 (do not upgrade to v4). Lock these dependencies in `package.json`
 
 <!-- INSFORGE:START -->
-
 ## InsForge backend
 
 This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
 
-- **Project:** **JSM_JobPilot** (API base `https://2zu6ipjr.eu-central.insforge.app`)
+- **Project:** **DTM-ONES** (API base `https://6pu9isni.us-east.insforge.app`)
 - **Skills:** these InsForge skills are installed for supported coding agents. Reach for them before implementing any InsForge feature instead of guessing the API:
   - `insforge`: app code with the `@insforge/sdk` client (database CRUD, auth, storage, edge functions, realtime, AI, email, and Stripe payments).
   - `insforge-cli`: backend and infrastructure via the `insforge` CLI (projects, SQL, migrations, RLS policies, storage buckets, functions, secrets, payment setup, schedules, deploys).
@@ -199,6 +200,8 @@ This project uses [InsForge](https://insforge.dev): an all-in-one, open-source P
 Key patterns:
 
 - Database inserts take an array: `insert([{ ... }])`.
-- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
+- Dashboard `public.users.id` is TEXT FK to `better_auth.user(id)`. Staff RLS helpers use `public.requesting_user_id()` (JWT `sub`), not `auth.uid()`.
+- `createInsforgeServer()` mints a bridge JWT from the Better Auth session; do not use InsForge Auth `updateSession` for staff.
+- Users list and detail join `public.users` with `better_auth.user` over `DATABASE_URL` for display name; privileged create and delete stay on Better Auth admin APIs, not the InsForge SDK alone.
 - For storage uploads, persist both the returned `url` and `key`.
 <!-- INSFORGE:END -->

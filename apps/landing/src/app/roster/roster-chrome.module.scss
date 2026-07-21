@@ -1,0 +1,98 @@
+@use "styles/typography" as type;
+
+.page {
+  width: 100%;
+  min-height: 100vh;
+  padding: var(--spacing-lg) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-dark-gray);
+  color: var(--color-white);
+}
+
+.inner {
+  width: min(100%, var(--content-width));
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.title {
+  @include type.title-main;
+}
+
+.message {
+  @include type.body-main;
+  opacity: 0.8;
+}
+
+.retry {
+  @include type.button-main;
+  align-self: flex-start;
+  margin-top: var(--spacing-sm);
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--color-white);
+  border-radius: 4px;
+  padding: 12px 20px;
+  color: var(--color-white);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 2px;
+  }
+}
+
+.skeletonTitle {
+  height: 3rem;
+  width: 12rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeletonSubtitle {
+  height: 1.25rem;
+  width: min(100%, 24rem);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeletonFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonBar {
+  height: 44px;
+  width: 100%;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.skeletonGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.skeletonCard {
+  width: 300px;
+  aspect-ratio: 4/5;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: var(--spacing-md);
+  align-items: start;
+}
+
+@media (width < 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

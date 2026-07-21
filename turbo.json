@@ -3,17 +3,17 @@
   "ui": "tui",
   "globalDependencies": [".env", ".env.*"],
   "globalEnv": [
-    "APP_ENV",
     "DATABASE_URL",
-    "API_URL",
-    "NEXT_PUBLIC_API_URL",
-    "AUTH_SECRET_KEY",
-    "AUTH_ACCESS_TOKEN_EXPIRE_MINUTES",
-    "AUTH_REFRESH_TOKEN_EXPIRE_DAYS",
-    "AUTH_ALGORITHM",
-    "BLOB_READ_WRITE_TOKEN",
-    "CORS_ORIGINS",
-    "SKIP_ENV_VALIDATION"
+    "SKIP_ENV_VALIDATION",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "NEXT_PUBLIC_BETTER_AUTH_URL",
+    "INSFORGE_JWT_SECRET",
+    "NEXT_PUBLIC_INSFORGE_URL",
+    "NEXT_PUBLIC_INSFORGE_ANON_KEY",
+    "DEV_SEED_ADMIN_EMAIL",
+    "DEV_SEED_ADMIN_PASSWORD",
+    "DEV_SEED_ADMIN_NAME"
   ],
   "tasks": {
     "build": {

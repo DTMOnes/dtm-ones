@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@insforge/sdk": "^1.4.4",
     "@phosphor-icons/react": "^2.1.10",
     "@t3-oss/env-core": "^0.13.10",
     "@t3-oss/env-nextjs": "^0.13.11",

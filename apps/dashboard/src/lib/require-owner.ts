@@ -12,7 +12,7 @@ export async function requireOwner(): Promise<
     return gate;
   }
 
-  if (gate.data.user.metadata?.role !== "owner") {
+  if (gate.data.user.role !== "owner") {
     return { data: null, error: { message: FORBIDDEN } };
   }
 

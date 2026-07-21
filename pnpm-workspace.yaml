@@ -4,6 +4,8 @@ packages:
 
 allowBuilds:
   '@parcel/watcher': false
+  '@prisma/client': set this to true or false
+  better-sqlite3: set this to true or false
   esbuild: false
   msw: false
   sharp: false

@@ -1,16 +1,15 @@
-// Next
 import Link from "next/link";
-import Image from "next/image";
 
-// Styles
+import { PlayerCard } from "@/components/players/player-card";
+import type { PublicRosterPlayer } from "@/types/roster";
+
 import styles from "./styles.module.scss";
 
-// Types
-import type { Player } from "@/types/player";
+type RosterProps = {
+  players: PublicRosterPlayer[];
+};
 
-export default function Roster({ players }: { players: Player[] }) {
-  console.log(players);
-
+export default function Roster({ players }: RosterProps) {
   return (
     <section id="roster" className={styles.container} aria-label="Roster">
       <div className={styles.content}>
@@ -23,29 +22,23 @@ export default function Roster({ players }: { players: Player[] }) {
           Check Our Roster
         </Link>
 
-        <div className={styles.cards_container}>
-          {players.map((player) => (
-            <div className={styles.card} key={player.id}>
-              <div className={styles.image_container}>
-                <div className={styles.image_background}></div>
-                <Image
-                  src="/assets/images/christian-alaekwe.png"
-                  alt="Christian Alaekwe"
-                  width={1025}
-                  height={1280}
-                  className={styles.image}
-                />
-                <div className={styles.image_overlay}></div>
-              </div>
-              <span className={styles.player_number}>24</span>
-              <div className={styles.player_info}>
-                <span className={styles.player_category}>Point Guard</span>
-                <h5 className={styles.player_name}>Christian Alaekwe</h5>
-                <span className={styles.player_league}>European League</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        {players.length === 0 ? (
+          <p className={styles.empty}>
+            No published players to show yet. Check the full roster for updates.
+          </p>
+        ) : (
+          <div className={styles.cards_container}>
+            {players.map((player) => (
+              <PlayerCard
+                key={player.id}
+                slug={player.slug}
+                fullName={player.full_name}
+                presentationImageUrl={player.presentation_image_url}
+                categoryName={player.categories[0]?.name ?? null}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

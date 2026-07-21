@@ -10,6 +10,15 @@ const nextConfig: NextConfig = {
   sassOptions: {
     loadPaths: [path.join(__dirname, "src")],
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.insforge.app",
+        pathname: "/api/storage/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

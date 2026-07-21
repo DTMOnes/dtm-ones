@@ -1,4 +1,5 @@
-// Styles
+import Link from "next/link";
+
 import styles from "./styles.module.scss";
 
 export default function Hero() {
@@ -18,8 +19,12 @@ export default function Hero() {
           talent, from actors to athletes.
         </p>
         <div className={styles.button_container}>
-          <button className={styles.button}>Check Our Roster</button>
-          <button className={styles.button}>Contact Us</button>
+          <Link href="/roster" className={styles.button}>
+            Check Our Roster
+          </Link>
+          <Link href="#contact" className={styles.button}>
+            Contact Us
+          </Link>
         </div>
       </div>
     </section>

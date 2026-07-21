@@ -1,24 +1,8 @@
-// React Query
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-
-// Components
-import UsersListView from "@/components/users/users-list-view";
-
-// Lib
-import { getQueryClient } from "@/lib/api/get-query-client";
-import { queryKeys } from "@/lib/api/query-keys";
-import { getUsersServer } from "@/lib/api/server-queries";
+import { listUsers } from "@/lib/users/queries";
+import { UsersListView } from "@/components/users/users-list-view";
 
 export default async function Page() {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.users.list(),
-    queryFn: getUsersServer,
-  });
+  const users = await listUsers();
 
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <UsersListView />
-    </HydrationBoundary>
-  );
+  return <UsersListView users={users} />;
 }

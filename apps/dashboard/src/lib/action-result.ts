@@ -17,3 +17,6 @@ export const NOT_FOUND = "Resource could not be found.";
 export const CONFLICT = "This action conflicts with the current state.";
 
 export const INVALID_CREDENTIALS = "Invalid email or password.";
+
+export const NOT_AUTHORIZED =
+  "This account is not authorized to access the dashboard.";

@@ -1,24 +1,16 @@
-// Zod
 import { z } from "zod";
 
-export const contactRequestSchema = z.object({
-  id: z.number().int().positive(),
-  reason: z.enum(["hire_services", "seek_representation"]),
-  email: z.string().email(),
-  message: z.string().min(1).max(5000),
-  createdAt: z.coerce.date(),
+export const createContactRequestSchema = z.object({
+  type: z.enum(["player", "recruiter"], {
+    message: "Please select Player or Recruiter",
+  }),
+  email: z.email("Invalid email"),
+  phone: z
+    .string()
+    .trim()
+    .min(7, "Phone must be at least 7 characters")
+    .max(30, "Phone must be at most 30 characters"),
+  message: z.string().min(1, "Message is required").max(5000),
 });
 
-export const getContactRequestSchema = contactRequestSchema.pick({
-  id: true,
-});
-
-export const createContactRequestSchema = contactRequestSchema.pick({
-  reason: true,
-  email: true,
-  message: true,
-});
-
-export type ContactRequest = z.infer<typeof contactRequestSchema>;
-export type GetContactRequest = z.infer<typeof getContactRequestSchema>;
 export type CreateContactRequest = z.infer<typeof createContactRequestSchema>;

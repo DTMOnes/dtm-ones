@@ -1,17 +1,16 @@
 "use client";
 
-// Next
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
-// React Hook Form
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// Validation Schema
-import { setUserRoleSchema } from "@/lib/validation/users";
 import { z } from "zod";
+import { toast } from "sonner";
 
-// Shadcn
+import { setUserRoleAction } from "@/actions/users/setUserRole";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -33,45 +32,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
-import { ApiError } from "@/lib/api/errors";
-import { useSetUserRoleMutation } from "@/hooks/api/use-users";
+import type { DashboardRole } from "@/lib/auth/types";
+import { roleLabel } from "@/lib/users/roles";
+import { setUserRoleSchema } from "@/lib/validation/users";
 
 type ChangeUserRoleFormValues = z.infer<typeof setUserRoleSchema>;
 
 type ChangeUserRoleFormProps = {
   userId: string;
-  currentRole: string | null;
-  isOnlyAdmin: boolean;
+  currentRole: DashboardRole;
+  isOnlyOwner: boolean;
 };
 
-function roleLabel(role: string | null) {
-  if (role === "admin") return "Administrator";
-  return "User";
-}
-
-export default function ChangeUserRoleForm({
+export function ChangeUserRoleForm({
   userId,
   currentRole,
-  isOnlyAdmin,
+  isOnlyOwner,
 }: ChangeUserRoleFormProps) {
   const router = useRouter();
-  const role = currentRole === "admin" ? "admin" : "user";
+  const [pending, setPending] = useState(false);
 
   const methods = useForm<ChangeUserRoleFormValues>({
-    resolver: zodResolver(setUserRoleSchema),
+    resolver: zodResolver(setUserRoleSchema as never),
     defaultValues: {
       userId,
-      role,
+      role: currentRole,
     },
   });
 
-  const { mutate: submitRole, isPending } = useSetUserRoleMutation();
-
   const selectedRole = methods.watch("role");
-  const cannotDemote = isOnlyAdmin && selectedRole === "user";
+  const cannotDemote = isOnlyOwner && selectedRole === "staff";
+
+  async function onSubmit(data: ChangeUserRoleFormValues): Promise<void> {
+    setPending(true);
+    try {
+      const result = await setUserRoleAction(data);
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      toast.success("Role updated successfully.");
+      router.refresh();
+    } catch (error) {
+      console.error("[ChangeUserRoleForm]", error);
+      toast.error("Could not update role.");
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <FormProvider {...methods}>
@@ -79,27 +89,11 @@ export default function ChangeUserRoleForm({
         <CardHeader className="border-b">
           <CardTitle>Role</CardTitle>
           <CardDescription>
-            Current role: {roleLabel(currentRole)}. Administrators can manage
-            users; standard users can only access players and categories.
+            Current role: {roleLabel(currentRole)}. Owners can manage users;
+            Staff can access contacts, players, and categories.
           </CardDescription>
         </CardHeader>
-        <form
-          onSubmit={methods.handleSubmit((data) =>
-            submitRole(data, {
-              onSuccess: (response) => {
-                toast.success(response.message);
-                router.refresh();
-              },
-              onError: (error) => {
-                toast.error("Could not update role.", {
-                  description:
-                    error instanceof ApiError ? error.message : undefined,
-                });
-              },
-            }),
-          )}
-          noValidate
-        >
+        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
           <CardContent className="pb-6">
             <FieldGroup className="gap-6">
               <input type="hidden" {...methods.register("userId")} />
@@ -112,7 +106,7 @@ export default function ChangeUserRoleForm({
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={isPending}
+                      disabled={pending}
                     >
                       <SelectTrigger
                         id="change-user-role"
@@ -122,10 +116,10 @@ export default function ChangeUserRoleForm({
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="user" disabled={isOnlyAdmin}>
-                          User
+                        <SelectItem value="staff" disabled={isOnlyOwner}>
+                          Staff
                         </SelectItem>
-                        <SelectItem value="admin">Administrator</SelectItem>
+                        <SelectItem value="owner">Owner</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -140,18 +134,17 @@ export default function ChangeUserRoleForm({
                   />
                 ) : null}
               </Field>
-              {isOnlyAdmin ? (
+              {isOnlyOwner ? (
                 <p className="text-muted-foreground text-xs">
-                  This is the only administrator. You cannot assign the User
-                  role until you promote another user or create a new
-                  administrator.
+                  This is the only owner. You cannot assign the Staff role until
+                  you promote another user or create a new owner.
                 </p>
               ) : null}
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
-            <Button type="submit" disabled={isPending || cannotDemote}>
-              {isPending ? <Spinner /> : "Save role"}
+            <Button type="submit" disabled={pending || cannotDemote}>
+              {pending ? <Spinner /> : "Save role"}
             </Button>
           </CardFooter>
         </form>

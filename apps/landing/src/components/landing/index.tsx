@@ -1,25 +1,23 @@
 "use client";
 
-// React
 import { useEffect } from "react";
 
-// Lenis
 import { ReactLenis } from "lenis/react";
 
-// Components
 import Hero from "@/components/landing/hero";
 import About from "@/components/landing/about";
 import Roster from "@/components/landing/roster";
 import Contact from "@/components/landing/contact";
 import Footer from "@/components/landing/footer";
+import type { PublicRosterPlayer } from "@/types/roster";
 
-// Styles
 import styles from "./styles.module.scss";
 
-// Types
-import type { Player } from "@/types/player";
+type LandingProps = {
+  players: PublicRosterPlayer[];
+};
 
-export default function Landing({ players }: { players: Player[] }) {
+export default function Landing({ players }: LandingProps) {
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash) return;
