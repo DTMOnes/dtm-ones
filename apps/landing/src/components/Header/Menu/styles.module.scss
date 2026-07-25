@@ -1,0 +1,11 @@
+.menu {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+
+  .collapsible {
+    position: relative;
+    background-color: white;
+    border-radius: 25px;
+  }
+}

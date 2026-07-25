@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Anton, Poppins } from "next/font/google";
 import "./globals.css";
 
+// Components
+import Header from "@/components/Header";
+
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
@@ -27,7 +30,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${anton.variable} ${poppins.variable} dark`}>
-      <body className="antialiased font-poppins">{children}</body>
+      <body className="antialiased font-poppins">
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
