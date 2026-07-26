@@ -14,8 +14,15 @@
     overflow: hidden;
 
     @media (width < 530px) {
-      --menu-w: calc(100vw - 50px);
+      --menu-w: calc(100vw - 10px);
       --menu-h: min(600px, calc(100vh - 50px));
     }
+  }
+}
+
+@media (width < 530px) {
+  .header {
+    top: 30px;
+    right: 30px;
   }
 }

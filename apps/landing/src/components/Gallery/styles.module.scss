@@ -95,3 +95,22 @@
     }
   }
 }
+
+@media (max-width: 530px) {
+  .container {
+    .buttons_container {
+      padding: 30px;
+      padding-top: 40px;
+
+      .button {
+        width: 48px;
+        height: 48px;
+
+        .button_icon {
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+  }
+}
