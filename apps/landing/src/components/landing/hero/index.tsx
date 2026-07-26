@@ -22,7 +22,7 @@ export default function Hero() {
           <Link href="/roster" className={styles.button}>
             Check Our Roster
           </Link>
-          <Link href="#contact" className={styles.button}>
+          <Link href="/contact" className={styles.button}>
             Contact Us
           </Link>
         </div>

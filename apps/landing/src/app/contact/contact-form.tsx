@@ -13,7 +13,7 @@ import {
 
 import styles from "./styles.module.scss";
 
-export default function Form() {
+export default function ContactForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const {
@@ -62,11 +62,10 @@ export default function Form() {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className={styles.field}>
-        <span className={styles.label}>I am a</span>
-        <div className={styles.options_container}>
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.label}>I am a</legend>
+        <div className={styles.options}>
           <label className={styles.option} htmlFor="contact-type-player">
-            <span>Player</span>
             <input
               id="contact-type-player"
               type="radio"
@@ -74,9 +73,9 @@ export default function Form() {
               disabled={isSubmitting}
               {...register("type")}
             />
+            <span>Player</span>
           </label>
           <label className={styles.option} htmlFor="contact-type-recruiter">
-            <span>Recruiter</span>
             <input
               id="contact-type-recruiter"
               type="radio"
@@ -84,6 +83,7 @@ export default function Form() {
               disabled={isSubmitting}
               {...register("type")}
             />
+            <span>Recruiter</span>
           </label>
         </div>
         {errors.type?.message ? (
@@ -91,13 +91,13 @@ export default function Form() {
             {errors.type.message}
           </p>
         ) : null}
-      </div>
+      </fieldset>
 
       <label className={styles.field}>
         <span className={styles.label}>Email</span>
         <input
           type="email"
-          placeholder="Example@email.com"
+          placeholder="you@email.com"
           aria-invalid={!!errors.email}
           disabled={isSubmitting}
           {...register("email")}
@@ -130,12 +130,12 @@ export default function Form() {
       <label className={styles.field}>
         <span className={styles.label}>Message</span>
         <textarea
-          placeholder="Your message goes here..."
-          rows={6}
+          placeholder="How can we help?"
+          rows={5}
           aria-invalid={!!errors.message}
           disabled={isSubmitting}
           {...register("message")}
-          className={styles.input}
+          className={styles.textarea}
         />
         {errors.message?.message ? (
           <p className={styles.error} role="alert">
@@ -147,12 +147,17 @@ export default function Form() {
       <button type="submit" disabled={isSubmitting} className={styles.button}>
         {isSubmitting ? "Sending…" : "Send message"}
       </button>
+
       {submitError ? (
         <p className={styles.error} role="alert">
           {submitError}
         </p>
       ) : null}
-      {submitMessage ? <p className={styles.success}>{submitMessage}</p> : null}
+      {submitMessage ? (
+        <p className={styles.success} role="status">
+          {submitMessage}
+        </p>
+      ) : null}
     </form>
   );
 }

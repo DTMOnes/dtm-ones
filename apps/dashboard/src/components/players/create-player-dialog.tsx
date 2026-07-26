@@ -45,6 +45,7 @@ export default function CreatePlayerDialog({
       fullName: "",
       heightCm: "",
       nationality: "",
+      lastClub: "",
       categoryIds: [],
     },
   });
@@ -121,6 +122,12 @@ export default function CreatePlayerDialog({
                   name="heightCm"
                   label="Height (cm)"
                   placeholder="185"
+                  disabled={pending}
+                />
+                <TextField
+                  name="lastClub"
+                  label="Last club"
+                  placeholder="FC Barcelona"
                   disabled={pending}
                 />
                 <OptionsField

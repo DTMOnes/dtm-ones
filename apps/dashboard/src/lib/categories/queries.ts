@@ -36,7 +36,7 @@ export async function getCategoryById(
   const { data, error } = await insforge.database
     .from("categories")
     .select(
-      `${CATEGORY_COLUMNS}, player_categories(players(id, full_name))`,
+      `${CATEGORY_COLUMNS}, player_categories(players(id, full_name, last_club))`,
     )
     .eq("id", id)
     .maybeSingle();

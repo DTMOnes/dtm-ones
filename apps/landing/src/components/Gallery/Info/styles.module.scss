@@ -28,11 +28,16 @@
   .player_stats {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
     gap: 24px;
+    min-width: 0;
+    max-width: 100%;
 
     .player_stats_item {
       width: 150px;
+      max-width: 100%;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -42,13 +47,16 @@
       text-transform: uppercase;
       p {
         font-size: 16px;
-        color: #ffffff;
+        color: var(--color-white);
         opacity: 0.5;
       }
       h2 {
         font-size: 24px;
         font-weight: 400;
-        color: #ffffff;
+        color: var(--color-white);
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
     }
   }

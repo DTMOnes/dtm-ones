@@ -27,6 +27,7 @@ export type Player = {
   full_name: string;
   nationality: string;
   height_cm: number;
+  last_club: string;
   presentation_image_url: string | null;
   status: PlayerStatus;
   deleted_at: string | null;

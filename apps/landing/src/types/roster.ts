@@ -20,6 +20,9 @@ export type PublicRosterPlayer = {
   id: string;
   slug: string;
   full_name: string;
+  nationality: string;
+  height_cm: number;
+  last_club: string;
   presentation_image_url: string | null;
   categories: PublicRosterCategoryRef[];
   gallery_images: PublicRosterGalleryImage[];

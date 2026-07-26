@@ -7,7 +7,6 @@ import { ReactLenis } from "lenis/react";
 import Hero from "@/components/landing/hero";
 import About from "@/components/landing/about";
 import Roster from "@/components/landing/roster";
-import Contact from "@/components/landing/contact";
 import Footer from "@/components/landing/footer";
 import type { PublicRosterPlayer } from "@/types/roster";
 
@@ -33,7 +32,6 @@ export default function Landing({ players }: LandingProps) {
         <Hero />
         <About />
         <Roster players={players} />
-        <Contact />
         <Footer />
       </main>
     </ReactLenis>

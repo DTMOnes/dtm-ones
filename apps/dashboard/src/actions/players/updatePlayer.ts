@@ -16,10 +16,8 @@ import {
   parsePlayer,
   updatePlayerSchema,
 } from "@/lib/validation/players";
+import { PLAYER_COLUMNS } from "@/lib/players/columns";
 import type { Player } from "@/types/player";
-
-const PLAYER_COLUMNS =
-  "id, slug, full_name, nationality, height_cm, presentation_image_url, status, deleted_at, created_at, updated_at";
 
 const SLUG_MAX_RETRIES = 5;
 
@@ -37,6 +35,7 @@ export async function updatePlayerAction(input: {
   fullName: string;
   nationality: string;
   heightCm: string;
+  lastClub: string;
   status: string;
   categoryIds: string[];
 }): Promise<ActionResult<{ player: Player }>> {
@@ -116,6 +115,7 @@ export async function updatePlayerAction(input: {
         full_name: parsed.data.fullName,
         nationality: parsed.data.nationality,
         height_cm: heightCm,
+        last_club: parsed.data.lastClub,
         status: parsed.data.status,
         slug,
       })

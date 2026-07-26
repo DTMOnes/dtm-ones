@@ -120,7 +120,9 @@ function parseRosterPlayer(value: unknown): PublicRosterPlayer | null {
   if (
     typeof row.id !== "string" ||
     typeof row.slug !== "string" ||
-    typeof row.full_name !== "string"
+    typeof row.full_name !== "string" ||
+    typeof row.nationality !== "string" ||
+    typeof row.height_cm !== "number"
   ) {
     return null;
   }
@@ -131,6 +133,8 @@ function parseRosterPlayer(value: unknown): PublicRosterPlayer | null {
       ? row.presentation_image_url
       : null;
 
+  const lastClub = typeof row.last_club === "string" ? row.last_club : "";
+
   const categories = parseCategoryRefs(row.player_categories);
   if (categories.length === 0) {
     return null;
@@ -140,6 +144,9 @@ function parseRosterPlayer(value: unknown): PublicRosterPlayer | null {
     id: row.id,
     slug: row.slug,
     full_name: row.full_name,
+    nationality: row.nationality,
+    height_cm: row.height_cm,
+    last_club: lastClub,
     presentation_image_url: presentationImageUrl,
     categories,
     gallery_images: parseGalleryImages(row.player_gallery_images),
@@ -217,6 +224,9 @@ export async function listPublicRosterPlayers(
       id,
       slug,
       full_name,
+      nationality,
+      height_cm,
+      last_club,
       presentation_image_url,
       player_categories!inner(categories(id, name, slug)),
       player_gallery_images(id, url, sort_order),

@@ -41,6 +41,11 @@ export const createPlayerSchema = z.object({
     .min(1, "Nationality is required.")
     .max(100, "Maximum 100 characters."),
   heightCm: heightCmStringSchema,
+  lastClub: z
+    .string()
+    .trim()
+    .min(1, "Last club is required.")
+    .max(100, "Maximum 100 characters."),
   categoryIds: categoryIdsSchema,
 });
 
@@ -57,6 +62,11 @@ export const updatePlayerSchema = z.object({
     .min(1, "Nationality cannot be empty.")
     .max(100, "Maximum 100 characters."),
   heightCm: heightCmStringSchema,
+  lastClub: z
+    .string()
+    .trim()
+    .min(1, "Last club cannot be empty.")
+    .max(100, "Maximum 100 characters."),
   status: playerStatusSchema,
   categoryIds: categoryIdsSchema,
 });
@@ -93,6 +103,7 @@ const playerRowSchema = z.object({
   full_name: z.string().min(1),
   nationality: z.string().min(1),
   height_cm: z.number().int(),
+  last_club: z.string(),
   presentation_image_url: z.string().nullable(),
   status: playerStatusSchema,
   deleted_at: z.string().nullable(),
@@ -160,6 +171,7 @@ export function parsePlayerListItem(value: unknown): PlayerListItem | null {
     full_name: row.full_name,
     nationality: row.nationality,
     height_cm: row.height_cm,
+    last_club: row.last_club,
     presentation_image_url: row.presentation_image_url,
     status: row.status,
     deleted_at: row.deleted_at,
@@ -233,6 +245,7 @@ export function parsePlayerDetail(value: unknown): PlayerDetail | null {
     full_name: row.full_name,
     nationality: row.nationality,
     height_cm: row.height_cm,
+    last_club: row.last_club,
     presentation_image_url: row.presentation_image_url,
     status: row.status,
     deleted_at: row.deleted_at,

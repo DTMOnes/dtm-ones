@@ -1,12 +1,10 @@
 import { createInsforgeServer } from "@/lib/insforge-server";
+import { PLAYER_COLUMNS } from "@/lib/players/columns";
 import {
   parsePlayerDetail,
   parsePlayerListItems,
 } from "@/lib/validation/players";
 import type { PlayerDetail, PlayerListItem } from "@/types/player";
-
-const PLAYER_COLUMNS =
-  "id, slug, full_name, nationality, height_cm, presentation_image_url, status, deleted_at, created_at, updated_at";
 
 const LIST_SELECT = `${PLAYER_COLUMNS}, player_categories(categories(id, name))`;
 

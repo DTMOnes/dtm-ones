@@ -45,6 +45,7 @@ export default function EditPlayerForm({
       fullName: player.full_name,
       nationality: player.nationality,
       heightCm: String(player.height_cm),
+      lastClub: player.last_club,
       status: player.status,
       categoryIds: player.categories.map((category) => category.id),
     },
@@ -97,6 +98,12 @@ export default function EditPlayerForm({
                 name="heightCm"
                 label="Height (cm)"
                 placeholder="185"
+                disabled={pending}
+              />
+              <TextField
+                name="lastClub"
+                label="Last club"
+                placeholder="FC Barcelona"
                 disabled={pending}
               />
               <Field className="flex flex-col gap-2">
