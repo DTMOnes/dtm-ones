@@ -38,5 +38,8 @@ export default async function Page({
     categoryIds,
   });
 
-  return <Canvas players={players} />;
+  const canvasKey =
+    players.map((player) => player.id).join(",") || "empty";
+
+  return <Canvas key={canvasKey} players={players} />;
 }

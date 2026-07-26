@@ -25,10 +25,11 @@
 html,
 body {
   overflow-x: hidden;
+  background-color: var(--color-black);
 }
 
 body {
-  background-color: rgb(12, 12, 12);
+  background-color: var(--color-black);
 }
 
 a {

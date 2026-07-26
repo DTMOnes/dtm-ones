@@ -42,5 +42,22 @@
 
 .loading {
   min-height: 100dvh;
-  background-color: var(--color-dark-gray);
+  display: grid;
+  place-items: center;
+  background-color: var(--color-black);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid color-mix(in srgb, var(--color-white) 20%, transparent);
+  border-top-color: var(--color-light-blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

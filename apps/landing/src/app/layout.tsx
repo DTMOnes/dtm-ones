@@ -4,6 +4,7 @@ import "./globals.css";
 
 // Components
 import Header from "@/components/Header";
+import NavigationProgress from "@/components/NavigationProgress";
 
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${anton.variable} ${poppins.variable} dark`}>
       <body className="antialiased font-poppins">
+        <NavigationProgress />
         <Header />
         {children}
       </body>

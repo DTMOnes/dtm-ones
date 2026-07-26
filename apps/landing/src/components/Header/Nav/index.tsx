@@ -87,7 +87,7 @@ const variants = {
   },
 } as const;
 
-export default function Nav() {
+export default function Nav({ onNavigate }: { onNavigate: () => void }) {
   return (
     <nav className={styles.nav}>
       <div className={styles.pages}>
@@ -101,7 +101,11 @@ export default function Nav() {
               animate="enter"
               exit="exit"
             >
-              <Link href={e.href} className={styles.page_link}>
+              <Link
+                href={e.href}
+                className={styles.page_link}
+                onClick={onNavigate}
+              >
                 <span className={styles.number}>0{index + 1}</span>
                 {e.label}
               </Link>

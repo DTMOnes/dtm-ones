@@ -3,9 +3,6 @@
   inset: 0;
   overflow: hidden;
 
-  display: grid;
-  place-items: center;
-
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -23,6 +20,9 @@
   }
 
   .plane {
+    position: absolute;
+    top: 0;
+    left: 0;
     padding: 100px;
     display: flex;
     flex-direction: column;

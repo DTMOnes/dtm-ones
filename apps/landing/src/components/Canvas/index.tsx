@@ -1,7 +1,7 @@
 "use client";
 
 // React
-import { useRef, useState, useLayoutEffect } from "react";
+import { useCallback, useEffect, useRef, useState, useLayoutEffect } from "react";
 
 // Motion
 import {
@@ -25,13 +25,16 @@ import { calculateRows } from "@/utils/calculate-rows";
 import { PublicRosterPlayer } from "@/types/roster";
 
 const SPRING = { stiffness: 120, damping: 32, mass: 1.1 };
+const REVEAL_TIMEOUT_MS = 4000;
 
 export default function Canvas({ players }: { players: PublicRosterPlayer[] }) {
   const constraintsRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
+  const readyIdsRef = useRef(new Set<string>());
 
   const [selectedPlayer, setSelectedPlayer] =
     useState<PublicRosterPlayer | null>(null);
+  const [reveal, setReveal] = useState(players.length === 0);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -43,7 +46,7 @@ export default function Canvas({ players }: { players: PublicRosterPlayer[] }) {
     rows.slice(0, i).reduce((sum, n) => sum + n, 0),
   );
 
-  useLayoutEffect(() => {
+  const centerPlane = useCallback(() => {
     const viewport = constraintsRef.current;
     const plane = planeRef.current;
     if (!viewport || !plane) return;
@@ -53,10 +56,37 @@ export default function Canvas({ players }: { players: PublicRosterPlayer[] }) {
 
     x.set(nextX);
     y.set(nextY);
-
     smoothX.jump(nextX);
     smoothY.jump(nextY);
-  }, [x, y, smoothX, smoothY, rows.length]);
+  }, [x, y, smoothX, smoothY]);
+
+  useLayoutEffect(() => {
+    centerPlane();
+  }, [centerPlane, rows.length, players.length]);
+
+  useEffect(() => {
+    if (reveal || players.length === 0) return;
+
+    const timeoutId = window.setTimeout(() => {
+      centerPlane();
+      setReveal(true);
+    }, REVEAL_TIMEOUT_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [reveal, players.length, centerPlane]);
+
+  const handleCardReady = useCallback(
+    (id: string) => {
+      if (readyIdsRef.current.has(id)) return;
+      readyIdsRef.current.add(id);
+
+      if (readyIdsRef.current.size >= players.length) {
+        centerPlane();
+        setReveal(true);
+      }
+    },
+    [centerPlane, players.length],
+  );
 
   return (
     <div ref={constraintsRef} className={styles.viewport}>
@@ -75,15 +105,31 @@ export default function Canvas({ players }: { players: PublicRosterPlayer[] }) {
           const cards = players.slice(offsets[r], offsets[r] + count);
 
           return (
-            <div key={r} className={styles.row}>
+            <motion.div
+              key={r}
+              className={styles.row}
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: {
+                    staggerChildren: 0.04,
+                    delayChildren: 0.08 + offsets[r] * 0.04,
+                  },
+                },
+              }}
+              initial="hidden"
+              animate={reveal ? "visible" : "hidden"}
+            >
               {cards.map((player: PublicRosterPlayer) => (
                 <Cards
                   key={player.id}
                   player={player}
+                  reveal={reveal}
+                  onReady={handleCardReady}
                   onSelect={() => setSelectedPlayer(player)}
                 />
               ))}
-            </div>
+            </motion.div>
           );
         })}
       </motion.div>

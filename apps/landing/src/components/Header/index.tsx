@@ -1,7 +1,10 @@
 "use client";
 
 // React
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+// Next
+import { usePathname } from "next/navigation";
 
 // Motion
 import { motion, AnimatePresence } from "motion/react";
@@ -38,7 +41,12 @@ const variants = {
 } as const;
 
 export default function Header() {
+  const pathname = usePathname();
   const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    setIsActive(false);
+  }, [pathname]);
 
   const handleClick = () => {
     setIsActive(!isActive);
@@ -52,7 +60,9 @@ export default function Header() {
         animate={isActive ? "open" : "closed"}
         initial="closed"
       >
-        <AnimatePresence>{isActive && <Nav />}</AnimatePresence>
+        <AnimatePresence>
+          {isActive && <Nav onNavigate={() => setIsActive(false)} />}
+        </AnimatePresence>
       </motion.div>
       <Button isActive={isActive} onClick={handleClick} />
     </header>
