@@ -36,9 +36,14 @@
         font-size: 48px;
         text-transform: uppercase;
         color: #1d1d1d;
+        transition: opacity 0.3s ease-in-out;
 
         .number {
           width: 50px;
+        }
+
+        &:hover {
+          opacity: 0.5;
         }
       }
     }
@@ -78,6 +83,37 @@
       &:hover {
         opacity: 1;
       }
+    }
+  }
+}
+
+@media (width < 530px) {
+  .nav {
+    padding: 30px 40px;
+
+    .pages {
+      .page_link_container {
+        .page_link {
+          gap: 16px;
+          font-size: 42px;
+
+          .number {
+            width: 42px;
+          }
+        }
+      }
+    }
+
+    .socials {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0;
+    }
+
+    .footer {
+      width: 100%;
+      justify-content: space-between;
+      gap: 0;
     }
   }
 }

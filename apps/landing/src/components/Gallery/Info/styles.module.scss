@@ -1,0 +1,119 @@
+.player_info {
+  width: 100%;
+  padding: 50px 70px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .player_name {
+    font-family: var(--font-anton);
+    text-transform: uppercase;
+    line-height: 1;
+
+    p {
+      font-size: 36px;
+      color: #0084ff;
+    }
+
+    h1 {
+      font-size: 64px;
+      font-weight: 400;
+      color: #ffffff;
+    }
+  }
+
+  .player_stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+
+    .player_stats_item {
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+
+      font-family: var(--font-anton);
+      text-transform: uppercase;
+      p {
+        font-size: 16px;
+        color: #ffffff;
+        opacity: 0.5;
+      }
+      h2 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+@media (width < 1280px) {
+  .player_info {
+    .player_name {
+      p {
+        font-size: 24px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+    }
+  }
+}
+
+@media (width < 900px) {
+  .player_info {
+    padding: 50px 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 36px;
+  }
+}
+
+@media (width < 600px) {
+  .player_info {
+    padding: 30px 50px;
+    .player_stats {
+      width: 100%;
+      .player_stats_item {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (width < 500px) {
+  .player_info {
+    padding: 20px 30px;
+
+    .player_name {
+      p {
+        font-size: 20px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+    }
+
+    .player_stats {
+      .player_stats_item {
+        p {
+          font-size: 16px;
+        }
+        h2 {
+          font-size: 24px;
+        }
+      }
+    }
+  }
+}

@@ -20,27 +20,13 @@ export default function Cards({
         className={styles.image}
         src={player.presentation_image_url ?? ""}
         alt={player.full_name}
-        width={360}
-        height={420}
+        fill
         draggable={false}
       />
 
-      <div className={styles.content}>
-        <div className={styles.top}>
-          <p className={styles.number}>24</p>
-          <Image
-            src="/assets/svg/dtm-ones-ball.svg"
-            alt="Dtm Ones Ball"
-            width={40}
-            height={33}
-            draggable={false}
-          />
-        </div>
-
-        <div className={styles.bottom}>
-          <p className={styles.position}>{player.categories[0].name}</p>
-          <h1 className={styles.name}>{player.full_name}</h1>
-        </div>
+      <div className={styles.card_description}>
+        <h1 className={styles.player_name}>{player.full_name}</h1>
+        <p className={styles.player_position}>{player.categories[0].name}</p>
       </div>
     </div>
   );

@@ -1,5 +1,21 @@
 .header {
-  width: 100%;
-  position: fixed;
-  z-index: 100;
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  z-index: 1000;
+
+  .collapsible {
+    --menu-w: 480px;
+    --menu-h: 600px;
+
+    position: relative;
+    background-color: white;
+    border-radius: 25px;
+    overflow: hidden;
+
+    @media (width < 530px) {
+      --menu-w: calc(100vw - 50px);
+      --menu-h: min(600px, calc(100vh - 50px));
+    }
+  }
 }

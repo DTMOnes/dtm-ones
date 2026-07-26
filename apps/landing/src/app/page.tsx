@@ -38,7 +38,5 @@ export default async function Page({
     categoryIds,
   });
 
-  console.log(players);
-
   return <Canvas players={players} />;
 }

@@ -27,6 +27,14 @@
       background: linear-gradient(to top, #000000, #00000000 75%);
     }
 
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
     .gallery_image {
       width: auto;
       height: 100%;
@@ -72,60 +80,16 @@
       border-radius: 999;
       -webkit-backdrop-filter: blur(50px);
       backdrop-filter: blur(50px);
-    }
-  }
+      z-index: 100;
+      transition: all 0.3s ease-in-out;
 
-  .player_info {
-    width: 100%;
-    padding: 50px 70px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-
-    .player_name {
-      font-family: var(--font-anton);
-      text-transform: uppercase;
-      line-height: 1;
-
-      p {
-        font-size: 36px;
-        color: #0084ff;
+      .button_icon {
+        opacity: 0.5;
       }
 
-      h1 {
-        font-size: 64px;
-        font-weight: 400;
-        color: #ffffff;
-      }
-    }
-
-    .player_stats {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 24px;
-
-      .player_stats_item {
-        width: 150px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-
-        font-family: var(--font-anton);
-        text-transform: uppercase;
-        p {
-          font-size: 16px;
-          color: #ffffff;
-          opacity: 0.5;
-        }
-        h2 {
-          font-size: 24px;
-          font-weight: 400;
-          color: #ffffff;
+      &:hover {
+        .button_icon {
+          opacity: 1;
         }
       }
     }
