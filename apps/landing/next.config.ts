@@ -9,6 +9,7 @@ loadEnvConfig(path.resolve(__dirname, "../.."), undefined, undefined, true);
 const nextConfig: NextConfig = {
   sassOptions: {
     loadPaths: [path.join(__dirname, "src")],
+    includePaths: [path.join(__dirname, "src")],
   },
   images: {
     remotePatterns: [

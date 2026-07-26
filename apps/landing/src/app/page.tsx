@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 // Components
-import Canvas from "@/components/Canvas";
+import Roster from "@/components/Roster";
 
 // Utils
 import { normalizeSearchParams } from "@/utils/normalize-search-params";
@@ -38,8 +38,5 @@ export default async function Page({
     categoryIds,
   });
 
-  const canvasKey =
-    players.map((player) => player.id).join(",") || "empty";
-
-  return <Canvas key={canvasKey} players={players} />;
+  return <Roster players={players} />;
 }

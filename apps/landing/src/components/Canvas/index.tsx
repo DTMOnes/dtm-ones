@@ -4,19 +4,13 @@
 import { useCallback, useEffect, useRef, useState, useLayoutEffect } from "react";
 
 // Motion
-import {
-  motion,
-  useMotionValue,
-  AnimatePresence,
-  useSpring,
-} from "motion/react";
+import { motion, useMotionValue, useSpring } from "motion/react";
 
 // Styles
 import styles from "./styles.module.scss";
 
 // Components
 import Cards from "../Cards";
-import Gallery from "../Gallery";
 
 // Utils
 import { calculateRows } from "@/utils/calculate-rows";
@@ -27,13 +21,17 @@ import { PublicRosterPlayer } from "@/types/roster";
 const SPRING = { stiffness: 120, damping: 32, mass: 1.1 };
 const REVEAL_TIMEOUT_MS = 4000;
 
-export default function Canvas({ players }: { players: PublicRosterPlayer[] }) {
+export default function Canvas({
+  players,
+  onSelect,
+}: {
+  players: PublicRosterPlayer[];
+  onSelect: (player: PublicRosterPlayer) => void;
+}) {
   const constraintsRef = useRef<HTMLDivElement>(null);
   const planeRef = useRef<HTMLDivElement>(null);
   const readyIdsRef = useRef(new Set<string>());
 
-  const [selectedPlayer, setSelectedPlayer] =
-    useState<PublicRosterPlayer | null>(null);
   const [reveal, setReveal] = useState(players.length === 0);
 
   const x = useMotionValue(0);
@@ -126,22 +124,13 @@ export default function Canvas({ players }: { players: PublicRosterPlayer[] }) {
                   player={player}
                   reveal={reveal}
                   onReady={handleCardReady}
-                  onSelect={() => setSelectedPlayer(player)}
+                  onSelect={() => onSelect(player)}
                 />
               ))}
             </motion.div>
           );
         })}
       </motion.div>
-
-      <AnimatePresence>
-        {selectedPlayer && (
-          <Gallery
-            player={selectedPlayer}
-            onClose={() => setSelectedPlayer(null)}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
