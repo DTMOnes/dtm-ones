@@ -4,12 +4,26 @@ export type PublicRosterCategoryRef = {
   slug: string;
 };
 
+export type PublicRosterGalleryImage = {
+  id: string;
+  url: string;
+  sort_order: number;
+};
+
+export type PublicRosterVideo = {
+  id: string;
+  youtube_url: string;
+  sort_order: number;
+};
+
 export type PublicRosterPlayer = {
   id: string;
   slug: string;
   full_name: string;
   presentation_image_url: string | null;
   categories: PublicRosterCategoryRef[];
+  gallery_images: PublicRosterGalleryImage[];
+  videos: PublicRosterVideo[];
 };
 
 export type PublicRosterCategory = {

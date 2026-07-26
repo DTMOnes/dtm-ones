@@ -1,0 +1,113 @@
+.card {
+  width: 360px;
+  height: 420px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image:
+    url("/assets/images/marble-texture.png"),
+    url("/assets/images/dtm-gradient.png");
+  background-size: cover, contain;
+  background-position: center, top;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px; // border thickness
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0.5)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 3; // above image/content so the ring shows
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #1d1d1d, transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+
+    .top {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+
+      .number {
+        font-family: var(--font-anton);
+        font-size: 36px;
+        font-weight: 400;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 1;
+      }
+    }
+
+    .bottom {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 10px;
+
+      .name {
+        font-family: var(--font-anton);
+        font-size: 36px;
+        font-weight: 400;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 1;
+      }
+
+      .position {
+        font-family: var(--font-anton);
+        font-size: 16px;
+        font-weight: 400;
+        color: #0084ff;
+        text-transform: uppercase;
+        letter-spacing: -2%;
+        line-height: 1;
+      }
+    }
+  }
+}

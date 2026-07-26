@@ -2,17 +2,14 @@ import { createInsforgeServer } from "@/lib/insforge-server";
 import type {
   PublicRosterCategory,
   PublicRosterCategoryRef,
+  PublicRosterGalleryImage,
   PublicRosterPlayer,
+  PublicRosterVideo,
 } from "@/types/roster";
-
-const ROSTER_PLAYER_SELECT =
-  "id, slug, full_name, presentation_image_url, player_categories!inner(categories(id, name, slug))";
 
 export type ListPublicRosterPlayersParams = {
   q?: string;
   categoryIds?: string[];
-  /** Cap rows after filters and sort. Home teaser passes 3; `/roster` omits. */
-  limit?: number;
 };
 
 function readPlayerId(row: unknown): string | null {
@@ -56,6 +53,64 @@ function parseCategoryRefs(value: unknown): PublicRosterCategoryRef[] {
   return refs;
 }
 
+function parseGalleryImages(value: unknown): PublicRosterGalleryImage[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const images: PublicRosterGalleryImage[] = [];
+
+  for (const item of value) {
+    if (typeof item !== "object" || item === null) {
+      continue;
+    }
+
+    const row = item as Record<string, unknown>;
+    if (
+      typeof row.id !== "string" ||
+      typeof row.url !== "string" ||
+      typeof row.sort_order !== "number"
+    ) {
+      continue;
+    }
+
+    images.push({ id: row.id, url: row.url, sort_order: row.sort_order });
+  }
+
+  return images.sort((a, b) => a.sort_order - b.sort_order);
+}
+
+function parseVideos(value: unknown): PublicRosterVideo[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const videos: PublicRosterVideo[] = [];
+
+  for (const item of value) {
+    if (typeof item !== "object" || item === null) {
+      continue;
+    }
+
+    const row = item as Record<string, unknown>;
+    if (
+      typeof row.id !== "string" ||
+      typeof row.youtube_url !== "string" ||
+      typeof row.sort_order !== "number"
+    ) {
+      continue;
+    }
+
+    videos.push({
+      id: row.id,
+      youtube_url: row.youtube_url,
+      sort_order: row.sort_order,
+    });
+  }
+
+  return videos.sort((a, b) => a.sort_order - b.sort_order);
+}
+
 function parseRosterPlayer(value: unknown): PublicRosterPlayer | null {
   if (typeof value !== "object" || value === null) {
     return null;
@@ -87,6 +142,8 @@ function parseRosterPlayer(value: unknown): PublicRosterPlayer | null {
     full_name: row.full_name,
     presentation_image_url: presentationImageUrl,
     categories,
+    gallery_images: parseGalleryImages(row.player_gallery_images),
+    videos: parseVideos(row.player_videos),
   };
 }
 
@@ -155,7 +212,17 @@ export async function listPublicRosterPlayers(
 
   let query = insforge.database
     .from("players")
-    .select(ROSTER_PLAYER_SELECT)
+    .select(
+      `
+      id,
+      slug,
+      full_name,
+      presentation_image_url,
+      player_categories!inner(categories(id, name, slug)),
+      player_gallery_images(id, url, sort_order),
+      player_videos(id, youtube_url, sort_order)
+      `,
+    )
     .eq("status", "published")
     .is("deleted_at", null)
     .order("full_name", { ascending: true });
@@ -167,10 +234,6 @@ export async function listPublicRosterPlayers(
 
   if (playerIds !== null) {
     query = query.in("id", playerIds);
-  }
-
-  if (params.limit !== undefined) {
-    query = query.limit(params.limit);
   }
 
   const { data, error } = await query;
