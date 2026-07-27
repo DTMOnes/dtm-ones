@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 
+// Styles
+import styles from "./page.module.scss";
+
 // Components
-import Roster from "@/components/Roster";
+import Cards from "@/components/Cards";
 
 // Utils
 import { normalizeSearchParams } from "@/utils/normalize-search-params";
@@ -38,5 +41,11 @@ export default async function Page({
     categoryIds,
   });
 
-  return <Roster players={players} />;
+  return (
+    <main className={styles.container}>
+      {players.map((player) => (
+        <Cards key={player.id} player={player} />
+      ))}
+    </main>
+  );
 }

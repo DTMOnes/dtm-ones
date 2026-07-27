@@ -50,7 +50,14 @@
 
 @media (width < 768px) {
   .card {
-    width: 240px;
-    height: 280px;
+    width: 160px;
+    height: 200px;
+
+    .card_description {
+      .player_position,
+      .player_name {
+        font-size: 10px;
+      }
+    }
   }
 }
