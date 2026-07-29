@@ -21,17 +21,21 @@ export default function Cards({ player }: { player: PublicRosterPlayer }) {
     <motion.div
       className={styles.card}
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: 0.5 }}
+      whileHover={{ opacity: 1, transition: { duration: 0.3 } }}
       transition={{ duration: 0.5, ease: EASE }}
     >
       {imageSrc ? (
-        <Image
-          className={styles.image}
-          src={imageSrc}
-          alt={player.full_name}
-          fill
-          draggable={false}
-        />
+        <div className={styles.image_container}>
+          <Image
+            className={styles.image}
+            src={imageSrc}
+            alt={player.full_name}
+            width={1025}
+            height={1280}
+            draggable={false}
+          />
+        </div>
       ) : null}
 
       <div className={styles.card_description}>

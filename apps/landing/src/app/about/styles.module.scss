@@ -1,53 +1,115 @@
-.page {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 120px var(--spacing-md) var(--spacing-lg);
-  font-family: var(--font-poppins), sans-serif;
-  color: var(--color-white);
-}
-
-.inner {
+.container {
   width: 100%;
-  max-width: 560px;
+  min-height: 100dvh;
+  padding: 120px 0;
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
+  align-items: center;
+  justify-content: flex-end;
 
-.heading {
-  font-family: var(--font-poppins), sans-serif;
-  font-size: 32px;
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.paragraph {
-  font-family: var(--font-poppins), sans-serif;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.75;
-  color: var(--color-white);
-  opacity: 0.55;
-}
-
-@media (width < 768px) {
-  .page {
-    padding: 100px var(--spacing-sm) var(--spacing-md);
-  }
-
-  .inner {
-    gap: 40px;
+  &::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 35%;
+    height: 100dvh;
+    background: url("/assets/images/dunk.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: grayscale(100%);
+    z-index: 0;
   }
 
   .content {
+    width: 65%;
+    height: 100%;
+    padding-left: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
     gap: 20px;
+    background: black;
+    z-index: 1;
+
+    h1,
+    p {
+      font-family: var(--font-inter);
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      color: white;
+      opacity: 0.7;
+    }
+
+    .paragraph {
+      width: 70%;
+      min-width: 800px;
+      padding: 40px 0;
+      font-family: var(--font-big-shoulders);
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-transform: uppercase;
+      opacity: 1;
+    }
+
+    .highlight {
+      opacity: 0.7;
+    }
+  }
+}
+
+@media (width < 1500px) {
+  .container {
+    .content {
+      .paragraph {
+        font-size: 40px;
+        min-width: 600px;
+      }
+    }
+  }
+}
+
+@media (width < 1200px) {
+  .container {
+    &::before {
+      display: none;
+    }
+
+    .content {
+      width: 100%;
+
+      .paragraph {
+        width: 80%;
+        font-size: 40px;
+      }
+    }
+  }
+}
+
+@media (width < 768px) {
+  .container {
+    .content {
+      padding: 120px 40px;
+      .paragraph {
+        width: 100%;
+        min-width: 100%;
+        font-size: 32px;
+      }
+    }
+  }
+}
+
+@media (width < 480px) {
+  .container {
+    .content {
+      padding: 80px 40px;
+      .paragraph {
+        font-size: 28px;
+      }
+    }
   }
 }

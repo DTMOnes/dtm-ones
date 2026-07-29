@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import { Anton, Poppins } from "next/font/google";
+import { Big_Shoulders, Inter } from "next/font/google";
 import "./globals.css";
 
 // Components
 import Header from "@/components/Header";
 import NavigationProgress from "@/components/NavigationProgress";
 
-const poppins = Poppins({
-  weight: ["400", "500", "600", "700"],
+const bigShoulders = Big_Shoulders({
+  weight: ["400", "700", "800", "900"],
   subsets: ["latin"],
-  variable: "--font-poppins",
+  variable: "--font-big-shoulders",
 });
 
-const anton = Anton({
-  weight: "400",
+const inter = Inter({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-anton",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -30,8 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${anton.variable} ${poppins.variable} dark`}>
-      <body className="antialiased font-poppins">
+    <html
+      lang="en"
+      className={`${bigShoulders.variable} ${inter.variable} dark`}
+    >
+      <body className="antialiased font-inter">
         <NavigationProgress />
         <Header />
         {children}
