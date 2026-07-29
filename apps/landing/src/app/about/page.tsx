@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     "Learn how DTM Ones supports basketball players and coaches worldwide.",
 };
 
-export default function AboutPage() {
+export default function Page() {
   return (
     <main className={styles.container}>
       <div className={styles.content}>
