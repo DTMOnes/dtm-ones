@@ -63,7 +63,7 @@ export default function ContactForm() {
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
       <fieldset className={styles.fieldset}>
-        <legend className={styles.label}>I am a</legend>
+        <legend className={styles.visuallyHidden}>I am a</legend>
         <div className={styles.options}>
           <label className={styles.option} htmlFor="contact-type-player">
             <input
@@ -73,7 +73,7 @@ export default function ContactForm() {
               disabled={isSubmitting}
               {...register("type")}
             />
-            <span>Player</span>
+            <span>Seeking representation</span>
           </label>
           <label className={styles.option} htmlFor="contact-type-recruiter">
             <input
@@ -83,7 +83,7 @@ export default function ContactForm() {
               disabled={isSubmitting}
               {...register("type")}
             />
-            <span>Recruiter</span>
+            <span>Hire services</span>
           </label>
         </div>
         {errors.type?.message ? (
@@ -130,7 +130,7 @@ export default function ContactForm() {
       <label className={styles.field}>
         <span className={styles.label}>Message</span>
         <textarea
-          placeholder="How can we help?"
+          placeholder="How can we help you?"
           rows={5}
           aria-invalid={!!errors.message}
           disabled={isSubmitting}
