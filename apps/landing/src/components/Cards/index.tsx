@@ -4,8 +4,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+// React
+import { useState } from "react";
+
 // Motion
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 // Icons
 import { ArrowUpRightIcon } from "@phosphor-icons/react";
@@ -18,20 +21,66 @@ import { PublicRosterPlayer } from "@/types/roster";
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 const PLACEHOLDER_SRC = "/assets/images/player-placeholder.png";
+const DEFAULT_META_VARIANTS = {
+  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 10 },
+};
+const INFO_PANEL_VARIANTS = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0 },
+};
 
-export default function Cards({ player }: { player: PublicRosterPlayer }) {
-  const imageSrc =
-    player.presentation_image_url?.trim() || PLACEHOLDER_SRC;
+export default function Cards({
+  player,
+  isSelected,
+  onSelect,
+}: {
+  player: PublicRosterPlayer;
+  isSelected: boolean;
+  onSelect: (player: PublicRosterPlayer) => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const imageSrc = player.presentation_image_url?.trim() || PLACEHOLDER_SRC;
   const categoryName = player.categories[0]?.name ?? "";
   const lastClub = player.last_club.trim();
+  const isRevealed = isSelected || isHovered;
+  const revealTransition = {
+    duration: shouldReduceMotion ? 0 : 0.35,
+    ease: EASE,
+  };
 
   return (
-    <motion.div
+    <motion.article
       className={styles.card}
+      data-selected={isSelected}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, ease: EASE }}
+      transition={{
+        duration: shouldReduceMotion ? 0 : 0.5,
+        ease: EASE,
+      }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
     >
+      <button
+        type="button"
+        className={styles.reveal_button}
+        aria-label={`${isSelected ? "Hide" : "Show"} details for ${player.full_name}`}
+        aria-expanded={isSelected}
+        aria-controls={`player-details-${player.id}`}
+        onPointerUp={(event) => {
+          if (event.pointerType !== "mouse") {
+            setIsSelected((selected) => !selected);
+          }
+        }}
+        onClick={(event) => {
+          if (event.detail === 0) {
+            setIsSelected((selected) => !selected);
+          }
+        }}
+      />
+
       <div className={styles.image_container}>
         <Image
           className={styles.image}
@@ -43,14 +92,31 @@ export default function Cards({ player }: { player: PublicRosterPlayer }) {
         />
       </div>
 
-      <div className={styles.default_meta}>
+      <motion.div
+        className={styles.default_meta}
+        variants={DEFAULT_META_VARIANTS}
+        initial="visible"
+        animate={isRevealed ? "hidden" : "visible"}
+        transition={revealTransition}
+        aria-hidden={isRevealed}
+      >
         <h2 className={styles.player_name}>{player.full_name}</h2>
         {categoryName ? (
           <p className={styles.player_position}>{categoryName}</p>
         ) : null}
-      </div>
+      </motion.div>
 
-      <div className={styles.hover_panel}>
+      <motion.div
+        id={`player-details-${player.id}`}
+        className={styles.hover_panel}
+        variants={INFO_PANEL_VARIANTS}
+        initial="hidden"
+        animate={isRevealed ? "visible" : "hidden"}
+        transition={revealTransition}
+        data-visible={isRevealed}
+        aria-hidden={!isRevealed}
+        inert={!isRevealed}
+      >
         <div className={styles.hover_header}>
           <div className={styles.hover_identity}>
             <h2 className={styles.player_name}>{player.full_name}</h2>
@@ -89,7 +155,7 @@ export default function Cards({ player }: { player: PublicRosterPlayer }) {
           View Profile
           <ArrowUpRightIcon size={16} weight="bold" aria-hidden />
         </Link>
-      </div>
-    </motion.div>
+      </motion.div>
+    </motion.article>
   );
 }

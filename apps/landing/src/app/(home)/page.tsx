@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 // Components
-import Slider from "@/components/Slider";
+import Grid from "@/components/Grid";
 
 // Utils
 import { normalizeSearchParams } from "@/utils/normalize-search-params";
@@ -38,5 +38,5 @@ export default async function Page({
     categoryIds,
   });
 
-  return <Slider players={players} />;
+  return <Grid players={players} />;
 }

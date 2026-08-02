@@ -1,28 +1,28 @@
 .header {
-  position: absolute;
-  top: 50px;
-  right: 50px;
+  width: 80%;
+  max-width: 500px;
+  padding-inline: 28px;
+  position: fixed;
+  top: 2.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #1d1d1d80;
+  border: 1px solid rgba(255, 255, 255, 0.151);
+  border-radius: 12px;
+  backdrop-filter: blur(50px);
+  --webkit-backdrop-filter: blur(50px);
+  overflow: hidden;
   z-index: 1000;
 
-  .collapsible {
-    --menu-w: 480px;
-    --menu-h: 600px;
-
-    position: relative;
-    background-color: white;
-    border-radius: 25px;
-    overflow: hidden;
-
-    @media (width < 530px) {
-      --menu-w: calc(100vw - 10px);
-      --menu-h: min(600px, calc(100vh - 50px));
-    }
-  }
-}
-
-@media (width < 530px) {
-  .header {
-    top: 30px;
-    right: 30px;
+  .main_container {
+    width: 100%;
+    padding-block: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }

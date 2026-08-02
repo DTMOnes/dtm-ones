@@ -1,0 +1,12 @@
+.controls {
+  width: 80%;
+  max-width: 500px;
+  position: fixed;
+  bottom: 2.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}

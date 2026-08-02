@@ -28,27 +28,19 @@ const pages = [
 const socials = [
   {
     label: "Instagram",
-    icon: "/assets/icons/instagram-logo-bold.svg",
     href: "https://www.instagram.com/dtm_ones/",
   },
   {
-    label: "Facebook",
-    icon: "/assets/icons/facebook-logo-bold.svg",
-    href: "https://www.facebook.com/dtm_ones/",
-  },
-  {
     label: "Youtube",
-    icon: "/assets/icons/youtube-logo-bold.svg",
     href: "https://www.youtube.com/channel/UC_x5XG1OV2P6yVqAlKxpw6w",
-  },
-  {
-    label: "Linkedin",
-    icon: "/assets/icons/linkedin-logo-bold.svg",
-    href: "https://www.linkedin.com/company/dtm-ones/",
   },
 ];
 
 const footer = [
+  {
+    label: "All rights reserved",
+    href: "/terms-of-service",
+  },
   {
     label: "Terms of Service",
     href: "/terms-of-service",
@@ -73,7 +65,6 @@ const variants = {
     translateX: 0,
     transition: {
       duration: 0.65,
-      // opacity: { duration: 0.35 },
       delay: 0.5 + index * 0.1,
       ease: [0.215, 0.61, 0.355, 1] as const,
     },
@@ -106,26 +97,12 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
                 className={styles.page_link}
                 onClick={onNavigate}
               >
-                <span className={styles.number}>0{index + 1}</span>
                 {e.label}
               </Link>
             </motion.div>
           </div>
         ))}
       </div>
-
-      <motion.div
-        className={styles.separator}
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: 0.2,
-          transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1], delay: 0.75 },
-        }}
-        exit={{
-          opacity: 0,
-          transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1] },
-        }}
-      />
 
       <div className={styles.socials}>
         {socials.map((e, index) => (
@@ -138,24 +115,11 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
             exit="exit"
           >
             <Link href={e.href} className={styles.social_link}>
-              <Image src={e.icon} alt={e.label} width={26} height={26} />
+              {e.label}
             </Link>
           </motion.div>
         ))}
       </div>
-
-      <motion.div
-        className={styles.separator}
-        initial={{ opacity: 0 }}
-        animate={{
-          opacity: 0.2,
-          transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1], delay: 0.85 },
-        }}
-        exit={{
-          opacity: 0,
-          transition: { duration: 0.5, ease: [0.76, 0, 0.24, 1] },
-        }}
-      />
 
       <footer className={styles.footer}>
         {footer.map((e, index) => (
