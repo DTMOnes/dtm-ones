@@ -17,6 +17,34 @@
   overflow: hidden;
 }
 
+.header {
+  width: 100%;
+  padding-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.151);
+
+  p {
+    font-family: var(--font-inter);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: -2%;
+    text-transform: uppercase;
+    color: white;
+    opacity: 0.5;
+  }
+}
+
+.content {
+  width: 100%;
+  padding-block: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .label {
   width: 100%;
   display: flex;
