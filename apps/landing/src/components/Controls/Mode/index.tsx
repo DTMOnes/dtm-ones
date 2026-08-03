@@ -3,11 +3,11 @@
 // Next
 import Image from "next/image";
 
-// React
-import { useState } from "react";
-
 // Motion
 import { motion } from "motion/react";
+
+// Hooks
+import { useViewMode } from "@/components/ViewModeProvider";
 
 // Styles
 import styles from "./styles.module.scss";
@@ -20,7 +20,7 @@ const variants = {
 } as const;
 
 export default function Mode() {
-  const [mode, setMode] = useState<"images" | "rows">("images");
+  const { mode, setMode } = useViewMode();
 
   return (
     <div className={styles.container}>

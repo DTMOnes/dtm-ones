@@ -3,6 +3,7 @@ import { listPublicRosterCategories } from "@/lib/roster/queries";
 
 // Components
 import Controls from "@/components/Controls";
+import { ViewModeProvider } from "@/components/ViewModeProvider";
 
 export default async function Layout({
   children,
@@ -12,9 +13,9 @@ export default async function Layout({
   const categories = await listPublicRosterCategories();
 
   return (
-    <>
+    <ViewModeProvider>
       {children}
       <Controls categories={categories} />
-    </>
+    </ViewModeProvider>
   );
 }
