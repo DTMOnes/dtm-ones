@@ -7,9 +7,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 // React
 import { useRef } from "react";
 
-// Motion
-import { motion } from "motion/react";
-
 // Utils
 import { useDebouncedCallback } from "use-debounce";
 
@@ -50,18 +47,14 @@ export default function Search() {
 
   return (
     <div className={styles.container}>
-      <motion.div
-        variants={buttonVariants}
-        animate={inputRef.current?.value ? "hover" : "initial"}
-        transition={{ duration: 0.3 }}
-      >
+      <div className={styles.icon}>
         <Image
           src="/assets/icons/magnifying-glass-bold-light.svg"
           alt="magnifying glass"
-          width={24}
-          height={24}
+          width={20}
+          height={20}
         />
-      </motion.div>
+      </div>
 
       <input
         ref={inputRef}
@@ -72,12 +65,8 @@ export default function Search() {
         defaultValue={searchParams.get("q")?.toString()}
       />
 
-      <motion.div
-        variants={buttonVariants}
-        initial="initial"
-        whileHover="hover"
-        whileTap="tap"
-        transition={{ duration: 0.3 }}
+      <div
+        className={styles.icon}
         onClick={() => {
           handleSearch("");
           if (inputRef.current) {
@@ -88,10 +77,10 @@ export default function Search() {
         <Image
           src="/assets/icons/x-bold-light.svg"
           alt="Menu"
-          width={24}
-          height={24}
+          width={20}
+          height={20}
         />
-      </motion.div>
+      </div>
     </div>
   );
 }

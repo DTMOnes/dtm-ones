@@ -2,7 +2,6 @@
 
 // Next
 import Link from "next/link";
-import Image from "next/image";
 
 // Motion
 import { motion } from "motion/react";

@@ -1,3 +1,5 @@
+@use "styles/typography" as type;
+
 .card {
   width: 360px;
   height: 420px;
@@ -5,6 +7,8 @@
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  transform-style: preserve-3d;
+  transform-origin: bottom center;
 
   .image {
     width: 100%;
@@ -42,23 +46,13 @@
   }
 
   .player_name {
-    font-family: var(--font-big-shoulders);
-    font-size: 24px;
-    font-weight: 900;
-    line-height: 1.2;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--color-white);
+    @include type.big-shoulders(24px);
   }
 
   .player_position {
-    font-family: var(--font-inter);
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.02em;
+    @include type.inter(12px);
     text-transform: uppercase;
-    color: var(--color-white);
+    opacity: 0.5;
   }
 
   &:hover {

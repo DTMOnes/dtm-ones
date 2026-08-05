@@ -44,7 +44,7 @@ const variants = {
   },
 } as const;
 
-export default function PictureCards({
+export default function Cards({
   player,
   index,
 }: {

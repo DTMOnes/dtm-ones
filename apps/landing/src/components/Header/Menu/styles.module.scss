@@ -1,0 +1,28 @@
+.container {
+  position: relative;
+}
+
+.button {
+  width: 48px;
+  aspect-ratio: 1/1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  .icon_container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: red;
+
+    &:nth-of-type(2) {
+      position: absolute;
+      top: 100%;
+      background-color: orange;
+    }
+  }
+}

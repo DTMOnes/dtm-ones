@@ -36,7 +36,6 @@ export default function RootLayout({
     >
       <body className="antialiased font-inter">
         <NavigationProgress />
-        <Header />
         {children}
       </body>
     </html>

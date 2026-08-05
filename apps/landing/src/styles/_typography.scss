@@ -1,51 +1,23 @@
-@mixin anton-display {
-  font-family: var(--font-title);
-  font-size: var(--anton-size-display);
+@mixin big-shoulders($size: null) {
+  font-family: var(--font-big-shoulders);
+  font-weight: 900;
   line-height: 1;
-  text-transform: uppercase;
-  text-align: center;
-  color: var(--color-white);
-}
-
-@mixin anton-player {
-  font-family: var(--font-title);
-  font-size: var(--anton-size-player);
-  line-height: 1;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--color-white);
+
+  @if $size {
+    font-size: $size;
+  }
 }
 
-@mixin anton-ui {
-  font-family: var(--font-title);
-  font-size: var(--anton-size-ui);
-  line-height: 1.1;
-  text-transform: uppercase;
+@mixin inter($size: null) {
+  font-family: var(--font-inter);
+  font-weight: 400;
+  letter-spacing: -0.02em;
   color: var(--color-white);
-}
 
-@mixin title-main {
-  @include anton-display;
-}
-
-@mixin body-main {
-  font-family: var(--font-body);
-  font-size: var(--body-size);
-  line-height: 1.4;
-  text-align: center;
-  color: var(--color-white);
-  opacity: 0.5;
-}
-
-@mixin button-main {
-  width: 300px;
-  padding: 16px 0;
-
-  background-color: var(--color-white);
-
-  border: none;
-  border-radius: 4px;
-
-  @include anton-ui;
-  text-align: center;
-  color: var(--color-dark-gray);
+  @if $size {
+    font-size: $size;
+  }
 }

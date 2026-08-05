@@ -1,0 +1,42 @@
+@use "styles/typography" as type;
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  p {
+    @include type.inter(14px);
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .categories {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+
+    label {
+      opacity: 0.5;
+      cursor: pointer;
+      transition: opacity 0.3s;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &:has(input:checked) {
+        opacity: 1;
+      }
+
+      input {
+        display: none;
+      }
+
+      span {
+        @include type.big-shoulders(24px);
+      }
+    }
+  }
+}

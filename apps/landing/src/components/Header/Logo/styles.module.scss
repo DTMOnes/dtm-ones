@@ -1,0 +1,12 @@
+@use "styles/typography" as type;
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  .text {
+    @include type.big-shoulders(24px);
+  }
+}
