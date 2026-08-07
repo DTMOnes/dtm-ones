@@ -27,11 +27,12 @@ export default function Logo({
   title?: string;
 }) {
   const { setPendingTitle } = useHeaderOverride();
+  const isBrandTitle = title === DEFAULT_BRAND_TITLE;
 
   return (
     <Link
       href="/"
-      className={styles.container}
+      className={`${styles.container}${isBrandTitle ? ` ${styles.brand}` : ""}`}
       onClick={() => setPendingTitle(DEFAULT_BRAND_TITLE)}
     >
       <Image

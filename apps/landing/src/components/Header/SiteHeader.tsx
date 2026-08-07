@@ -33,7 +33,7 @@ export default function SiteHeader({
     if (override?.type !== "player") return null;
 
     return {
-      // Desktop: share the top row with logo + menu. Mobile stacks via Header CSS.
+      // Top row with logo + menu; stacks under 650px via Header CSS.
       search: (
         <Filters
           items={[...PLAYER_SECTIONS]}

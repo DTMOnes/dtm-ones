@@ -34,6 +34,8 @@
   gap: 24px;
 
   label {
+    display: flex;
+    align-items: center;
     opacity: 0.5;
     cursor: pointer;
     transition: opacity 0.3s;
@@ -52,6 +54,7 @@
 
     span {
       @include type.big-shoulders(24px);
+      display: block;
     }
   }
 }

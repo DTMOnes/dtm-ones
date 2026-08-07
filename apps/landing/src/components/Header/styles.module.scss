@@ -15,6 +15,14 @@
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
 
+    .start,
+    .center,
+    .end {
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+    }
+
     .start {
       grid-column: 1;
       justify-self: start;
@@ -28,6 +36,35 @@
     .end {
       grid-column: 3;
       justify-self: end;
+    }
+  }
+}
+
+// Same row, but free the center slot from the forced middle column.
+@media (width < 950px) {
+  .header.stack_center {
+    .top_container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+
+      .start,
+      .center,
+      .end {
+        grid-column: unset;
+        justify-self: unset;
+      }
+
+      .start,
+      .center {
+        min-width: 0;
+        flex: 0 1 auto;
+      }
+
+      .end {
+        flex: 0 0 auto;
+      }
     }
   }
 }
@@ -59,17 +96,20 @@
         .start {
           grid-area: start;
           justify-self: start;
+          flex: unset;
         }
 
         .center {
           grid-area: center;
           justify-self: center;
           min-width: 0;
+          flex: unset;
         }
 
         .end {
           grid-area: end;
           justify-self: end;
+          flex: unset;
         }
       }
     }
