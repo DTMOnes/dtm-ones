@@ -8,7 +8,10 @@ import Header from "@/components/Header";
 import Logo from "@/components/Header/Logo";
 import Search from "@/components/Header/Search";
 import Filters from "@/components/Header/Filters";
-import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+import {
+  DEFAULT_BRAND_TITLE,
+  useHeaderOverride,
+} from "@/components/Header/HeaderProvider";
 import {
   PLAYER_SECTIONS,
   type PlayerSectionId,
@@ -22,14 +25,13 @@ export default function SiteHeader({
   categories: FilterItem[];
 }) {
   const pathname = usePathname();
-  const { override } = useHeaderOverride();
+  const { override, pendingTitle } = useHeaderOverride();
   const isHome = pathname === "/";
 
   const playerSlots = useMemo(() => {
     if (override?.type !== "player") return null;
 
     return {
-      brand: <Logo title={override.playerName} />,
       search: null,
       filters: (
         <Filters
@@ -43,7 +45,11 @@ export default function SiteHeader({
     };
   }, [override]);
 
-  const brand = playerSlots?.brand;
+  const brandTitle =
+    pendingTitle ??
+    (override?.type === "player" ? override.playerName : DEFAULT_BRAND_TITLE);
+
+  const brand = <Logo title={brandTitle} />;
   const search = playerSlots
     ? playerSlots.search
     : isHome ? (

@@ -14,15 +14,19 @@ export function usePlayerHeader(
   section: PlayerSectionId,
   onSectionChange: (id: PlayerSectionId) => void,
 ) {
-  const { setOverride } = useHeaderOverride();
+  const { setOverride, setPendingTitle } = useHeaderOverride();
 
   useEffect(() => {
+    setPendingTitle(null);
     setOverride({
       type: "player",
       playerName,
       section,
       onSectionChange,
     });
-    return () => setOverride(null);
-  }, [setOverride, playerName, section, onSectionChange]);
+    return () => {
+      setOverride(null);
+      setPendingTitle(null);
+    };
+  }, [setOverride, setPendingTitle, playerName, section, onSectionChange]);
 }
