@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
         hostname: "*.insforge.app",
         pathname: "/api/storage/**",
       },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+        pathname: "/vi/**",
+      },
     ],
   },
 };

@@ -2,8 +2,13 @@ import type { Metadata } from "next";
 import { Big_Shoulders, Inter } from "next/font/google";
 import "./globals.css";
 
+// Queries
+import { listPublicRosterCategories } from "@/lib/roster/queries";
+
 // Components
 import NavigationProgress from "@/components/NavigationProgress";
+import { HeaderProvider } from "@/components/Header/HeaderProvider";
+import SiteHeader from "@/components/Header/SiteHeader";
 
 const bigShoulders = Big_Shoulders({
   weight: ["400", "700", "800", "900"],
@@ -23,11 +28,13 @@ export const metadata: Metadata = {
     "Basketball talent agency built on 25 years of trust. Connecting players and coaches with opportunities worldwide.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const categories = await listPublicRosterCategories();
+
   return (
     <html
       lang="en"
@@ -35,7 +42,10 @@ export default function RootLayout({
     >
       <body className="antialiased font-inter">
         <NavigationProgress />
-        {children}
+        <HeaderProvider>
+          <SiteHeader categories={categories} />
+          {children}
+        </HeaderProvider>
       </body>
     </html>
   );

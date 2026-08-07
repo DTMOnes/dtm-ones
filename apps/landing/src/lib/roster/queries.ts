@@ -315,10 +315,11 @@ export async function listPublicRosterPlayers(
 /**
  * All categories with counts of eligible public roster players only.
  * Counts do not change with the active name or AND filter.
+ * Cached per request so root layout + home page share one fetch.
  */
-export async function listPublicRosterCategories(): Promise<
+export const listPublicRosterCategories = cache(async (): Promise<
   PublicRosterCategory[]
-> {
+> => {
   const insforge = createInsforgeServer();
 
   const { data: categories, error: categoriesError } = await insforge.database
@@ -407,4 +408,4 @@ export async function listPublicRosterCategories(): Promise<
   }
 
   return result;
-}
+});
