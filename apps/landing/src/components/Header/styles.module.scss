@@ -44,6 +44,35 @@
         display: none;
       }
     }
+
+    &.stack_center {
+      .top_container {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "start end"
+          "center center";
+        justify-content: unset;
+        column-gap: 36px;
+        row-gap: 36px;
+
+        .start {
+          grid-area: start;
+          justify-self: start;
+        }
+
+        .center {
+          grid-area: center;
+          justify-self: center;
+          min-width: 0;
+        }
+
+        .end {
+          grid-area: end;
+          justify-self: end;
+        }
+      }
+    }
   }
 }
 
@@ -52,6 +81,13 @@
     .top_container {
       gap: 24px;
     }
+
+    &.stack_center {
+      .top_container {
+        column-gap: 24px;
+        row-gap: 24px;
+      }
+    }
   }
 }
 
@@ -59,6 +95,13 @@
   .header {
     .top_container {
       gap: 16px;
+    }
+
+    &.stack_center {
+      .top_container {
+        column-gap: 16px;
+        row-gap: 16px;
+      }
     }
   }
 }

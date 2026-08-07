@@ -88,4 +88,12 @@
       flex-shrink: 0;
     }
   }
+
+  .sections {
+    justify-content: center;
+
+    .categories {
+      justify-content: center;
+    }
+  }
 }

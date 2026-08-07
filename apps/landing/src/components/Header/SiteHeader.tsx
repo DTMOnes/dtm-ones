@@ -27,13 +27,14 @@ export default function SiteHeader({
   const pathname = usePathname();
   const { override, pendingTitle } = useHeaderOverride();
   const isHome = pathname === "/";
+  const isPlayer = override?.type === "player";
 
   const playerSlots = useMemo(() => {
     if (override?.type !== "player") return null;
 
     return {
-      search: null,
-      filters: (
+      // Desktop: share the top row with logo + menu. Mobile stacks via Header CSS.
+      search: (
         <Filters
           items={[...PLAYER_SECTIONS]}
           variant="sections"
@@ -42,12 +43,13 @@ export default function SiteHeader({
           onChange={(id) => override.onSectionChange(id as PlayerSectionId)}
         />
       ),
+      filters: null,
     };
   }, [override]);
 
   const brandTitle =
     pendingTitle ??
-    (override?.type === "player" ? override.playerName : DEFAULT_BRAND_TITLE);
+    (isPlayer ? override.playerName : DEFAULT_BRAND_TITLE);
 
   const brand = <Logo title={brandTitle} />;
   const search = playerSlots
@@ -65,5 +67,12 @@ export default function SiteHeader({
         </Suspense>
       ) : null;
 
-  return <Header brand={brand} search={search} filters={filters} />;
+  return (
+    <Header
+      brand={brand}
+      search={search}
+      filters={filters}
+      stackCenterOnMobile={isPlayer}
+    />
+  );
 }
