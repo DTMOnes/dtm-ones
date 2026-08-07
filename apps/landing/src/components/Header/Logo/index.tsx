@@ -5,7 +5,7 @@ import Image from "next/image";
 // Styles
 import styles from "./styles.module.scss";
 
-export default function Logo() {
+export default function Logo({ title = "DTM ONES" }: { title?: string }) {
   return (
     <Link href="/" className={styles.container}>
       <Image
@@ -15,7 +15,7 @@ export default function Logo() {
         width={30}
         height={25}
       />
-      <span className={styles.text}>DTM ONES</span>
+      <span className={styles.text}>{title}</span>
     </Link>
   );
 }

@@ -9,6 +9,10 @@
 
   .text {
     @include type.big-shoulders(24px);
+    max-width: min(40vw, 320px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 

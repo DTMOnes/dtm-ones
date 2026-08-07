@@ -1,57 +1,139 @@
 "use client";
 
 // Next
-import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-// React
-import { useMemo } from "react";
-
-// Motion
-import { motion } from "motion/react";
 
 // Styles
 import styles from "./styles.module.scss";
 
-// Types
-import { Category } from "@/types/category";
+export type FilterItem = {
+  id: string;
+  name: string;
+};
 
-export default function Filters({ categories }: { categories: Category[] }) {
+function CategoriesFilters({
+  items,
+  param = "c",
+  label = "Categories",
+  name = "filter",
+}: {
+  items: FilterItem[];
+  param?: string;
+  label?: string;
+  name?: string;
+}) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const selected = searchParams.get("c");
+  const selected = searchParams.get(param);
 
   const handleSelect = (id: string) => {
     const params = new URLSearchParams(searchParams);
     if (selected === id) {
-      params.delete("c");
+      params.delete(param);
     } else {
-      params.set("c", id);
+      params.set(param, id);
     }
+    replace(`${pathname}?${params.toString()}`);
+  };
+
+  const handleClear = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete(param);
     replace(`${pathname}?${params.toString()}`);
   };
 
   return (
     <div className={styles.container}>
-      <p className={styles.meta}>Categories</p>
+      <p className={styles.meta}>{label}</p>
 
       <div className={styles.categories}>
-        {categories.map((category) => (
-          <label key={category.id} htmlFor={category.id}>
+        {items.map((item) => (
+          <label key={item.id} htmlFor={`${name}-${item.id}`}>
             <input
               type="radio"
-              id={category.id}
-              name="category"
-              checked={selected === category.id}
-              onChange={() => handleSelect(category.id)}
+              id={`${name}-${item.id}`}
+              name={name}
+              checked={selected === item.id}
+              onChange={() => handleSelect(item.id)}
             />
-            <span>{category.name}</span>
+            <span>{item.name}</span>
           </label>
         ))}
       </div>
 
-      <p className={styles.meta}>24 Results</p>
+      <p className={styles.meta} onClick={handleClear}>
+        Clear
+      </p>
     </div>
+  );
+}
+
+function SectionsFilters({
+  items,
+  name = "section",
+  value,
+  onChange,
+}: {
+  items: FilterItem[];
+  name?: string;
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div className={styles.sections}>
+      <div className={styles.categories}>
+        {items.map((item) => (
+          <label key={item.id} htmlFor={`${name}-${item.id}`}>
+            <input
+              type="radio"
+              id={`${name}-${item.id}`}
+              name={name}
+              checked={value === item.id}
+              onChange={() => onChange(item.id)}
+            />
+            <span>{item.name}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function Filters(
+  props:
+    | {
+        items: FilterItem[];
+        variant?: "categories";
+        param?: string;
+        label?: string;
+        name?: string;
+      }
+    | {
+        items: FilterItem[];
+        variant: "sections";
+        name?: string;
+        value: string;
+        onChange: (id: string) => void;
+      },
+) {
+  if (props.variant === "sections") {
+    return (
+      <SectionsFilters
+        items={props.items}
+        name={props.name}
+        value={props.value}
+        onChange={props.onChange}
+      />
+    );
+  }
+
+  return (
+    <CategoriesFilters
+      items={props.items}
+      param={props.param}
+      label={props.label}
+      name={props.name}
+    />
   );
 }

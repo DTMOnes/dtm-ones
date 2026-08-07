@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createInsforgeServer } from "@/lib/insforge-server";
 import type {
   PublicRosterCategory,
@@ -198,6 +200,48 @@ async function playerIdsMatchingAllCategories(
 
   return intersection === null ? [] : [...intersection];
 }
+
+/**
+ * Single public roster player by id: published, not soft deleted, at least one category.
+ * Cached per request so layout + page can share one fetch.
+ */
+export const getPublicRosterPlayer = cache(
+  async (id: string): Promise<PublicRosterPlayer | null> => {
+    const insforge = createInsforgeServer();
+
+    const { data, error } = await insforge.database
+      .from("players")
+      .select(
+        `
+      id,
+      slug,
+      full_name,
+      nationality,
+      height_cm,
+      last_club,
+      presentation_image_url,
+      player_categories!inner(categories(id, name, slug)),
+      player_gallery_images(id, url, sort_order),
+      player_videos(id, youtube_url, sort_order)
+      `,
+      )
+      .eq("id", id)
+      .eq("status", "published")
+      .is("deleted_at", null)
+      .limit(1);
+
+    if (error) {
+      console.error("[roster/queries/players/by-id]", error);
+      throw new Error("Failed to load player");
+    }
+
+    if (!Array.isArray(data) || data.length === 0) {
+      return null;
+    }
+
+    return parseRosterPlayer(data[0]);
+  },
+);
 
 /**
  * Public roster players: published, not soft deleted, at least one category.

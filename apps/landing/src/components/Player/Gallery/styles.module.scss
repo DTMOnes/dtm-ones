@@ -1,0 +1,143 @@
+@use "styles/typography" as type;
+
+.container {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.track {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.slide {
+  width: 100%;
+  height: 100%;
+  flex: 0 0 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.index {
+  width: 100%;
+  padding-bottom: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.thumbActive {
+  opacity: 1;
+  border-color: var(--color-white);
+}
+
+.empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    @include type.inter(14px);
+    text-transform: uppercase;
+    color: var(--color-white);
+    opacity: 0.5;
+  }
+}
+
+@media (width < 650px) {
+  .container {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr;
+    gap: 12px;
+  }
+
+  .track {
+    grid-column: 2;
+    grid-row: 1;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-snap-type: y mandatory;
+  }
+
+  .index {
+    grid-column: 1;
+    grid-row: 1;
+    width: auto;
+    height: 100%;
+    padding-bottom: 0;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .thumb {
+    width: 48px;
+    height: 48px;
+  }
+}
