@@ -23,13 +23,11 @@ export default function Grid({ players }: { players: PublicRosterPlayer[] }) {
 
   return (
     <main ref={constraintsRef} className={styles.container}>
-      <ReactLenis root options={{ lerp: 0.05 }}>
         <AnimatePresence mode="wait">
           {players.map((player, index) => (
             <Cards key={player.id} player={player} index={index} />
           ))}
         </AnimatePresence>
-      </ReactLenis>
     </main>
   );
 }

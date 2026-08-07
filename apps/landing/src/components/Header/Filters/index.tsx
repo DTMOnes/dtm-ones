@@ -34,7 +34,7 @@ export default function Filters({ categories }: { categories: Category[] }) {
 
   return (
     <div className={styles.container}>
-      <p>Categories</p>
+      <p className={styles.meta}>Categories</p>
 
       <div className={styles.categories}>
         {categories.map((category) => (
@@ -51,7 +51,7 @@ export default function Filters({ categories }: { categories: Category[] }) {
         ))}
       </div>
 
-      <p>24 Results</p>
+      <p className={styles.meta}>24 Results</p>
     </div>
   );
 }
