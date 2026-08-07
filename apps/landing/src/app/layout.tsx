@@ -3,7 +3,6 @@ import { Big_Shoulders, Inter } from "next/font/google";
 import "./globals.css";
 
 // Components
-import Header from "@/components/Header";
 import NavigationProgress from "@/components/NavigationProgress";
 
 const bigShoulders = Big_Shoulders({
