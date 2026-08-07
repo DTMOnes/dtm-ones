@@ -1,6 +1,7 @@
 @use "styles/typography" as type;
 
 .container {
+  min-width: 48px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,5 +9,13 @@
 
   .text {
     @include type.big-shoulders(24px);
+  }
+}
+
+@media (width < 1000px) {
+  .container {
+    .text {
+      display: none;
+    }
   }
 }

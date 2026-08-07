@@ -40,3 +40,9 @@
     @include type.inter(14px);
   }
 }
+
+@media (width < 650px) {
+  .container {
+    width: 100%;
+  }
+}
