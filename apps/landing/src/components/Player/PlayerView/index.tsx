@@ -17,10 +17,17 @@ import {
 import PlayerGallery from "@/components/Player/Gallery";
 import PlayerHighlights from "@/components/Player/Highlights";
 
+const DESCRIPTION_PLACEHOLDER = (
+  <>
+    Ala-pivot con recorrido en <strong>Liga Nacional</strong> y experiencia
+    internacional reciente en <strong>IBL Indonesia</strong>. Fuerte bajo el
+    aro, buena movilidad para su altura.
+  </>
+);
+
 export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
   const [section, setSection] = useState<PlayerSectionId>("gallery");
   const categoryName = player.categories[0]?.name ?? "";
-  const lastClub = player.last_club.trim();
 
   return (
     <main className={styles.main}>
@@ -33,6 +40,8 @@ export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
             ) : null}
           </header>
 
+          <p className={styles.description}>{DESCRIPTION_PLACEHOLDER}</p>
+
           <dl className={styles.stats}>
             <div className={styles.stat}>
               <dt>Height</dt>
@@ -44,7 +53,7 @@ export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
             </div>
             <div className={styles.stat}>
               <dt>Last Club</dt>
-              <dd>{lastClub.length > 0 ? lastClub : "-"}</dd>
+              <dd>Quimsa</dd>
             </div>
           </dl>
         </div>
