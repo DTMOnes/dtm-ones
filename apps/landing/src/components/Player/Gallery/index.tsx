@@ -21,7 +21,6 @@ export default function PlayerGallery({
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
-  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -29,7 +28,6 @@ export default function PlayerGallery({
     if (!track || images.length === 0) return;
 
     slideRefs.current = slideRefs.current.slice(0, images.length);
-
     const slides = slideRefs.current.filter(
       (slide): slide is HTMLElement => slide !== null,
     );
@@ -46,9 +44,7 @@ export default function PlayerGallery({
             best = { index, ratio: entry.intersectionRatio };
           }
         }
-        if (best) {
-          setActiveIndex(best.index);
-        }
+        if (best) setActiveIndex(best.index);
       },
       {
         root: track,
@@ -56,25 +52,14 @@ export default function PlayerGallery({
       },
     );
 
-    for (const slide of slides) {
-      observer.observe(slide);
-    }
-
+    for (const slide of slides) observer.observe(slide);
     return () => observer.disconnect();
   }, [images.length]);
-
-  useEffect(() => {
-    thumbRefs.current[activeIndex]?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "nearest",
-    });
-  }, [activeIndex]);
 
   const scrollToIndex = (index: number) => {
     const slide = slideRefs.current[index];
     if (!slide) return;
-    slide.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    slide.scrollIntoView({ behavior: "smooth", block: "nearest" });
     setActiveIndex(index);
   };
 
@@ -102,8 +87,8 @@ export default function PlayerGallery({
               src={image.url}
               alt={`${playerName} gallery ${index + 1}`}
               width={1600}
-              height={1200}
-              sizes="100vw"
+              height={2000}
+              sizes="(max-width: 900px) 100vw, 50vw"
               priority={index === 0}
               draggable={false}
             />
@@ -111,35 +96,25 @@ export default function PlayerGallery({
         ))}
       </div>
 
-      <div className={styles.index} role="tablist" aria-label="Gallery index">
-        {images.map((image, index) => (
-          <button
-            key={image.id}
-            ref={(node) => {
-              thumbRefs.current[index] = node;
-            }}
-            type="button"
-            role="tab"
-            aria-selected={activeIndex === index}
-            aria-label={`Go to image ${index + 1}`}
-            className={
-              activeIndex === index
-                ? `${styles.thumb} ${styles.thumbActive}`
-                : styles.thumb
-            }
-            onClick={() => scrollToIndex(index)}
-          >
-            <Image
-              src={image.url}
-              alt=""
-              width={80}
-              height={80}
-              sizes="64px"
-              draggable={false}
+      {images.length > 1 ? (
+        <div className={styles.index} role="tablist" aria-label="Gallery index">
+          {images.map((image, index) => (
+            <button
+              key={image.id}
+              type="button"
+              role="tab"
+              aria-selected={activeIndex === index}
+              aria-label={`Go to image ${index + 1}`}
+              className={
+                activeIndex === index
+                  ? `${styles.marker} ${styles.markerActive}`
+                  : styles.marker
+              }
+              onClick={() => scrollToIndex(index)}
             />
-          </button>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

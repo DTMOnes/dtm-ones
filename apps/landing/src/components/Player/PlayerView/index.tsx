@@ -8,35 +8,81 @@ import styles from "./styles.module.scss";
 
 // Types
 import type { PublicRosterPlayer } from "@/types/roster";
-import type { PlayerSectionId } from "@/components/Header/Filters/player-sections";
-
-// Hooks
-import { usePlayerHeader } from "@/components/Header/usePlayerHeader";
+import {
+  PLAYER_SECTIONS,
+  type PlayerSectionId,
+} from "@/components/Header/Filters/player-sections";
 
 // Components
 import PlayerGallery from "@/components/Player/Gallery";
 import PlayerHighlights from "@/components/Player/Highlights";
-import PlayerInfo from "@/components/Player/Info";
 
 export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
   const [section, setSection] = useState<PlayerSectionId>("gallery");
-  usePlayerHeader(section, setSection);
+  const categoryName = player.categories[0]?.name ?? "";
+  const lastClub = player.last_club.trim();
 
   return (
     <main className={styles.main}>
-      {section === "gallery" ? (
-        <PlayerGallery
-          images={player.gallery_images}
-          playerName={player.full_name}
-        />
-      ) : null}
-      {section === "highlights" ? (
-        <PlayerHighlights
-          videos={player.videos}
-          playerName={player.full_name}
-        />
-      ) : null}
-      {section === "info" ? <PlayerInfo /> : null}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarTop}>
+          <header className={styles.intro}>
+            <h1 className={styles.name}>{player.full_name}</h1>
+            {categoryName ? (
+              <p className={styles.category}>{categoryName}</p>
+            ) : null}
+          </header>
+
+          <dl className={styles.stats}>
+            <div className={styles.stat}>
+              <dt>Height</dt>
+              <dd>{player.height_cm} cm</dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Nationality</dt>
+              <dd>{player.nationality}</dd>
+            </div>
+            <div className={styles.stat}>
+              <dt>Last Club</dt>
+              <dd>{lastClub.length > 0 ? lastClub : "-"}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <nav className={styles.sections} aria-label="Player sections">
+          {PLAYER_SECTIONS.map((item) => {
+            const active = section === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                className={
+                  active ? `${styles.section} ${styles.sectionActive}` : styles.section
+                }
+                aria-current={active ? "true" : undefined}
+                onClick={() => setSection(item.id)}
+              >
+                <span>{item.name}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+
+      <div className={styles.media}>
+        {section === "gallery" ? (
+          <PlayerGallery
+            images={player.gallery_images}
+            playerName={player.full_name}
+          />
+        ) : null}
+        {section === "highlights" ? (
+          <PlayerHighlights
+            videos={player.videos}
+            playerName={player.full_name}
+          />
+        ) : null}
+      </div>
     </main>
   );
 }

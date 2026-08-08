@@ -1,14 +1,25 @@
 @use "styles/typography" as type;
 
 .container {
-  width: 100%;
+  position: relative;
+  width: 50vw;
   height: 100%;
   min-height: 0;
-  display: grid;
-  grid-template-rows: 1fr auto;
-  grid-template-columns: 1fr;
-  gap: 16px;
   overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      to left,
+      color-mix(in srgb, var(--color-black) 55%, transparent) 0%,
+      color-mix(in srgb, var(--color-black) 20%, transparent) 28%,
+      transparent 55%
+    );
+  }
 }
 
 .track {
@@ -16,10 +27,10 @@
   height: 100%;
   min-height: 0;
   display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
+  flex-direction: column;
+  gap: 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -34,90 +45,90 @@
   height: 100%;
   flex: 0 0 100%;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-dark-gray);
 }
 
 .image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   user-select: none;
-}
-
-.video,
-.poster {
-  width: 100%;
-  height: 100%;
   display: block;
-  border: 0;
-}
-
-.poster {
-  object-fit: contain;
-  user-select: none;
 }
 
 .index {
-  width: 100%;
-  padding-bottom: 4px;
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  z-index: 2;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
-.thumb {
-  width: 56px;
-  height: 56px;
+.marker {
+  width: 28px;
+  aspect-ratio: 4 / 3;
+  height: auto;
   flex-shrink: 0;
   padding: 0;
-  border: 1px solid transparent;
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-black) 90%, transparent);
+  opacity: 0.9;
   cursor: pointer;
-  opacity: 0.45;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  pointer-events: auto;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
-    opacity: 0.75;
+    border-color: color-mix(in srgb, var(--color-white) 70%, transparent);
   }
 }
 
-.thumbActive {
-  opacity: 1;
+.markerActive {
   border-color: var(--color-white);
+  background: color-mix(in srgb, var(--color-black) 90%, transparent);
 }
 
 .empty {
-  width: 100%;
+  width: 50vw;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: var(--color-dark-gray);
 
   p {
     @include type.inter(14px);
     text-transform: uppercase;
     color: var(--color-white);
     opacity: 0.5;
+  }
+}
+
+@media (width < 900px) {
+  .container,
+  .empty {
+    width: 100%;
+  }
+
+  .index {
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    flex-direction: row;
+    justify-content: center;
+    transform: none;
+  }
+
+  .marker {
+    width: 24px;
+    height: auto;
+    aspect-ratio: 4 / 3;
   }
 }

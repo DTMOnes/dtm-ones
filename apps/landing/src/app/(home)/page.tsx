@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 // Components
 import Grid from "@/components/Grid";
+import GridLoading from "@/components/Grid/Loading";
 import HomeRoster from "@/components/Home/Roster";
 
 // Utils
@@ -41,7 +43,9 @@ export default async function Page({
 
   return (
     <HomeRoster>
-      <Grid players={players} />
+      <Suspense fallback={<GridLoading />}>
+        <Grid players={players} />
+      </Suspense>
     </HomeRoster>
   );
 }
