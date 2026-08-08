@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 // Components
 import Grid from "@/components/Grid";
+import HomeRoster from "@/components/Home/Roster";
 
 // Utils
 import { normalizeSearchParams } from "@/utils/normalize-search-params";
@@ -38,5 +39,9 @@ export default async function Page({
     categoryIds,
   });
 
-  return <Grid players={players} />;
+  return (
+    <HomeRoster>
+      <Grid players={players} />
+    </HomeRoster>
+  );
 }

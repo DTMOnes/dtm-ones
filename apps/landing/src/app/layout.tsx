@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { Big_Shoulders, Inter } from "next/font/google";
 import "./globals.css";
 
-// Queries
-import { listPublicRosterCategories } from "@/lib/roster/queries";
-
 // Components
 import NavigationProgress from "@/components/NavigationProgress";
 import { HeaderProvider } from "@/components/Header/HeaderProvider";
@@ -33,8 +30,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const categories = await listPublicRosterCategories();
-
   return (
     <html
       lang="en"
@@ -43,7 +38,7 @@ export default async function RootLayout({
       <body className="antialiased font-inter">
         <NavigationProgress />
         <HeaderProvider>
-          <SiteHeader categories={categories} />
+          <SiteHeader />
           {children}
         </HeaderProvider>
       </body>

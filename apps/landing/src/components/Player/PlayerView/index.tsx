@@ -20,7 +20,7 @@ import PlayerInfo from "@/components/Player/Info";
 
 export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
   const [section, setSection] = useState<PlayerSectionId>("gallery");
-  usePlayerHeader(player.full_name, section, setSection);
+  usePlayerHeader(section, setSection);
 
   return (
     <main className={styles.main}>

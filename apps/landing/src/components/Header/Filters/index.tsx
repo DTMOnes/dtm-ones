@@ -6,6 +6,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 // Styles
 import styles from "./styles.module.scss";
 
+// Components
+import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+
 export type FilterItem = {
   id: string;
   name: string;
@@ -25,6 +28,7 @@ function CategoriesFilters({
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { startRosterTransition } = useHeaderOverride();
   const selected = searchParams.get(param);
 
   const handleSelect = (id: string) => {
@@ -34,13 +38,19 @@ function CategoriesFilters({
     } else {
       params.set(param, id);
     }
-    replace(`${pathname}?${params.toString()}`);
+    const next = `${pathname}?${params.toString()}`;
+    startRosterTransition(() => {
+      replace(next);
+    });
   };
 
   const handleClear = () => {
     const params = new URLSearchParams(searchParams);
     params.delete(param);
-    replace(`${pathname}?${params.toString()}`);
+    const next = `${pathname}?${params.toString()}`;
+    startRosterTransition(() => {
+      replace(next);
+    });
   };
 
   return (

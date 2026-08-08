@@ -6,16 +6,16 @@ import {
   useContext,
   useMemo,
   useState,
+  useTransition,
   type ReactNode,
+  type TransitionStartFunction,
 } from "react";
 
+import type { FilterItem } from "@/components/Header/Filters";
 import type { PlayerSectionId } from "@/components/Header/Filters/player-sections";
-
-export const DEFAULT_BRAND_TITLE = "DTM ONES";
 
 export type PlayerHeaderOverride = {
   type: "player";
-  playerName: string;
   section: PlayerSectionId;
   onSectionChange: (id: PlayerSectionId) => void;
 };
@@ -25,9 +25,12 @@ export type HeaderOverride = PlayerHeaderOverride;
 type HeaderOverrideContextValue = {
   override: HeaderOverride | null;
   setOverride: (override: HeaderOverride | null) => void;
-  /** Optimistic brand title set on click before the route settles. */
-  pendingTitle: string | null;
-  setPendingTitle: (title: string | null) => void;
+  /** Home category filter items; rendered inside the shared header shell. */
+  categoryFilters: FilterItem[] | null;
+  setCategoryFilters: (filters: FilterItem[] | null) => void;
+  /** True while home search/filter navigations are pending. */
+  isRosterPending: boolean;
+  startRosterTransition: TransitionStartFunction;
 };
 
 const HeaderOverrideContext = createContext<HeaderOverrideContextValue | null>(
@@ -36,24 +39,36 @@ const HeaderOverrideContext = createContext<HeaderOverrideContextValue | null>(
 
 export function HeaderProvider({ children }: { children: ReactNode }) {
   const [override, setOverrideState] = useState<HeaderOverride | null>(null);
-  const [pendingTitle, setPendingTitleState] = useState<string | null>(null);
+  const [categoryFilters, setCategoryFiltersState] = useState<
+    FilterItem[] | null
+  >(null);
+  const [isRosterPending, startRosterTransition] = useTransition();
 
   const setOverride = useCallback((next: HeaderOverride | null) => {
     setOverrideState(next);
   }, []);
 
-  const setPendingTitle = useCallback((title: string | null) => {
-    setPendingTitleState(title);
+  const setCategoryFilters = useCallback((next: FilterItem[] | null) => {
+    setCategoryFiltersState(next);
   }, []);
 
   const value = useMemo(
     () => ({
       override,
       setOverride,
-      pendingTitle,
-      setPendingTitle,
+      categoryFilters,
+      setCategoryFilters,
+      isRosterPending,
+      startRosterTransition,
     }),
-    [override, setOverride, pendingTitle, setPendingTitle],
+    [
+      override,
+      setOverride,
+      categoryFilters,
+      setCategoryFilters,
+      isRosterPending,
+      startRosterTransition,
+    ],
   );
 
   return (

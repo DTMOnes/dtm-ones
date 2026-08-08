@@ -7,9 +7,6 @@ import { useRouter } from "next/navigation";
 // Motion
 import { motion } from "motion/react";
 
-// Components
-import { useHeaderOverride } from "@/components/Header/HeaderProvider";
-
 // Styles
 import styles from "./styles.module.scss";
 
@@ -51,13 +48,11 @@ export default function Cards({
   index: number;
 }) {
   const router = useRouter();
-  const { setPendingTitle } = useHeaderOverride();
 
   const imageSrc = player.presentation_image_url?.trim() || PLACEHOLDER_SRC;
   const categoryName = player.categories[0]?.name ?? "";
 
   const handleNavigate = () => {
-    setPendingTitle(player.full_name);
     router.push(`/players/${player.id}`);
   };
 

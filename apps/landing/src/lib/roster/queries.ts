@@ -315,7 +315,7 @@ export async function listPublicRosterPlayers(
 /**
  * All categories with counts of eligible public roster players only.
  * Counts do not change with the active name or AND filter.
- * Cached per request so root layout + home page share one fetch.
+ * Cached per request so home layout + roster grid share one fetch.
  */
 export const listPublicRosterCategories = cache(async (): Promise<
   PublicRosterCategory[]

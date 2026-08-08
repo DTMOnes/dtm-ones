@@ -91,11 +91,12 @@
           "center center";
         justify-content: unset;
         column-gap: 36px;
-        row-gap: 36px;
+        row-gap: 8px;
 
         .start {
           grid-area: start;
-          justify-self: start;
+          justify-self: stretch;
+          min-width: 0;
           flex: unset;
         }
 
@@ -125,7 +126,6 @@
     &.stack_center {
       .top_container {
         column-gap: 24px;
-        row-gap: 24px;
       }
     }
   }
@@ -140,7 +140,6 @@
     &.stack_center {
       .top_container {
         column-gap: 16px;
-        row-gap: 16px;
       }
     }
   }

@@ -10,6 +10,9 @@ import { useRef } from "react";
 // Utils
 import { useDebouncedCallback } from "use-debounce";
 
+// Components
+import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+
 // Styles
 import styles from "./styles.module.scss";
 
@@ -32,6 +35,7 @@ export default function Search() {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { startRosterTransition } = useHeaderOverride();
 
   const handleSearch = useDebouncedCallback((value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -42,7 +46,10 @@ export default function Search() {
       params.delete("q");
     }
 
-    replace(`${pathname}?${params.toString()}`);
+    const next = `${pathname}?${params.toString()}`;
+    startRosterTransition(() => {
+      replace(next);
+    });
   }, 300);
 
   return (
