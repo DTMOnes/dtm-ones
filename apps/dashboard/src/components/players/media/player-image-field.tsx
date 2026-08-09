@@ -2,9 +2,19 @@
 
 import { useRouter } from "next/navigation";
 
-import { uploadGalleryImageAction } from "@/actions/players/galleryImage";
-import { uploadPresentationImageAction } from "@/actions/players/presentationImage";
+import {
+  beginGalleryImageUploadAction,
+  commitGalleryImageUploadAction,
+} from "@/actions/players/galleryImage";
+import {
+  beginPresentationImageUploadAction,
+  commitPresentationImageUploadAction,
+} from "@/actions/players/presentationImage";
 import { ImageUpload } from "@/components/media/image-upload";
+import { createBridgedInsforgeClient } from "@/lib/insforge-browser-upload";
+import { validateNormalizedImageFile } from "@/lib/players/image-upload";
+import { normalizePlayerImage } from "@/lib/players/normalize-image";
+import { MAX_IMAGE_INPUT_BYTES } from "@/lib/validation/player-media";
 import { toast } from "sonner";
 
 export default function PlayerImageField({
@@ -20,31 +30,99 @@ export default function PlayerImageField({
 
   return (
     <ImageUpload
+      maxBytes={MAX_IMAGE_INPUT_BYTES}
       onSubmitFile={async (file) => {
-        const formData = new FormData();
-        formData.set("playerId", playerId);
-        formData.set("file", file);
-
         try {
-          const result =
-            kind === "presentation"
-              ? await uploadPresentationImageAction(formData)
-              : await uploadGalleryImageAction(formData);
-
-          if (result.error) {
-            toast.error(result.error.message);
+          const normalized = await normalizePlayerImage(file);
+          const normalizedError = validateNormalizedImageFile(normalized);
+          if (normalizedError) {
+            toast.error(normalizedError);
             return;
           }
 
-          toast.success(
-            kind === "presentation"
-              ? "Institutional picture updated."
-              : "Gallery image added.",
-          );
+          if (kind === "presentation") {
+            const beginResult = await beginPresentationImageUploadAction({
+              playerId,
+            });
+            if (beginResult.error || !beginResult.data) {
+              toast.error(
+                beginResult.error?.message ??
+                  "Could not start the upload. Please try again.",
+              );
+              return;
+            }
+
+            const client = await createBridgedInsforgeClient();
+            const { data: uploaded, error: uploadError } = await client.storage
+              .from(beginResult.data.bucket)
+              .upload(beginResult.data.key, normalized);
+
+            if (uploadError || !uploaded?.url || !uploaded.key) {
+              console.error("[PlayerImageField/upload]", uploadError);
+              toast.error("There was an error uploading the image.");
+              return;
+            }
+
+            const commitResult = await commitPresentationImageUploadAction({
+              playerId,
+              bucket: uploaded.bucket,
+              key: uploaded.key,
+              url: uploaded.url,
+            });
+
+            if (commitResult.error) {
+              toast.error(commitResult.error.message);
+              return;
+            }
+
+            toast.success("Institutional picture updated.");
+          } else {
+            const beginResult = await beginGalleryImageUploadAction({
+              playerId,
+            });
+            if (beginResult.error || !beginResult.data) {
+              toast.error(
+                beginResult.error?.message ??
+                  "Could not start the upload. Please try again.",
+              );
+              return;
+            }
+
+            const client = await createBridgedInsforgeClient();
+            const { data: uploaded, error: uploadError } = await client.storage
+              .from(beginResult.data.bucket)
+              .upload(beginResult.data.key, normalized);
+
+            if (uploadError || !uploaded?.url || !uploaded.key) {
+              console.error("[PlayerImageField/upload]", uploadError);
+              toast.error("There was an error uploading the image.");
+              return;
+            }
+
+            const commitResult = await commitGalleryImageUploadAction({
+              playerId,
+              imageId: beginResult.data.imageId,
+              bucket: uploaded.bucket,
+              key: uploaded.key,
+              url: uploaded.url,
+            });
+
+            if (commitResult.error) {
+              toast.error(commitResult.error.message);
+              return;
+            }
+
+            toast.success("Gallery image added.");
+          }
+
           router.refresh();
         } catch (error) {
           console.error("[PlayerImageField]", error);
-          toast.error("There was an error processing the uploaded file");
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "There was an error processing the uploaded file",
+          );
         }
       }}
     >

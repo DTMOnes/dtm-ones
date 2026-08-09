@@ -10,42 +10,46 @@ import {
 import { createInsforgeServer } from "@/lib/insforge-server";
 import { assertActivePlayer } from "@/lib/players/assert-active-player";
 import {
-  extensionForImageMime,
-  validateImageFile,
+  isExactUploadMatch,
+  presentationImageKey,
 } from "@/lib/players/image-upload";
 import { requireStaff } from "@/lib/require-staff";
+import {
+  commitUploadedImageSchema,
+  PRESENTATION_BUCKET,
+} from "@/lib/validation/player-media";
 import { playerIdSchema } from "@/lib/validation/players";
 
-const PRESENTATION_BUCKET = "player-presentation";
-
-async function bestEffortRemovePresentationObjects(
-  playerId: string,
+async function bestEffortRemoveKeys(
+  keys: string[],
+  label: string,
 ): Promise<void> {
+  if (keys.length === 0) {
+    return;
+  }
   const insforge = await createInsforgeServer();
   const bucket = insforge.storage.from(PRESENTATION_BUCKET);
-  for (const ext of ["jpg", "png", "webp"]) {
-    const key = `${playerId}/main.${ext}`;
+  for (const key of keys) {
     const { error } = await bucket.remove(key);
     if (error) {
-      console.error("[uploadPresentation/remove]", key, error);
+      console.error(`[${label}/remove]`, key, error);
     }
   }
 }
 
-export async function uploadPresentationImageAction(
-  formData: FormData,
-): Promise<ActionResult<{ url: string }>> {
+async function legacyPresentationKeys(playerId: string): Promise<string[]> {
+  return ["jpg", "png", "webp"].map((ext) => `${playerId}/main.${ext}`);
+}
+
+export async function beginPresentationImageUploadAction(input: {
+  playerId: string;
+}): Promise<ActionResult<{ bucket: string; key: string }>> {
   const gate = await requireStaff();
   if (gate.error) {
     return gate;
   }
 
-  const playerIdRaw = formData.get("playerId");
-  const fileRaw = formData.get("file");
-
-  const parsed = playerIdSchema.safeParse({
-    playerId: typeof playerIdRaw === "string" ? playerIdRaw : "",
-  });
+  const parsed = playerIdSchema.safeParse(input);
   if (!parsed.success) {
     return {
       data: null,
@@ -55,63 +59,128 @@ export async function uploadPresentationImageAction(
     };
   }
 
-  if (!(fileRaw instanceof File)) {
-    return {
-      data: null,
-      error: { message: "Please choose an image file to upload." },
-    };
-  }
-
-  const validationMessage = validateImageFile(fileRaw);
-  if (validationMessage) {
-    return { data: null, error: { message: validationMessage } };
-  }
-
-  const ext = extensionForImageMime(fileRaw.type);
-  if (!ext) {
-    return { data: null, error: { message: validationMessage ?? UNAVAILABLE } };
-  }
-
   const playerGate = await assertActivePlayer(
     parsed.data.playerId,
-    "uploadPresentation",
+    "beginPresentation",
   );
   if (playerGate.error) {
     return playerGate;
   }
 
-  await bestEffortRemovePresentationObjects(parsed.data.playerId);
-
   const insforge = await createInsforgeServer();
-  const key = `${parsed.data.playerId}/main.${ext}`;
-  const { data: uploaded, error: uploadError } = await insforge.storage
-    .from(PRESENTATION_BUCKET)
-    .upload(key, fileRaw);
+  const { data: row, error } = await insforge.database
+    .from("players")
+    .select("presentation_image_key")
+    .eq("id", parsed.data.playerId)
+    .is("deleted_at", null)
+    .maybeSingle();
 
-  if (uploadError || !uploaded?.url) {
-    console.error("[uploadPresentation]", uploadError);
+  if (error) {
+    console.error("[beginPresentation]", error);
     return { data: null, error: { message: UNAVAILABLE } };
   }
 
+  const storedKey =
+    row &&
+    typeof row === "object" &&
+    "presentation_image_key" in row &&
+    typeof (row as { presentation_image_key: unknown }).presentation_image_key ===
+      "string"
+      ? (row as { presentation_image_key: string }).presentation_image_key
+      : null;
+
+  const keysToRemove = storedKey
+    ? [storedKey]
+    : await legacyPresentationKeys(parsed.data.playerId);
+
+  await bestEffortRemoveKeys(keysToRemove, "beginPresentation");
+
+  return {
+    data: {
+      bucket: PRESENTATION_BUCKET,
+      key: presentationImageKey(parsed.data.playerId),
+    },
+    error: null,
+  };
+}
+
+export async function commitPresentationImageUploadAction(input: {
+  playerId: string;
+  bucket: string;
+  key: string;
+  url: string;
+}): Promise<ActionResult<{ url: string; key: string }>> {
+  const gate = await requireStaff();
+  if (gate.error) {
+    return gate;
+  }
+
+  const parsed = commitUploadedImageSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      data: null,
+      error: {
+        message: "The upload could not be validated. Please try again.",
+      },
+    };
+  }
+
+  const expectedKey = presentationImageKey(parsed.data.playerId);
+  if (
+    !isExactUploadMatch({
+      expectedBucket: PRESENTATION_BUCKET,
+      expectedKey,
+      bucket: parsed.data.bucket,
+      key: parsed.data.key,
+      url: parsed.data.url,
+    })
+  ) {
+    await bestEffortRemoveKeys([parsed.data.key], "commitPresentation/reject");
+    return {
+      data: null,
+      error: {
+        message: "The uploaded file did not match the expected location.",
+      },
+    };
+  }
+
+  const playerGate = await assertActivePlayer(
+    parsed.data.playerId,
+    "commitPresentation",
+  );
+  if (playerGate.error) {
+    await bestEffortRemoveKeys([parsed.data.key], "commitPresentation/player");
+    return playerGate;
+  }
+
+  const insforge = await createInsforgeServer();
   const { data, error } = await insforge.database
     .from("players")
-    .update({ presentation_image_url: uploaded.url })
+    .update({
+      presentation_image_url: parsed.data.url,
+      presentation_image_key: parsed.data.key,
+    })
     .eq("id", parsed.data.playerId)
     .is("deleted_at", null)
     .select("id");
 
   if (error) {
-    console.error("[uploadPresentation/db]", error);
+    console.error("[commitPresentation/db]", error);
+    await bestEffortRemoveKeys([parsed.data.key], "commitPresentation/db");
     return { data: null, error: { message: UNAVAILABLE } };
   }
 
   if (!Array.isArray(data) || data.length === 0) {
+    await bestEffortRemoveKeys([parsed.data.key], "commitPresentation/missing");
     return { data: null, error: { message: NOT_FOUND } };
   }
 
   revalidatePath(`/players/${parsed.data.playerId}`);
   revalidatePath("/players");
-  return { data: { url: uploaded.url }, error: null };
+  return {
+    data: { url: parsed.data.url, key: parsed.data.key },
+    error: null,
+  };
 }
 
 export async function clearPresentationImageAction(input: {
@@ -141,9 +210,33 @@ export async function clearPresentationImageAction(input: {
   }
 
   const insforge = await createInsforgeServer();
+  const { data: existing, error: readError } = await insforge.database
+    .from("players")
+    .select("presentation_image_key")
+    .eq("id", parsed.data.playerId)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (readError) {
+    console.error("[clearPresentation/read]", readError);
+    return { data: null, error: { message: UNAVAILABLE } };
+  }
+
+  const storedKey =
+    existing &&
+    typeof existing === "object" &&
+    "presentation_image_key" in existing &&
+    typeof (existing as { presentation_image_key: unknown })
+      .presentation_image_key === "string"
+      ? (existing as { presentation_image_key: string }).presentation_image_key
+      : null;
+
   const { data, error } = await insforge.database
     .from("players")
-    .update({ presentation_image_url: null })
+    .update({
+      presentation_image_url: null,
+      presentation_image_key: null,
+    })
     .eq("id", parsed.data.playerId)
     .is("deleted_at", null)
     .select("id");
@@ -157,7 +250,10 @@ export async function clearPresentationImageAction(input: {
     return { data: null, error: { message: NOT_FOUND } };
   }
 
-  await bestEffortRemovePresentationObjects(parsed.data.playerId);
+  const keysToRemove = storedKey
+    ? [storedKey]
+    : await legacyPresentationKeys(parsed.data.playerId);
+  await bestEffortRemoveKeys(keysToRemove, "clearPresentation");
 
   revalidatePath(`/players/${parsed.data.playerId}`);
   revalidatePath("/players");

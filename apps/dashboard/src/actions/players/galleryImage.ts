@@ -12,10 +12,14 @@ import {
 import { createInsforgeServer } from "@/lib/insforge-server";
 import { assertActivePlayer } from "@/lib/players/assert-active-player";
 import {
-  extensionForImageMime,
-  validateImageFile,
+  galleryImageKey,
+  isExactUploadMatch,
 } from "@/lib/players/image-upload";
 import { requireStaff } from "@/lib/require-staff";
+import {
+  commitGalleryUploadedImageSchema,
+  GALLERY_BUCKET,
+} from "@/lib/validation/player-media";
 import {
   galleryImageIdSchema,
   playerIdSchema,
@@ -23,12 +27,11 @@ import {
 import type { PlayerGalleryImage } from "@/types/player";
 import { z } from "zod";
 
-const GALLERY_BUCKET = "player-gallery";
-
 const galleryImageRowSchema = z.object({
   id: z.uuid(),
   player_id: z.uuid(),
   url: z.string().min(1),
+  storage_key: z.string().nullable(),
   sort_order: z.number().int(),
   created_at: z.string().min(1),
 });
@@ -62,20 +65,26 @@ async function nextGallerySortOrder(
   return { data: { sortOrder: current + 1 }, error: null };
 }
 
-export async function uploadGalleryImageAction(
-  formData: FormData,
-): Promise<ActionResult<{ image: PlayerGalleryImage }>> {
+async function bestEffortRemoveGalleryKey(
+  key: string,
+  label: string,
+): Promise<void> {
+  const insforge = await createInsforgeServer();
+  const { error } = await insforge.storage.from(GALLERY_BUCKET).remove(key);
+  if (error) {
+    console.error(`[${label}/remove]`, key, error);
+  }
+}
+
+export async function beginGalleryImageUploadAction(input: {
+  playerId: string;
+}): Promise<ActionResult<{ bucket: string; key: string; imageId: string }>> {
   const gate = await requireStaff();
   if (gate.error) {
     return gate;
   }
 
-  const playerIdRaw = formData.get("playerId");
-  const fileRaw = formData.get("file");
-
-  const parsed = playerIdSchema.safeParse({
-    playerId: typeof playerIdRaw === "string" ? playerIdRaw : "",
-  });
+  const parsed = playerIdSchema.safeParse(input);
   if (!parsed.success) {
     return {
       data: null,
@@ -85,72 +94,107 @@ export async function uploadGalleryImageAction(
     };
   }
 
-  if (!(fileRaw instanceof File)) {
-    return {
-      data: null,
-      error: { message: "Please choose an image file to upload." },
-    };
-  }
-
-  const validationMessage = validateImageFile(fileRaw);
-  if (validationMessage) {
-    return { data: null, error: { message: validationMessage } };
-  }
-
-  const ext = extensionForImageMime(fileRaw.type);
-  if (!ext) {
-    return { data: null, error: { message: validationMessage ?? UNAVAILABLE } };
-  }
-
   const playerGate = await assertActivePlayer(
     parsed.data.playerId,
-    "uploadGallery",
+    "beginGallery",
   );
   if (playerGate.error) {
     return playerGate;
   }
 
+  const imageId = randomUUID();
+  return {
+    data: {
+      bucket: GALLERY_BUCKET,
+      key: galleryImageKey(parsed.data.playerId, imageId),
+      imageId,
+    },
+    error: null,
+  };
+}
+
+export async function commitGalleryImageUploadAction(input: {
+  playerId: string;
+  imageId: string;
+  bucket: string;
+  key: string;
+  url: string;
+}): Promise<ActionResult<{ image: PlayerGalleryImage }>> {
+  const gate = await requireStaff();
+  if (gate.error) {
+    return gate;
+  }
+
+  const parsed = commitGalleryUploadedImageSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      data: null,
+      error: {
+        message: "The upload could not be validated. Please try again.",
+      },
+    };
+  }
+
+  const expectedKey = galleryImageKey(
+    parsed.data.playerId,
+    parsed.data.imageId,
+  );
+  if (
+    !isExactUploadMatch({
+      expectedBucket: GALLERY_BUCKET,
+      expectedKey,
+      bucket: parsed.data.bucket,
+      key: parsed.data.key,
+      url: parsed.data.url,
+    })
+  ) {
+    await bestEffortRemoveGalleryKey(
+      parsed.data.key,
+      "commitGallery/reject",
+    );
+    return {
+      data: null,
+      error: {
+        message: "The uploaded file did not match the expected location.",
+      },
+    };
+  }
+
+  const playerGate = await assertActivePlayer(
+    parsed.data.playerId,
+    "commitGallery",
+  );
+  if (playerGate.error) {
+    await bestEffortRemoveGalleryKey(parsed.data.key, "commitGallery/player");
+    return playerGate;
+  }
+
   const sortResult = await nextGallerySortOrder(
     parsed.data.playerId,
-    "uploadGallery",
+    "commitGallery",
   );
   if (sortResult.error) {
+    await bestEffortRemoveGalleryKey(parsed.data.key, "commitGallery/sort");
     return sortResult;
   }
 
-  const imageId = randomUUID();
-  const key = `${parsed.data.playerId}/${imageId}.${ext}`;
   const insforge = await createInsforgeServer();
-
-  const { data: uploaded, error: uploadError } = await insforge.storage
-    .from(GALLERY_BUCKET)
-    .upload(key, fileRaw);
-
-  if (uploadError || !uploaded?.url) {
-    console.error("[uploadGallery]", uploadError);
-    return { data: null, error: { message: UNAVAILABLE } };
-  }
-
   const { data, error } = await insforge.database
     .from("player_gallery_images")
     .insert([
       {
-        id: imageId,
+        id: parsed.data.imageId,
         player_id: parsed.data.playerId,
-        url: uploaded.url,
+        url: parsed.data.url,
+        storage_key: parsed.data.key,
         sort_order: sortResult.data.sortOrder,
       },
     ])
-    .select("id, player_id, url, sort_order, created_at");
+    .select("id, player_id, url, storage_key, sort_order, created_at");
 
   if (error) {
-    console.error("[uploadGallery/db]", error);
-    const { error: cleanupError } = await insforge.storage
-      .from(GALLERY_BUCKET)
-      .remove(key);
-    if (cleanupError) {
-      console.error("[uploadGallery/cleanup]", cleanupError);
-    }
+    console.error("[commitGallery/db]", error);
+    await bestEffortRemoveGalleryKey(parsed.data.key, "commitGallery/db");
     return { data: null, error: { message: UNAVAILABLE } };
   }
 
@@ -161,12 +205,25 @@ export async function uploadGalleryImageAction(
     : null;
 
   if (!row) {
-    console.error("[uploadGallery]", "insert returned no gallery row");
+    console.error("[commitGallery]", "insert returned no gallery row");
+    await bestEffortRemoveGalleryKey(parsed.data.key, "commitGallery/empty");
     return { data: null, error: { message: UNAVAILABLE } };
   }
 
   revalidatePath(`/players/${parsed.data.playerId}`);
-  return { data: { image: row }, error: null };
+  return {
+    data: {
+      image: {
+        id: row.id,
+        player_id: row.player_id,
+        url: row.url,
+        storage_key: row.storage_key,
+        sort_order: row.sort_order,
+        created_at: row.created_at,
+      },
+    },
+    error: null,
+  };
 }
 
 export async function deleteGalleryImageAction(input: {
@@ -194,7 +251,7 @@ export async function deleteGalleryImageAction(input: {
     .delete()
     .eq("id", parsed.data.imageId)
     .eq("player_id", parsed.data.playerId)
-    .select("id, url");
+    .select("id, url, storage_key");
 
   if (error) {
     console.error("[deleteGallery]", error);
@@ -205,23 +262,21 @@ export async function deleteGalleryImageAction(input: {
     return { data: null, error: { message: NOT_FOUND } };
   }
 
-  const url =
-    typeof data[0] === "object" &&
-    data[0] !== null &&
-    "url" in data[0] &&
-    typeof (data[0] as { url: unknown }).url === "string"
-      ? (data[0] as { url: string }).url
+  const row = data[0];
+  const storedKey =
+    typeof row === "object" &&
+    row !== null &&
+    "storage_key" in row &&
+    typeof (row as { storage_key: unknown }).storage_key === "string"
+      ? (row as { storage_key: string }).storage_key
       : null;
 
-  if (url) {
+  if (storedKey) {
+    await bestEffortRemoveGalleryKey(storedKey, "deleteGallery");
+  } else {
     for (const ext of ["jpg", "png", "webp"]) {
       const key = `${parsed.data.playerId}/${parsed.data.imageId}.${ext}`;
-      const { error: removeError } = await insforge.storage
-        .from(GALLERY_BUCKET)
-        .remove(key);
-      if (removeError) {
-        console.error("[deleteGallery/storage]", key, removeError);
-      }
+      await bestEffortRemoveGalleryKey(key, "deleteGallery/legacy");
     }
   }
 

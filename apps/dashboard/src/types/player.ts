@@ -9,6 +9,7 @@ export type PlayerGalleryImage = {
   id: string;
   player_id: string;
   url: string;
+  storage_key: string | null;
   sort_order: number;
   created_at: string;
 };
@@ -29,6 +30,7 @@ export type Player = {
   height_cm: number;
   last_club: string;
   presentation_image_url: string | null;
+  presentation_image_key: string | null;
   status: PlayerStatus;
   deleted_at: string | null;
   created_at: string;

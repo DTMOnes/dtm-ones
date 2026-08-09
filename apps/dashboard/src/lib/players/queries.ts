@@ -8,7 +8,7 @@ import type { PlayerDetail, PlayerListItem } from "@/types/player";
 
 const LIST_SELECT = `${PLAYER_COLUMNS}, player_categories(categories(id, name))`;
 
-const DETAIL_SELECT = `${PLAYER_COLUMNS}, player_categories(categories(id, name)), player_gallery_images(id, player_id, url, sort_order, created_at), player_videos(id, player_id, youtube_url, sort_order, created_at)`;
+const DETAIL_SELECT = `${PLAYER_COLUMNS}, player_categories(categories(id, name)), player_gallery_images(id, player_id, url, storage_key, sort_order, created_at), player_videos(id, player_id, youtube_url, sort_order, created_at)`;
 
 export type ListPlayersParams = {
   q?: string;

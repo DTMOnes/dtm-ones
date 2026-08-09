@@ -24,7 +24,11 @@ import {
 // Phosphor
 import { InfoIcon, UploadIcon } from "@phosphor-icons/react";
 
-const MAX_BYTES = 5 * 1024 * 1024;
+import {
+  isHeicFileName,
+  isRejectedImageMime,
+} from "@/lib/players/image-upload";
+import { MAX_IMAGE_INPUT_BYTES } from "@/lib/validation/player-media";
 
 function canDecodeImage(file: File): Promise<boolean> {
   return new Promise((resolve) => {
@@ -66,7 +70,7 @@ function useImageUpload() {
 
 function ImageUpload({
   onSubmitFile,
-  maxBytes = MAX_BYTES,
+  maxBytes = MAX_IMAGE_INPUT_BYTES,
   children,
 }: {
   onSubmitFile: (file: File) => Promise<void>;
@@ -118,14 +122,28 @@ function ImageUploadLabel({ children }: { children: ReactNode }) {
 }
 
 function ImageUploadInput() {
-  const { inputId, inputRef, maxBytes, selectFile, setError, error, isUploading } =
-    useImageUpload();
+  const {
+    inputId,
+    inputRef,
+    maxBytes,
+    selectFile,
+    setError,
+    error,
+    isUploading,
+  } = useImageUpload();
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selected = event.target.files?.[0] ?? null;
     setError(null);
 
     if (!selected) {
+      selectFile(null);
+      return;
+    }
+
+    if (isRejectedImageMime(selected.type) || isHeicFileName(selected.name)) {
+      event.target.value = "";
+      setError("HEIC is not supported. Export as JPEG, PNG, or WebP.");
       selectFile(null);
       return;
     }
@@ -139,7 +157,7 @@ function ImageUploadInput() {
 
     if (!(await canDecodeImage(selected))) {
       event.target.value = "";
-      setError("Could not load that image. Try another file.");
+      setError("Could not load that image. Try another JPEG, PNG, or WebP.");
       selectFile(null);
       return;
     }
@@ -153,7 +171,7 @@ function ImageUploadInput() {
       id={inputId}
       className="min-w-0 flex-1"
       type="file"
-      accept="image/*"
+      accept="image/jpeg,image/png,image/webp"
       autoComplete="off"
       onChange={handleChange}
       disabled={isUploading}
@@ -194,7 +212,10 @@ function ImageUploadDescription() {
   return (
     <FieldDescription className="flex items-center gap-1 text-sm text-muted-foreground">
       <InfoIcon />
-      <span>Max file size: {maxBytes / 1024 / 1024}MB</span>
+      <span>
+        JPEG, PNG, or WebP up to {maxBytes / 1024 / 1024}MB. Images are resized
+        automatically. HEIC is not supported.
+      </span>
     </FieldDescription>
   );
 }
