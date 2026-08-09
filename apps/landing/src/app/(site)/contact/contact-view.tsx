@@ -11,22 +11,22 @@ const stageVariants: Variants = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.08,
+      staggerChildren: 0.07,
+      delayChildren: 0,
     },
   },
 };
 
 const itemVariants: Variants = {
   hidden: {
-    opacity: 0,
-    y: 36,
+    opacity: 1,
+    y: 18,
   },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.55,
+      duration: 0.45,
       ease: easeOut,
     },
   },
@@ -52,7 +52,10 @@ export default function ContactView() {
           Contact us
         </motion.h1>
 
-        <motion.div variants={reduce ? undefined : itemVariants}>
+        <motion.div
+          className={styles.formStage}
+          variants={reduce ? undefined : itemVariants}
+        >
           <ContactForm />
         </motion.div>
       </motion.div>

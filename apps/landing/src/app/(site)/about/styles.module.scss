@@ -2,7 +2,8 @@
   width: 100%;
   max-width: 100%;
   min-height: 100dvh;
-  padding-block: 40px;
+  padding-top: 100px;
+  padding-bottom: 40px;
   position: relative;
   display: flex;
   align-items: center;
@@ -80,5 +81,17 @@
 
   .content {
     width: 100%;
+  }
+}
+
+@media (width < 640px) {
+  .container {
+    align-items: flex-start;
+    padding-top: 96px;
+    padding-bottom: 32px;
+  }
+
+  .content {
+    justify-content: flex-start;
   }
 }

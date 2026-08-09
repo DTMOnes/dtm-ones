@@ -10,22 +10,22 @@ const stageVariants: Variants = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.08,
+      staggerChildren: 0.07,
+      delayChildren: 0,
     },
   },
 };
 
 const itemVariants: Variants = {
   hidden: {
-    opacity: 0,
-    y: 36,
+    opacity: 1,
+    y: 18,
   },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.55,
+      duration: 0.45,
       ease: easeOut,
     },
   },
@@ -35,22 +35,22 @@ const metaVariants: Variants = {
   hidden: {},
   show: {
     transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.02,
+      staggerChildren: 0.05,
+      delayChildren: 0,
     },
   },
 };
 
 const metaItemVariants: Variants = {
   hidden: {
-    opacity: 0,
-    y: 18,
+    opacity: 1,
+    y: 12,
   },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.45,
+      duration: 0.4,
       ease: easeOut,
     },
   },
