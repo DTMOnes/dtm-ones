@@ -1,20 +1,20 @@
 .container {
+  position: relative;
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 12px;
   box-sizing: border-box;
-  background: #111;
+  background: var(--color-black);
   pointer-events: auto;
 }
 
 .cinema {
   container-type: size;
+  width: 100%;
+  height: 100%;
   min-height: 0;
   display: grid;
   place-items: center;
-  background: #0a0a0a;
+  background: var(--color-black);
 }
 
 .ratio {
@@ -24,7 +24,7 @@
   max-width: 100%;
   max-height: 100%;
   overflow: hidden;
-  background: #111;
+  background: var(--color-dark-gray);
 }
 
 .frame,
@@ -37,11 +37,12 @@
   padding: 0;
   border: 0;
   display: block;
+  z-index: 1;
 }
 
 .poster {
   cursor: pointer;
-  background: #111;
+  background: var(--color-dark-gray);
 }
 
 .posterImage,
@@ -56,6 +57,7 @@
   object-fit: cover;
   object-position: center center;
   pointer-events: none;
+  user-select: none;
 }
 
 .play {
@@ -69,50 +71,73 @@
   height: 64px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.92);
-  color: #0a0a0a;
+  background: color-mix(in srgb, var(--color-white) 92%, transparent);
+  color: var(--color-black);
   pointer-events: none;
 }
 
-.strip {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  width: 100%;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.thumb {
-  position: relative;
-  flex: 0 0 auto;
-  width: 120px;
-  aspect-ratio: 16 / 9;
+.nav {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   padding: 0;
-  border: 2px solid transparent;
-  background: transparent;
-  opacity: 0.45;
+  border: 0;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: color-mix(in srgb, var(--color-black) 62%, transparent);
+  color: var(--color-white);
   cursor: pointer;
-  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+  &:hover {
+    background: color-mix(in srgb, var(--color-black) 78%, transparent);
+    opacity: 1;
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.96);
   }
 }
 
-.thumbActive {
-  opacity: 1;
-  border-color: #fff;
+.navPrev {
+  left: 14px;
+}
+
+.navNext {
+  right: 14px;
+}
+
+.index {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 4;
+  width: min(220px, 42%);
+  height: 3px;
+  padding: 0;
+  border: 0;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--color-white) 22%, transparent);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.indexThumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--color-white);
+  pointer-events: none;
 }
 
 .empty {
@@ -121,28 +146,56 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #111;
+  background: var(--color-black);
 
   p {
     font-family: var(--font-inter);
     font-size: 14px;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--color-white);
     opacity: 0.5;
   }
 }
 
 @media (width < 900px) {
-  .container {
-    gap: 10px;
-  }
-
   .play {
     width: 56px;
     height: 56px;
   }
 
-  .thumb {
-    width: 96px;
+  .nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .navPrev {
+    left: 10px;
+  }
+
+  .navNext {
+    right: 10px;
+  }
+
+  .index {
+    bottom: 14px;
+    width: min(180px, 48%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav {
+    transition: none;
+
+    &:active {
+      transform: translateY(-50%);
+    }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav {
+    background: color-mix(in srgb, var(--color-black) 88%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }

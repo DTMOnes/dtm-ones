@@ -4,13 +4,13 @@
 import Image from "next/image";
 
 // React
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Motion
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 // Icons
-import { Play } from "@phosphor-icons/react";
+import { CaretLeft, CaretRight, Play } from "@phosphor-icons/react";
 
 // Styles
 import styles from "./styles.module.scss";
@@ -49,6 +49,45 @@ export default function PlayerHighlights({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [slideDir, setSlideDir] = useState(0);
+  const activeIndexRef = useRef(activeIndex);
+
+  activeIndexRef.current = activeIndex;
+
+  const canPager = items.length > 1;
+  const thumbRatio = canPager ? 1 / items.length : 1;
+
+  const selectClip = (index: number) => {
+    if (index === activeIndexRef.current) return;
+    setSlideDir(index > activeIndexRef.current ? 1 : -1);
+    setActiveIndex(index);
+    setPlaying(false);
+  };
+
+  const step = (delta: number) => {
+    if (!canPager) return;
+    const current = activeIndexRef.current;
+    selectClip((current + delta + items.length) % items.length);
+  };
+
+  useEffect(() => {
+    if (!canPager) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      event.preventDefault();
+      const delta = event.key === "ArrowRight" ? 1 : -1;
+      const current = activeIndexRef.current;
+      const next = (current + delta + items.length) % items.length;
+      if (next === current) return;
+      setSlideDir(delta);
+      setActiveIndex(next);
+      setPlaying(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [canPager, items.length]);
 
   if (items.length === 0) {
     return (
@@ -60,23 +99,36 @@ export default function PlayerHighlights({
 
   const active = items[activeIndex] ?? items[0];
 
-  const selectClip = (index: number) => {
-    setActiveIndex(index);
-    setPlaying(false);
+  const seek = (clientX: number, target: HTMLElement) => {
+    const rect = target.getBoundingClientRect();
+    const ratio = Math.min(
+      1,
+      Math.max(0, (clientX - rect.left) / rect.width),
+    );
+    selectClip(Math.min(items.length - 1, Math.floor(ratio * items.length)));
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.cinema}>
         <div className={styles.ratio}>
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={slideDir}>
             {playing ? (
               <motion.div
                 key={`play-${active.id}`}
                 className={styles.frame}
-                initial={reduce ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={reduce ? undefined : { opacity: 0 }}
+                custom={slideDir}
+                initial={
+                  reduce
+                    ? false
+                    : { opacity: 0, x: slideDir === 0 ? 0 : slideDir * 36 }
+                }
+                animate={{ opacity: 1, x: 0 }}
+                exit={
+                  reduce
+                    ? undefined
+                    : { opacity: 0, x: slideDir === 0 ? 0 : slideDir * -36 }
+                }
                 transition={{ duration: 0.3, ease: easeOut }}
               >
                 <iframe
@@ -97,9 +149,18 @@ export default function PlayerHighlights({
                 className={styles.poster}
                 aria-label={`Play highlight ${activeIndex + 1}`}
                 onClick={() => setPlaying(true)}
-                initial={reduce ? false : { opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={reduce ? undefined : { opacity: 0, scale: 0.98 }}
+                custom={slideDir}
+                initial={
+                  reduce
+                    ? false
+                    : { opacity: 0, x: slideDir === 0 ? 0 : slideDir * 36 }
+                }
+                animate={{ opacity: 1, x: 0 }}
+                exit={
+                  reduce
+                    ? undefined
+                    : { opacity: 0, x: slideDir === 0 ? 0 : slideDir * -36 }
+                }
                 transition={{ duration: 0.35, ease: easeOut }}
                 whileHover={reduce ? undefined : { scale: 1.01 }}
                 whileTap={reduce ? undefined : { scale: 0.99 }}
@@ -120,42 +181,46 @@ export default function PlayerHighlights({
               </motion.button>
             )}
           </AnimatePresence>
+
+          {canPager ? (
+            <>
+              <button
+                type="button"
+                className={`${styles.nav} ${styles.navPrev}`}
+                aria-label="Previous highlight"
+                onClick={() => step(-1)}
+              >
+                <CaretLeft weight="bold" size={22} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.nav} ${styles.navNext}`}
+                aria-label="Next highlight"
+                onClick={() => step(1)}
+              >
+                <CaretRight weight="bold" size={22} />
+              </button>
+              <button
+                type="button"
+                className={styles.index}
+                aria-label={`Highlight ${activeIndex + 1} of ${items.length}`}
+                onClick={(event) => seek(event.clientX, event.currentTarget)}
+              >
+                <motion.span
+                  className={styles.indexThumb}
+                  animate={{ left: `${activeIndex * thumbRatio * 100}%` }}
+                  transition={
+                    reduce
+                      ? { duration: 0 }
+                      : { type: "spring", stiffness: 380, damping: 32 }
+                  }
+                  style={{ width: `${thumbRatio * 100}%` }}
+                />
+              </button>
+            </>
+          ) : null}
         </div>
       </div>
-
-      {items.length > 1 ? (
-        <div className={styles.strip} role="tablist" aria-label="Highlights index">
-          {items.map((item, index) => {
-            const selected = index === activeIndex;
-            return (
-              <motion.button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                aria-label={`Go to highlight ${index + 1}`}
-                className={
-                  selected
-                    ? `${styles.thumb} ${styles.thumbActive}`
-                    : styles.thumb
-                }
-                onClick={() => selectClip(index)}
-                whileHover={reduce ? undefined : { opacity: 1, y: -2 }}
-                whileTap={reduce ? undefined : { scale: 0.97 }}
-              >
-                <Image
-                  src={getYouTubeThumbnailUrl(item.videoId)}
-                  alt=""
-                  width={160}
-                  height={90}
-                  sizes="120px"
-                  draggable={false}
-                />
-              </motion.button>
-            );
-          })}
-        </div>
-      ) : null}
     </div>
   );
 }
