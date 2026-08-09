@@ -25,9 +25,6 @@ import {
 import PlayerGallery from "@/components/Player/Gallery";
 import PlayerHighlights from "@/components/Player/Highlights";
 
-const DESCRIPTION_PLACEHOLDER =
-  "Ala-pivot con recorrido en Liga Nacional y experiencia internacional reciente en IBL Indonesia. Fuerte bajo el aro, buena movilidad para su altura.";
-
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
 const chromeVariants: Variants = {
@@ -136,13 +133,6 @@ export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
           ) : null}
           <h1 className={styles.name}>{player.full_name}</h1>
         </motion.div>
-
-        <motion.p
-          className={styles.description}
-          variants={reduce ? undefined : itemVariants}
-        >
-          {DESCRIPTION_PLACEHOLDER}
-        </motion.p>
 
         <motion.dl
           className={styles.stats}
