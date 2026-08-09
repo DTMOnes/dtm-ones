@@ -19,12 +19,19 @@ export function parseYouTubeVideoId(url: string): string | null {
   }
 }
 
-export function getYouTubeEmbedUrl(videoId: string): string {
+export function getYouTubeEmbedUrl(
+  videoId: string,
+  options?: { autoplay?: boolean; mute?: boolean },
+): string {
+  const autoplay = options?.autoplay ?? true;
+  const mute = options?.mute ?? autoplay;
+
   const params = new URLSearchParams({
-    autoplay: "1",
-    mute: "1",
+    autoplay: autoplay ? "1" : "0",
+    mute: mute ? "1" : "0",
     playsinline: "1",
     rel: "0",
+    modestbranding: "1",
   });
 
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params}`;

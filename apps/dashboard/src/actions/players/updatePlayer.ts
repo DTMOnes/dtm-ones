@@ -36,7 +36,6 @@ export async function updatePlayerAction(input: {
   nationality: string;
   heightCm: string;
   lastClub: string;
-  status: string;
   categoryIds: string[];
 }): Promise<ActionResult<{ player: Player }>> {
   const gate = await requireStaff();
@@ -116,7 +115,6 @@ export async function updatePlayerAction(input: {
         nationality: parsed.data.nationality,
         height_cm: heightCm,
         last_club: parsed.data.lastClub,
-        status: parsed.data.status,
         slug,
       })
       .eq("id", parsed.data.id)

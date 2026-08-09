@@ -67,8 +67,12 @@ export const updatePlayerSchema = z.object({
     .trim()
     .min(1, "Last club cannot be empty.")
     .max(100, "Maximum 100 characters."),
-  status: playerStatusSchema,
   categoryIds: categoryIdsSchema,
+});
+
+export const updatePlayerStatusSchema = z.object({
+  id: z.uuid({ message: "Invalid player ID." }),
+  status: playerStatusSchema,
 });
 
 export const softDeletePlayerSchema = z.object({
@@ -91,6 +95,7 @@ export const videoIdSchema = z.object({
 
 export type CreatePlayerInput = z.infer<typeof createPlayerSchema>;
 export type UpdatePlayerInput = z.infer<typeof updatePlayerSchema>;
+export type UpdatePlayerStatusInput = z.infer<typeof updatePlayerStatusSchema>;
 export type SoftDeletePlayerInput = z.infer<typeof softDeletePlayerSchema>;
 
 export function parseHeightCm(value: string): number {

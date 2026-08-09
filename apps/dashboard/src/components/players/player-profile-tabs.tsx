@@ -3,6 +3,7 @@
 import DeletePlayerCard from "@/components/players/delete-player-card";
 import EditPlayerForm from "@/components/players/edit-player-form";
 import PlayerMedia from "@/components/players/media/player-media";
+import PlayerPublishingCard from "@/components/players/player-publishing-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CategoryWithCount } from "@/types/category";
 import type { PlayerDetail } from "@/types/player";
@@ -27,6 +28,7 @@ export default function PlayerProfileTabs({
       </TabsList>
       <TabsContent value="general-info" className="flex flex-col gap-6">
         <EditPlayerForm player={player} categories={categoryOptions} />
+        <PlayerPublishingCard player={player} />
         <DeletePlayerCard playerId={player.id} fullName={player.full_name} />
       </TabsContent>
       <TabsContent value="player-media">

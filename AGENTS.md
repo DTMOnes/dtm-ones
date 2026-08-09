@@ -200,8 +200,6 @@ This project uses [InsForge](https://insforge.dev): an all-in-one, open-source P
 Key patterns:
 
 - Database inserts take an array: `insert([{ ... }])`.
-- Dashboard `public.users.id` is TEXT FK to `better_auth.user(id)`. Staff RLS helpers use `public.requesting_user_id()` (JWT `sub`), not `auth.uid()`.
-- `createInsforgeServer()` mints a bridge JWT from the Better Auth session; do not use InsForge Auth `updateSession` for staff.
-- Users list and detail join `public.users` with `better_auth.user` over `DATABASE_URL` for display name; privileged create and delete stay on Better Auth admin APIs, not the InsForge SDK alone.
+- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
 - For storage uploads, persist both the returned `url` and `key`.
 <!-- INSFORGE:END -->

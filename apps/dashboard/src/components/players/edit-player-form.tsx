@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { updatePlayerAction } from "@/actions/players/updatePlayer";
@@ -19,8 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { FieldGroup } from "@/components/ui/field";
 import {
   updatePlayerSchema,
   type UpdatePlayerInput,
@@ -46,7 +45,6 @@ export default function EditPlayerForm({
       nationality: player.nationality,
       heightCm: String(player.height_cm),
       lastClub: player.last_club,
-      status: player.status,
       categoryIds: player.categories.map((category) => category.id),
     },
   });
@@ -106,41 +104,6 @@ export default function EditPlayerForm({
                 placeholder="FC Barcelona"
                 disabled={pending}
               />
-              <Field className="flex flex-col gap-2">
-                <FieldLabel>Status</FieldLabel>
-                <Controller
-                  name="status"
-                  control={methods.control}
-                  render={({ field, fieldState }) => (
-                    <>
-                      <ToggleGroup
-                        type="single"
-                        size="sm"
-                        variant="outline"
-                        spacing={2}
-                        className="flex flex-wrap gap-2"
-                        disabled={pending}
-                        value={field.value}
-                        onValueChange={(value) => {
-                          if (value === "draft" || value === "published") {
-                            field.onChange(value);
-                          }
-                        }}
-                      >
-                        <ToggleGroupItem value="draft">Draft</ToggleGroupItem>
-                        <ToggleGroupItem value="published">
-                          Published
-                        </ToggleGroupItem>
-                      </ToggleGroup>
-                      {fieldState.error?.message ? (
-                        <FieldError
-                          errors={[{ message: fieldState.error.message }]}
-                        />
-                      ) : null}
-                    </>
-                  )}
-                />
-              </Field>
               <OptionsField
                 name="categoryIds"
                 label="Categories"

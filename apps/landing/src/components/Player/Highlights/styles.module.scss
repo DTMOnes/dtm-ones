@@ -1,30 +1,50 @@
-@use "styles/typography" as type;
-
 .container {
   width: 100%;
   height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  box-sizing: border-box;
+  background: #111;
+  pointer-events: auto;
+}
+
+.cinema {
+  container-type: size;
   min-height: 0;
   display: grid;
-  grid-template-columns: 50vw auto;
-  gap: 12px;
-  padding-right: 12px;
-  box-sizing: border-box;
-  overflow: hidden;
+  place-items: center;
+  background: #0a0a0a;
 }
 
-.stage {
-  margin: 0;
-  width: 50vw;
-  min-width: 0;
-  min-height: 0;
+.ratio {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: min(100cqw, calc(100cqh * 16 / 9));
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  background: #111;
+}
+
+.frame,
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background-color: var(--color-dark-gray);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: block;
 }
 
+.poster {
+  cursor: pointer;
+  background: #111;
+}
+
+.posterImage,
 .video {
   width: 100%;
   height: 100%;
@@ -32,16 +52,38 @@
   border: 0;
 }
 
-.index {
-  height: 100%;
-  min-height: 0;
+.posterImage {
+  object-fit: cover;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.92);
+  color: #0a0a0a;
+  pointer-events: none;
+}
+
+.strip {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
     display: none;
@@ -49,15 +91,15 @@
 }
 
 .thumb {
-  width: 56px;
-  height: 72px;
-  flex-shrink: 0;
+  position: relative;
+  flex: 0 0 auto;
+  width: 120px;
+  aspect-ratio: 16 / 9;
   padding: 0;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   background: transparent;
-  cursor: pointer;
   opacity: 0.45;
-  transition: opacity 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
   overflow: hidden;
 
   img {
@@ -66,15 +108,11 @@
     object-fit: cover;
     display: block;
   }
-
-  &:hover {
-    opacity: 0.75;
-  }
 }
 
 .thumbActive {
   opacity: 1;
-  border-color: var(--color-white);
+  border-color: #fff;
 }
 
 .empty {
@@ -83,37 +121,28 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--color-dark-gray);
+  background: #111;
 
   p {
-    @include type.inter(14px);
+    font-family: var(--font-inter);
+    font-size: 14px;
     text-transform: uppercase;
-    color: var(--color-white);
+    color: #fff;
     opacity: 0.5;
   }
 }
 
 @media (width < 900px) {
   .container {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) auto;
-    padding-right: 0;
+    gap: 10px;
   }
 
-  .stage {
-    width: 100%;
-  }
-
-  .index {
-    height: auto;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
+  .play {
+    width: 56px;
+    height: 56px;
   }
 
   .thumb {
-    width: 56px;
-    height: 56px;
+    width: 96px;
   }
 }
