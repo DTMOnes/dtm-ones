@@ -1,9 +1,73 @@
+@use "styles/typography" as type;
+
 .container {
   width: 100%;
-  padding-block: 180px;
+  box-sizing: border-box;
+  padding: 180px 28px 40px;
+  display: grid;
+  /* Prefer ~320px cards; grow equally so each full row spans the viewport. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.empty_shell {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100dvh;
+  padding: 180px 28px 40px;
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+}
+
+.empty {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.empty_title {
+  @include type.big-shoulders(40px);
+}
+
+.empty_copy {
+  @include type.inter(14px);
+  opacity: 0.5;
+  line-height: 1.45;
+}
+
+.empty_action {
+  margin-top: 8px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-dark-gray);
+  @include type.inter(13px);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+@media (width < 700px) {
+  .container,
+  .empty_shell {
+    padding: 160px 16px 32px;
+  }
+
+  .container {
+    gap: 16px;
+  }
+
+  .empty_title {
+    font-size: 32px;
+  }
 }

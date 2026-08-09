@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 // Motion
-import { motion } from "motion/react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 
 // Styles
 import styles from "./styles.module.scss";
@@ -15,30 +15,59 @@ import { PublicRosterPlayer } from "@/types/roster";
 
 const PLACEHOLDER_SRC = "/assets/images/player-placeholder.png";
 
-// delay: index % 2 === 0 ? 0.5 : 1,
+const easeOut = [0.16, 1, 0.3, 1] as const;
 
-const variants = {
+const cardVariants: Variants = {
   initial: {
     opacity: 0,
-    rotateX: 90,
+    y: 36,
+    scale: 0.94,
   },
   enter: (index: number) => ({
     opacity: 1,
-    rotateX: 0,                 
+    y: 0,
+    scale: 1,
     transition: {
-      duration: 0.65,
-      delay: 0.5 + index * 0.1,
-      ease: [0.215, 0.61, 0.355, 1] as const,
+      duration: 0.7,
+      delay: 0.18 + Math.min(index, 11) * 0.055,
+      ease: easeOut,
     },
   }),
   exit: {
     opacity: 0,
+    y: 16,
+    scale: 0.98,
     transition: {
-      duration: 0.5,
+      duration: 0.28,
       ease: [0.76, 0, 0.24, 1],
     },
   },
-} as const;
+};
+
+const mediaVariants: Variants = {
+  initial: { scale: 1.14 },
+  enter: (index: number) => ({
+    scale: 1,
+    transition: {
+      duration: 1.05,
+      delay: 0.18 + Math.min(index, 11) * 0.055,
+      ease: easeOut,
+    },
+  }),
+};
+
+const infoVariants: Variants = {
+  initial: { opacity: 0, y: 14 },
+  enter: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      delay: 0.32 + Math.min(index, 11) * 0.055,
+      ease: easeOut,
+    },
+  }),
+};
 
 export default function Cards({
   player,
@@ -48,6 +77,7 @@ export default function Cards({
   index: number;
 }) {
   const router = useRouter();
+  const reduce = useReducedMotion();
 
   const imageSrc = player.presentation_image_url?.trim() || PLACEHOLDER_SRC;
   const categoryName = player.categories[0]?.name ?? "";
@@ -61,25 +91,41 @@ export default function Cards({
       className={styles.card}
       onClick={handleNavigate}
       custom={index}
-      variants={variants}
-      initial="initial"
+      variants={reduce ? undefined : cardVariants}
+      initial={reduce ? false : "initial"}
       animate="enter"
       exit="exit"
     >
-      <Image
-        className={styles.image}
-        src={imageSrc}
-        alt={player.full_name}
-        width={1025}
-        height={1280}
-        draggable={false}
-      />
-      <div className={styles.player_info}>
+      <div className={styles.media}>
+        <motion.div
+          className={styles.media_inner}
+          custom={index}
+          variants={reduce ? undefined : mediaVariants}
+          initial={reduce ? false : "initial"}
+          animate="enter"
+        >
+          <Image
+            className={styles.image}
+            src={imageSrc}
+            alt={player.full_name}
+            width={1025}
+            height={1280}
+            draggable={false}
+          />
+        </motion.div>
+      </div>
+      <motion.div
+        className={styles.player_info}
+        custom={index}
+        variants={reduce ? undefined : infoVariants}
+        initial={reduce ? false : "initial"}
+        animate="enter"
+      >
         <h2 className={styles.player_name}>{player.full_name}</h2>
         {categoryName ? (
           <p className={styles.player_position}>{categoryName}</p>
         ) : null}
-      </div>
+      </motion.div>
     </motion.div>
   );
 }

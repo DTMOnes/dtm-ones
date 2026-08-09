@@ -73,12 +73,23 @@
   .header {
     .top_container {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       gap: 36px;
 
       .center:empty {
         display: none;
+      }
+
+      .start,
+      .end {
+        flex: 0 0 auto;
+      }
+
+      .center:not(:empty) {
+        min-width: 0;
+        flex: 1 1 auto;
+        justify-content: center;
       }
     }
 

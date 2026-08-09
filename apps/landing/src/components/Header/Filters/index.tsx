@@ -3,6 +3,9 @@
 // Next
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+// Motion
+import { motion, useReducedMotion, type Variants } from "motion/react";
+
 // Styles
 import styles from "./styles.module.scss";
 
@@ -12,6 +15,24 @@ import { useHeaderOverride } from "@/components/Header/HeaderProvider";
 export type FilterItem = {
   id: string;
   name: string;
+};
+
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
+const rowVariants: Variants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.045, delayChildren: 0.08 },
+  },
+};
+
+const chipVariants: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: easeOut },
+  },
 };
 
 function CategoriesFilters({
@@ -29,6 +50,7 @@ function CategoriesFilters({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { startRosterTransition } = useHeaderOverride();
+  const reduce = useReducedMotion();
   const selected = searchParams.get(param);
 
   const handleSelect = (id: string) => {
@@ -54,12 +76,26 @@ function CategoriesFilters({
   };
 
   return (
-    <div className={styles.container}>
-      <p className={styles.meta}>{label}</p>
+    <motion.div
+      className={styles.container}
+      variants={reduce ? undefined : rowVariants}
+      initial={reduce ? false : "hidden"}
+      animate="show"
+    >
+      <motion.p className={styles.meta} variants={reduce ? undefined : chipVariants}>
+        <span>{label}</span>
+      </motion.p>
 
-      <div className={styles.categories}>
+      <motion.div
+        className={styles.categories}
+        variants={reduce ? undefined : rowVariants}
+      >
         {items.map((item) => (
-          <label key={item.id} htmlFor={`${name}-${item.id}`}>
+          <motion.label
+            key={item.id}
+            htmlFor={`${name}-${item.id}`}
+            variants={reduce ? undefined : chipVariants}
+          >
             <input
               type="radio"
               id={`${name}-${item.id}`}
@@ -68,14 +104,18 @@ function CategoriesFilters({
               onChange={() => handleSelect(item.id)}
             />
             <span>{item.name}</span>
-          </label>
+          </motion.label>
         ))}
-      </div>
+      </motion.div>
 
-      <p className={styles.meta} onClick={handleClear}>
-        Clear
-      </p>
-    </div>
+      <motion.p
+        className={`${styles.meta} ${styles.clear}`}
+        onClick={handleClear}
+        variants={reduce ? undefined : chipVariants}
+      >
+        <span>Clear</span>
+      </motion.p>
+    </motion.div>
   );
 }
 
@@ -90,11 +130,25 @@ function SectionsFilters({
   value: string;
   onChange: (id: string) => void;
 }) {
+  const reduce = useReducedMotion();
+
   return (
-    <div className={styles.sections}>
-      <div className={styles.categories}>
+    <motion.div
+      className={styles.sections}
+      variants={reduce ? undefined : rowVariants}
+      initial={reduce ? false : "hidden"}
+      animate="show"
+    >
+      <motion.div
+        className={styles.categories}
+        variants={reduce ? undefined : rowVariants}
+      >
         {items.map((item) => (
-          <label key={item.id} htmlFor={`${name}-${item.id}`}>
+          <motion.label
+            key={item.id}
+            htmlFor={`${name}-${item.id}`}
+            variants={reduce ? undefined : chipVariants}
+          >
             <input
               type="radio"
               id={`${name}-${item.id}`}
@@ -103,10 +157,10 @@ function SectionsFilters({
               onChange={() => onChange(item.id)}
             />
             <span>{item.name}</span>
-          </label>
+          </motion.label>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

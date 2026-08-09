@@ -8,15 +8,41 @@
   .meta {
     @include type.inter(14px);
     text-transform: uppercase;
-    opacity: 0.5;
 
-    &:nth-of-type(2) {
-      cursor: pointer;
-      transition: opacity 0.3s;
+    > span {
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
+    }
+  }
 
-      &:hover {
-        opacity: 1;
-      }
+  .clear {
+    cursor: pointer;
+
+    &:hover > span {
+      opacity: 1;
+    }
+  }
+
+  /* When a category is active, dim everything else and lift the selected chip. */
+  &:has(input:checked) {
+    .meta > span {
+      opacity: 0.35;
+    }
+
+    .clear:hover > span {
+      opacity: 1;
+    }
+
+    .categories label > span {
+      opacity: 0.28;
+    }
+
+    .categories label:hover > span {
+      opacity: 0.55;
+    }
+
+    .categories label:has(input:checked) > span {
+      opacity: 1;
     }
   }
 }
@@ -25,6 +51,19 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
+
+  /* Player sections always have one active — same contrast treatment. */
+  .categories label > span {
+    opacity: 0.28;
+  }
+
+  .categories label:hover > span {
+    opacity: 0.55;
+  }
+
+  .categories label:has(input:checked) > span {
+    opacity: 1;
+  }
 }
 
 .categories {
@@ -36,25 +75,21 @@
   label {
     display: flex;
     align-items: center;
-    opacity: 0.5;
     cursor: pointer;
-    transition: opacity 0.3s;
 
-    &:hover {
-      opacity: 1;
+    > span {
+      @include type.big-shoulders(24px);
+      display: block;
+      opacity: 0.5;
+      transition: opacity 0.3s ease;
     }
 
-    &:has(input:checked) {
+    &:hover > span {
       opacity: 1;
     }
 
     input {
       display: none;
-    }
-
-    span {
-      @include type.big-shoulders(24px);
-      display: block;
     }
   }
 }

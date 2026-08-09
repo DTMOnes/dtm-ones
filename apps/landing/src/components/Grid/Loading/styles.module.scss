@@ -1,22 +1,101 @@
 .loading {
   width: 100%;
-  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: 180px 28px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 20px;
+  align-items: stretch;
+}
+
+.skeleton {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 360 / 420;
+  overflow: hidden;
+  background: var(--color-dark-gray);
+  opacity: 0;
+  animation: skeleton-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgb(255 255 255 / 6%) 45%,
+    transparent 65%
+  );
+  background-size: 220% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.meta {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 16px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1;
 }
 
-.spinner {
-  width: 28px;
-  height: 28px;
-  border: 2px solid rgb(255 255 255 / 20%);
-  border-top-color: var(--color-white);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+.lineName,
+.lineRole {
+  display: block;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 10%);
 }
 
-@keyframes spin {
+.lineName {
+  width: 68%;
+  height: 18px;
+}
+
+.lineRole {
+  width: 34%;
+  height: 10px;
+}
+
+@keyframes skeleton-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 140% 0;
+  }
+
+  to {
+    background-position: -40% 0;
+  }
+}
+
+@media (width < 700px) {
+  .loading {
+    padding: 160px 16px 32px;
+    gap: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    opacity: 1;
+    animation: none;
+  }
+
+  .shimmer {
+    animation: none;
   }
 }
