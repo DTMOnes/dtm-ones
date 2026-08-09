@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
-import ContactForm from "./contact-form";
-import styles from "./styles.module.scss";
+import ContactView from "./contact-view";
 
 export const metadata: Metadata = {
   title: "Contact | DTM Ones",
@@ -10,12 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  return (
-    <main className={styles.container}>
-      <div className={styles.content}>
-        <h1 className={styles.title}>Contact us</h1>
-        <ContactForm />
-      </div>
-    </main>
-  );
+  return <ContactView />;
 }

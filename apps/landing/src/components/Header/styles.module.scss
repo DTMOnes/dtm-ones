@@ -7,8 +7,9 @@
   display: flex;
   flex-direction: column;
   gap: 36px;
-  background-color: black;
+  background-color: var(--color-black);
   z-index: 1000;
+  transition: background-color 0.35s ease;
 
   .top_container {
     display: grid;
@@ -37,6 +38,18 @@
       grid-column: 3;
       justify-self: end;
     }
+  }
+}
+
+:global(html[data-menu-open]) .header {
+  z-index: 1002;
+  background-color: transparent;
+
+  .center,
+  .filters {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 }
 

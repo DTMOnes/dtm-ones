@@ -1,76 +1,84 @@
 .container {
   width: 100%;
+  max-width: 100%;
   min-height: 100dvh;
   padding-block: 40px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  overflow-x: hidden;
+}
 
-  &::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 35%;
-    height: 100dvh;
-    background: url("/assets/images/dunk.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: grayscale(100%);
-    z-index: 0;
+.media {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 35%;
+  height: 100dvh;
+  background: url("/assets/images/dunk.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: grayscale(100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.content {
+  width: 65%;
+  height: 100%;
+  padding-left: clamp(24px, 5vw, 80px);
+  padding-right: clamp(24px, 4vw, 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  background: var(--color-black);
+  z-index: 1;
+  container-type: inline-size;
+
+  h1,
+  p {
+    margin: 0;
+    font-family: var(--font-inter);
+    font-size: 14px;
+    font-weight: 400;
+    text-align: left;
+    color: color-mix(in srgb, var(--color-white) 70%, transparent);
   }
 
-  .content {
-    width: 65%;
-    height: 100%;
-    padding-left: clamp(24px, 5vw, 80px);
-    padding-right: clamp(24px, 4vw, 80px);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 20px;
-    background: black;
-    z-index: 1;
-    container-type: inline-size;
+  .paragraph {
+    width: min(100%, 800px);
+    padding: 40px 0;
+    font-family: var(--font-big-shoulders);
+    font-size: clamp(28px, 4.5cqi, 40px);
+    font-weight: 900;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
 
-    h1,
-    p {
-      font-family: var(--font-inter);
-      font-size: 14px;
-      font-weight: 400;
-      text-align: left;
-      color: white;
-      opacity: 0.7;
-    }
-
-    .paragraph {
-      width: min(100%, 800px);
-      padding: 40px 0;
-      font-family: var(--font-big-shoulders);
-      font-size: clamp(28px, 4.5cqi, 40px);
-      font-weight: 900;
-      line-height: 1.2;
-      text-transform: uppercase;
-      opacity: 1;
-    }
-
-    .highlight {
-      opacity: 0.7;
-    }
+  .highlight {
+    color: color-mix(in srgb, var(--color-white) 70%, transparent);
   }
 }
 
-@media (width < 1200px) {
-  .container {
-    &::before {
-      display: none;
-    }
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+}
 
-    .content {
-      width: 100%;
-    }
+@media (width < 1200px) {
+  .media {
+    display: none;
+  }
+
+  .content {
+    width: 100%;
   }
 }

@@ -1,13 +1,15 @@
 "use client";
 
-// Next
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 
-// Motion
-import { motion } from "motion/react";
-
-// Styles
 import styles from "./styles.module.scss";
+import {
+  fadeUpVariants,
+  linkVariants,
+  panelVariants,
+} from "../Menu/variants";
 
 const pages = [
   {
@@ -25,117 +27,98 @@ const pages = [
 ];
 
 const socials = [
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/dtm_ones/",
-  },
+  { label: "Instagram", href: "https://www.instagram.com/dtm_ones/" },
   {
     label: "Youtube",
     href: "https://www.youtube.com/channel/UC_x5XG1OV2P6yVqAlKxpw6w",
   },
 ];
 
-const footer = [
-  {
-    label: "All rights reserved",
-    href: "/terms-of-service",
-  },
-  {
-    label: "Terms of Service",
-    href: "/terms-of-service",
-  },
-  {
-    label: "Privacy Policy",
-    href: "/privacy-policy",
-  },
+const legal = [
+  { label: "Terms of Service", href: "/terms-of-service" },
+  { label: "Privacy Policy", href: "/privacy-policy" },
 ];
 
-const variants = {
-  initial: {
-    opacity: 0,
-    rotateX: 90,
-    translateY: 80,
-    translateX: -20,
-  },
-  enter: (index: number) => ({
-    opacity: 1,
-    rotateX: 0,
-    translateY: 0,
-    translateX: 0,
-    transition: {
-      duration: 0.65,
-      delay: 0.5 + index * 0.1,
-      ease: [0.215, 0.61, 0.355, 1] as const,
-    },
-  }),
-  exit: {
-    opacity: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.76, 0, 0.24, 1],
-    },
-  },
-} as const;
-
 export default function Nav({ onNavigate }: { onNavigate: () => void }) {
+  const pathname = usePathname();
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <nav className={styles.nav}>
-      <div className={styles.pages}>
-        {pages.map((e, index) => (
-          <div key={e.label} className={styles.page_link_container}>
-            <motion.div
-              key={e.label}
-              custom={index}
-              variants={variants}
-              initial="initial"
-              animate="enter"
-              exit="exit"
-            >
+    <motion.div
+      key="site-menu"
+      id="site-menu"
+      className={styles.nav}
+      variants={panelVariants}
+      initial={shouldReduceMotion ? false : "initial"}
+      animate="enter"
+      exit={shouldReduceMotion ? undefined : "exit"}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Site menu"
+    >
+      <div className={styles.stage}>
+        <nav className={styles.pages} aria-label="Primary">
+          {pages.map((page, index) => {
+            const isCurrent =
+              page.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(page.href);
+
+            return (
+              <motion.div
+                key={page.label}
+                className={`${styles.page} ${isCurrent ? styles.page_current : ""}`}
+                custom={index}
+                variants={linkVariants}
+              >
+                <Link
+                  href={page.href}
+                  className={styles.page_link}
+                  onClick={onNavigate}
+                  aria-current={isCurrent ? "page" : undefined}
+                >
+                  {page.label}
+                </Link>
+              </motion.div>
+            );
+          })}
+        </nav>
+
+        <motion.footer
+          className={styles.footer}
+          custom={0.58}
+          variants={fadeUpVariants}
+        >
+          <div className={styles.accordions}>
+            {socials.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                className={styles.accordion}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className={styles.accordion_label}>{social.label}</span>
+                <span className={styles.accordion_mark} aria-hidden>
+                  ↗
+                </span>
+              </a>
+            ))}
+          </div>
+          <div className={styles.legal}>
+            {legal.map((item) => (
               <Link
-                href={e.href}
-                className={styles.page_link}
+                key={item.label}
+                href={item.href}
+                className={styles.legal_link}
                 onClick={onNavigate}
               >
-                {e.label}
+                {item.label}
               </Link>
-            </motion.div>
+            ))}
           </div>
-        ))}
+        </motion.footer>
       </div>
-
-      <div className={styles.socials}>
-        {socials.map((e, index) => (
-          <motion.div
-            key={e.label}
-            custom={index}
-            variants={variants}
-            initial="initial"
-            animate="enter"
-            exit="exit"
-          >
-            <Link href={e.href} className={styles.social_link}>
-              {e.label}
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-
-      <footer className={styles.footer}>
-        {footer.map((e, index) => (
-          <motion.div
-            key={e.label}
-            custom={index}
-            variants={variants}
-            initial="initial"
-            animate="enter"
-            exit="exit"
-          >
-            <Link href={e.href} className={styles.footer_link}>
-              {e.label}
-            </Link>
-          </motion.div>
-        ))}
-      </footer>
-    </nav>
+    </motion.div>
   );
 }

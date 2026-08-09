@@ -1,116 +1,230 @@
 .nav {
-  padding: 30px 60px;
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 78% 42%,
+      color-mix(in srgb, var(--color-white) 6%, transparent),
+      transparent 34%
+    ),
+    var(--color-black);
+  isolation: isolate;
+}
+
+.stage {
+  position: relative;
+  width: min(100%, 1100px);
+  max-width: 100%;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 116px 28px 36px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  gap: 70px;
+  justify-content: center;
+  gap: clamp(56px, 8vh, 96px);
+  text-align: center;
+}
 
-  .separator {
-    width: 100%;
-    height: 1px;
-    margin: 20px 0;
-    background-color: var(--color-white);
-    opacity: 0.1;
+.pages {
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.4vh, 16px);
+}
+
+.page {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.page_link {
+  display: inline-block;
+  font-family: var(--font-big-shoulders);
+  font-weight: 900;
+  font-size: clamp(4rem, 10vw, 7.75rem);
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  opacity: 0.32;
+  transition:
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    letter-spacing 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    transform: translateY(-3px);
+    letter-spacing: -0.01em;
+    outline: none;
   }
+}
 
-  .pages {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 12px;
+.page_current .page_link {
+  opacity: 1;
+}
 
-    .page_link_container {
-      position: relative;
-      perspective: 120px;
-      perspective-origin: bottom;
+.footer {
+  width: min(100%, 440px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
 
-      .page_link {
-        font-family: var(--font-big-shoulders);
-        font-weight: 900;
-        font-size: 48px;
-        text-transform: uppercase;
-        color: var(--color-white);
-        opacity: 0.5;
-        transition: opacity 0.3s ease-in-out;
+.accordions {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  gap: 1px;
+}
 
-        &:hover {
-          opacity: 1;
-        }
-      }
+.accordion {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  background: color-mix(in srgb, var(--color-white) 8%, transparent);
+  color: var(--color-white);
+  text-decoration: none;
+  transition:
+    flex-grow 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.35s ease;
+
+  &:hover,
+  &:focus-visible {
+    flex-grow: 2.4;
+    background: var(--color-white);
+    outline: none;
+
+    .accordion_label {
+      color: var(--color-black);
+      opacity: 1;
     }
-  }
 
-  .socials {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 50px;
-
-    .social_link {
-      font-family: var(--font-inter);
-      font-size: 12px;
-      color: var(--color-white);
-      opacity: 0.5;
-      transition: opacity 0.3s ease-in-out;
-
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
-
-  .footer {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 60px;
-
-    .footer_link {
-      font-family: var(--font-inter);
-      font-size: 12px;
-      color: var(--color-white);
-      opacity: 0.5;
-      transition: opacity 0.3s ease-in-out;
-
-      &:hover {
-        opacity: 1;
-      }
+    .accordion_mark {
+      color: var(--color-black);
+      transform: translate(0, 0);
+      opacity: 1;
     }
   }
 }
 
-@media (width < 530px) {
-  .nav {
-    padding: 30px 40px;
+.accordion_label {
+  font-family: var(--font-big-shoulders);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-white);
+  opacity: 0.7;
+  white-space: nowrap;
+  transition:
+    color 0.35s ease,
+    opacity 0.35s ease;
+}
 
-    .pages {
-      .page_link_container {
-        .page_link {
-          gap: 16px;
-          font-size: 42px;
+.accordion_mark {
+  position: absolute;
+  right: 18px;
+  font-family: var(--font-inter);
+  font-size: 14px;
+  color: var(--color-white);
+  transform: translate(-6px, 6px);
+  opacity: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s ease,
+    color 0.35s ease;
+}
 
-          .number {
-            width: 42px;
-          }
-        }
-      }
-    }
+.legal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
 
-    .socials {
-      width: 100%;
-      justify-content: space-between;
-      gap: 0;
-    }
+.legal_link {
+  font-family: var(--font-inter);
+  font-size: 12px;
+  color: color-mix(in srgb, var(--color-white) 48%, transparent);
+  transition: color 0.3s ease;
 
-    .footer {
-      width: 100%;
-      justify-content: space-between;
-      gap: 0;
-    }
+  &:hover,
+  &:focus-visible {
+    color: var(--color-white);
+    outline: none;
+  }
+}
+
+@media (width < 900px) {
+  .stage {
+    padding-top: 104px;
+  }
+
+  .page_link {
+    font-size: clamp(4rem, 12vw, 7rem);
+  }
+}
+
+@media (width < 700px) {
+  .stage {
+    min-height: 100svh;
+    padding: 96px 20px 28px;
+    gap: clamp(44px, 6vh, 64px);
+  }
+
+  .page_link {
+    font-size: clamp(3.4rem, 17vw, 5.4rem);
+  }
+
+  .footer {
+    width: 100%;
+    gap: 24px;
+  }
+
+  .accordions {
+    width: 100%;
+    height: 48px;
+  }
+}
+
+@media (width < 420px) {
+  .stage {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .page_link {
+    min-height: 70px;
+    font-size: clamp(3rem, 16vw, 4.25rem);
+  }
+
+  .accordion {
+    padding: 0 14px;
+  }
+
+  .accordion_mark {
+    right: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page_link,
+  .accordion,
+  .accordion_label,
+  .accordion_mark {
+    transition-duration: 0.01ms;
   }
 }

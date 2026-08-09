@@ -70,7 +70,10 @@ export default function Header({
         </motion.div>
       </div>
       {filters ? (
-        <motion.div variants={reduce ? undefined : itemVariants}>
+        <motion.div
+          className={styles.filters}
+          variants={reduce ? undefined : itemVariants}
+        >
           {filters}
         </motion.div>
       ) : null}

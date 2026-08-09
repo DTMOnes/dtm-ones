@@ -1,44 +1,108 @@
 "use client";
 
-// Next
-import Image from "next/image";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
+import { AnimatePresence } from "motion/react";
 
-// React
-import { useState } from "react";
-
-// Motion
-import { motion, AnimatePresence } from "motion/react";
-
-// Styles
 import styles from "./styles.module.scss";
-
-// Components
 import Button from "./Button";
 import Nav from "../Nav";
 
-const buttonVariants = {
-  initial: {
-    opacity: 0.5,
-  },
-  hover: {
-    opacity: 1,
-  },
-  tap: {
-    opacity: 1,
-    scale: 0.8,
-  },
-} as const;
+const subscribeToClient = () => () => {};
 
 export default function Menu() {
-  const [isActive, setIsActive] = useState(false);
+  const pathname = usePathname();
+  const [openPathname, setOpenPathname] = useState<string | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const mounted = useSyncExternalStore(
+    subscribeToClient,
+    () => true,
+    () => false,
+  );
+  const isActive = openPathname === pathname;
+
+  useEffect(() => {
+    if (isActive) {
+      document.documentElement.dataset.menuOpen = "true";
+    } else {
+      delete document.documentElement.dataset.menuOpen;
+    }
+
+    return () => {
+      delete document.documentElement.dataset.menuOpen;
+    };
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!isActive) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const menuButton = buttonRef.current;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenPathname(null);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const menuLinks = Array.from(
+        document.querySelectorAll<HTMLElement>("#site-menu a[href]"),
+      );
+      const focusableElements = menuButton
+        ? [...menuLinks, menuButton]
+        : menuLinks;
+
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement?.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement?.focus();
+      }
+    };
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>("#site-menu a[href]")?.focus();
+    });
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      menuButton?.focus();
+    };
+  }, [isActive]);
 
   return (
-    <motion.div className={styles.container}>
-      <Button isActive={isActive} onClick={() => setIsActive(!isActive)} />
-
-      <AnimatePresence>
-        {/*isActive && <Nav onNavigate={() => setIsActive(false)} />*/}
-      </AnimatePresence>
-    </motion.div>
+    <div className={styles.container}>
+      <Button
+        isActive={isActive}
+        onClick={() =>
+          setOpenPathname((open) => (open === pathname ? null : pathname))
+        }
+        buttonRef={buttonRef}
+      />
+      {mounted
+        ? createPortal(
+            <AnimatePresence mode="wait">
+              {isActive ? (
+                <Nav onNavigate={() => setOpenPathname(null)} />
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
+    </div>
   );
 }

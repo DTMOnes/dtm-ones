@@ -63,7 +63,7 @@ export default function ContactForm() {
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
       <fieldset className={styles.fieldset}>
-        <legend className={styles.visuallyHidden}>I am a</legend>
+        <legend className={styles.visuallyHidden}>Inquiry type</legend>
         <div className={styles.options}>
           <label className={styles.option} htmlFor="contact-type-player">
             <input
@@ -93,44 +93,48 @@ export default function ContactForm() {
         ) : null}
       </fieldset>
 
-      <label className={styles.field}>
-        <span className={styles.label}>Email</span>
-        <input
-          type="email"
-          placeholder="you@email.com"
-          aria-invalid={!!errors.email}
-          disabled={isSubmitting}
-          {...register("email")}
-          className={styles.input}
-        />
-        {errors.email?.message ? (
-          <p className={styles.error} role="alert">
-            {errors.email.message}
-          </p>
-        ) : null}
-      </label>
+      <div className={styles.row}>
+        <label className={styles.field}>
+          <span className={styles.label}>Email</span>
+          <input
+            type="email"
+            placeholder="you@email.com"
+            autoComplete="email"
+            aria-invalid={!!errors.email}
+            disabled={isSubmitting}
+            {...register("email")}
+            className={styles.input}
+          />
+          {errors.email?.message ? (
+            <p className={styles.error} role="alert">
+              {errors.email.message}
+            </p>
+          ) : null}
+        </label>
 
-      <label className={styles.field}>
-        <span className={styles.label}>Phone</span>
-        <input
-          type="tel"
-          placeholder="Your phone number"
-          aria-invalid={!!errors.phone}
-          disabled={isSubmitting}
-          {...register("phone")}
-          className={styles.input}
-        />
-        {errors.phone?.message ? (
-          <p className={styles.error} role="alert">
-            {errors.phone.message}
-          </p>
-        ) : null}
-      </label>
+        <label className={styles.field}>
+          <span className={styles.label}>Phone</span>
+          <input
+            type="tel"
+            placeholder="+1 555 000 0000"
+            autoComplete="tel"
+            aria-invalid={!!errors.phone}
+            disabled={isSubmitting}
+            {...register("phone")}
+            className={styles.input}
+          />
+          {errors.phone?.message ? (
+            <p className={styles.error} role="alert">
+              {errors.phone.message}
+            </p>
+          ) : null}
+        </label>
+      </div>
 
       <label className={styles.field}>
         <span className={styles.label}>Message</span>
         <textarea
-          placeholder="How can we help you?"
+          placeholder="Tell us what you need"
           rows={5}
           aria-invalid={!!errors.message}
           disabled={isSubmitting}
@@ -144,20 +148,22 @@ export default function ContactForm() {
         ) : null}
       </label>
 
-      <button type="submit" disabled={isSubmitting} className={styles.button}>
-        {isSubmitting ? "Sending…" : "Send message"}
-      </button>
+      <div className={styles.actions}>
+        <button type="submit" disabled={isSubmitting} className={styles.button}>
+          {isSubmitting ? "Sending…" : "Send message"}
+        </button>
 
-      {submitError ? (
-        <p className={styles.error} role="alert">
-          {submitError}
-        </p>
-      ) : null}
-      {submitMessage ? (
-        <p className={styles.success} role="status">
-          {submitMessage}
-        </p>
-      ) : null}
+        {submitError ? (
+          <p className={styles.error} role="alert">
+            {submitError}
+          </p>
+        ) : null}
+        {submitMessage ? (
+          <p className={styles.success} role="status">
+            {submitMessage}
+          </p>
+        ) : null}
+      </div>
     </form>
   );
 }
