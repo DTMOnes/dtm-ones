@@ -38,7 +38,7 @@ function EmptyState() {
   return (
     <motion.div
       className={styles.empty}
-      initial={reduce ? false : { opacity: 0, y: 18 }}
+      initial={reduce ? false : { opacity: 1, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: easeOut }}
     >

@@ -19,17 +19,17 @@ const easeOut = [0.16, 1, 0.3, 1] as const;
 
 const cardVariants: Variants = {
   initial: {
-    opacity: 0,
-    y: 36,
-    scale: 0.94,
+    opacity: 1,
+    y: 20,
+    scale: 0.98,
   },
   enter: (index: number) => ({
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.7,
-      delay: 0.18 + Math.min(index, 11) * 0.055,
+      duration: 0.55,
+      delay: Math.min(index, 11) * 0.04,
       ease: easeOut,
     },
   }),
@@ -45,25 +45,25 @@ const cardVariants: Variants = {
 };
 
 const mediaVariants: Variants = {
-  initial: { scale: 1.14 },
+  initial: { scale: 1.06 },
   enter: (index: number) => ({
     scale: 1,
     transition: {
-      duration: 1.05,
-      delay: 0.18 + Math.min(index, 11) * 0.055,
+      duration: 0.85,
+      delay: Math.min(index, 11) * 0.04,
       ease: easeOut,
     },
   }),
 };
 
 const infoVariants: Variants = {
-  initial: { opacity: 0, y: 14 },
+  initial: { opacity: 1, y: 10 },
   enter: (index: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.55,
-      delay: 0.32 + Math.min(index, 11) * 0.055,
+      duration: 0.45,
+      delay: 0.06 + Math.min(index, 11) * 0.04,
       ease: easeOut,
     },
   }),
