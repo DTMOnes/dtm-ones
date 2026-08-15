@@ -49,6 +49,20 @@ Read in this exact order before any implementation:
 - `/remember save` — when a feature spans multiple sessions.
 - `/remember restore` — when returning after a multi-session feature.
 
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `FrancoLedArg/dtm-ones` via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical roles, same strings: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
+
 # InsForge SDK Documentation - Overview
 
 ## What is InsForge?

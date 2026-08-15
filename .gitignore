@@ -83,7 +83,6 @@ Desktop.ini
 .cursor
 .agents/**
 skills-lock.json
-docs/
 
 # InsForge & AI agent skills
 .insforge
@@ -99,5 +98,3 @@ docs/
 .roo
 .trae
 .windsurf
-
-docs
