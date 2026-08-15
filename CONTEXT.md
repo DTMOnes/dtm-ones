@@ -1,0 +1,50 @@
+# DTM Ones
+
+A basketball agency that represents Clients. The Roster is the public Clients. Users maintain Clients and inbound ContactRequests from a dashboard.
+
+## Language
+
+### Staff
+
+**User**:
+A person who signs in to the dashboard. A User is either an Owner or a Staff member. A User is not a Client.
+_Avoid_: Admin (as a type of person), account, operator, Client
+
+**Owner**:
+A User who can create other Users, change their role, and delete them.
+_Avoid_: Admin, superuser
+
+**Staff**:
+A User who can manage Clients and ContactRequests and cannot manage Users.
+
+### Roster
+
+**Client**:
+A Player or a Coach the agency represents. A Client is not a User. A Client is exactly one of Player or Coach; the same human doing both is two Clients. A Client has a Visibility.
+_Avoid_: User, talent, represented being, super-entity
+
+**Visibility**:
+Whether a Client is on the Roster. Public means on the Roster. Private means not on the Roster. A Client may be public only when that kind’s profile is complete. Visibility is not a document-draft workflow.
+_Avoid_: draft, published, GitHub
+
+**Roster**:
+The public Clients. A private Client is still a Client, not on the Roster.
+_Avoid_: team, catalog, all Clients, the database of Clients
+
+**Player**:
+A basketball player the agency represents. A Player is a Client, is not a User, does not sign in, and is not a Coach. A Player has at most one Category. A public Player has a complete profile: name, Category, presentation image, height, nationality, and last club. Gallery and videos may be empty.
+_Avoid_: User, account, athlete-as-login, Coach-as-Player
+
+**Coach**:
+A basketball coach the agency represents. A Coach is a Client, is not a Player, is not a User, and does not share a Player’s attributes (height and Category are Player facts). A public Coach has a complete profile: name, nationality, and last club.
+_Avoid_: Player, Player tagged “Coaches”
+
+**Category**:
+A Player’s position on the court. Staff create and rename Categories. A Category cannot be deleted while any Player has it. A Coach does not have a Category.
+_Avoid_: Youths, Coaches-as-Category, tag, filter-bucket, age group, closed position enum
+
+### Inquiries
+
+**ContactRequest**:
+An inbound message from the public contact form, classified by why it was sent, not by who sent it. The two reasons are seeking representation and looking for a player. “Looking for a player” is the hiring reason; it is not a Player record and is not about a specific Client.
+_Avoid_: Contact, lead, ticket, Recruiter (as a person we store), Player (as the sender)
