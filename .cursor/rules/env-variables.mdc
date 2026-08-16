@@ -1,0 +1,30 @@
+---
+description: t3-env per consumer in this Turborepo. Use when adding, reading, or validating environment variables, or when editing env.ts, turbo.json, or .env.example.
+alwaysApply: true
+---
+
+# Environment variables
+
+Three layers: **load** (root `.env*` via each app’s `next.config` `loadEnvConfig`, drizzle/tests via `dotenv`), **cache** (`turbo.json` `globalEnv` or task `env`), **validate** (t3-env).
+
+## Schemas
+
+| Consumer | File | Adapter |
+|---|---|---|
+| `@dtm/database` | `packages/database/src/env.ts` | `@t3-oss/env-core` |
+| Dashboard | `apps/dashboard/src/config/env.ts` | `@t3-oss/env-nextjs`, `extends: [databaseEnv]` |
+| Landing | `apps/landing/src/config/env.ts` | `@t3-oss/env-nextjs`, `extends: [databaseEnv]` |
+
+Colocate a preset with the package that **reads** the var. Apps `extends` that preset. Do not add a catch-all `packages/env`.
+
+## Adding a variable
+
+1. Put the Zod schema on the owning consumer (the package if shared runtime, otherwise the one app).
+2. Package-owned: export from that package (`@dtm/database/env`) and `extends: [thatEnv]` in each app that needs it.
+3. Document it in root `.env.example`.
+4. List it in `turbo.json` `globalEnv` (all tasks) or the task’s `env` (one task).
+5. Read `env.NAME` in app/package code. Use `process.env` only in `runtimeEnv` / `experimental__runtimeEnv`, drizzle-kit, and scripts that run before Next.
+
+`experimental__runtimeEnv` lists **client** (`NEXT_PUBLIC_*`) keys only.
+
+Landing does not validate dashboard secrets (`BETTER_AUTH_*`, `INSFORGE_JWT_SECRET`). `SKIP_ENV_VALIDATION=true` is CI-only.

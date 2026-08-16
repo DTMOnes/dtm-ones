@@ -247,12 +247,18 @@ importers:
       '@neondatabase/serverless':
         specifier: ^1.0.2
         version: 1.1.0
+      '@t3-oss/env-core':
+        specifier: ^0.13.10
+        version: 0.13.11(typescript@5.9.3)(zod@4.1.12)
       dotenv:
         specifier: ^17.2.1
         version: 17.2.3
       drizzle-orm:
         specifier: ^0.44.6
         version: 0.44.7(@neondatabase/serverless@1.1.0)(@types/pg@8.20.0)(kysely@0.28.17)(pg@8.22.0)
+      zod:
+        specifier: 4.1.12
+        version: 4.1.12
     devDependencies:
       '@dtm/typescript-config':
         specifier: workspace:*

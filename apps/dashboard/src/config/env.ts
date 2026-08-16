@@ -1,7 +1,9 @@
+import { env as databaseEnv } from "@dtm/database/env";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 export const env = createEnv({
+  extends: [databaseEnv],
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
     /**
@@ -9,7 +11,6 @@ export const env = createEnv({
      * Not required in `.env` — defaults locally.
      */
     API_URL: z.url().default("http://localhost:8000"),
-    DATABASE_URL: z.string().min(1),
     BETTER_AUTH_SECRET: z.string().min(1),
     BETTER_AUTH_URL: z.url(),
     INSFORGE_JWT_SECRET: z.string().min(1),

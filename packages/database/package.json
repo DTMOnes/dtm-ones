@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./env": "./src/env.ts"
   },
   "scripts": {
     "db:push": "drizzle-kit push",
@@ -13,8 +14,10 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "@t3-oss/env-core": "^0.13.10",
     "dotenv": "^17.2.1",
-    "drizzle-orm": "^0.44.6"
+    "drizzle-orm": "^0.44.6",
+    "zod": "4.1.12"
   },
   "devDependencies": {
     "@dtm/typescript-config": "workspace:*",

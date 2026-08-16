@@ -39,6 +39,7 @@ Read in this exact order before any implementation:
 - Dashboard staff identity is Better Auth on InsForge Postgres (`better_auth` schema) with an HS256 `/api/insforge-token` bridge for InsForge SDK and RLS. App roles come from `public.users.role` (`owner` / `staff`). Do not use InsForge Auth SSR cookies for dashboard login.
 - Owner Users admin ops use Better Auth `auth.api` (`createUser`, `setRole`, `removeUser`) on the server with the acting Owner session headers; keep plugin role `admin`/`user` aligned with app `owner`/`staff`. Do not add an InsForge `admin-users` edge function for this.
 - Dashboard `next.config` allows `https://*.insforge.app/api/storage/**` for Next.js `Image` on player media URLs
+- Environment variables: t3-env per consumer, package presets via `extends`. Follow `.cursor/rules/env-variables.mdc` when adding or reading env vars.
 
 ## Available Skills
 
