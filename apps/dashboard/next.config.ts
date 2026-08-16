@@ -7,6 +7,7 @@ import path from "node:path";
 loadEnvConfig(path.resolve(__dirname, "../.."), undefined, undefined, true);
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@dtm/database"],
   images: {
     remotePatterns: [
       {

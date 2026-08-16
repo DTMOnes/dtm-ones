@@ -13,6 +13,7 @@
     "db:seed": "tsx src/scripts/seed-better-auth-owner.ts"
   },
   "dependencies": {
+    "@dtm/database": "workspace:*",
     "@base-ui/react": "^1.1.0",
     "@hookform/resolvers": "^5.2.2",
     "@insforge/sdk": "^1.4.4",

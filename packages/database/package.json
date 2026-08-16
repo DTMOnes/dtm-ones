@@ -1,0 +1,26 @@
+{
+  "name": "@dtm/database",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "db:push": "drizzle-kit push",
+    "test": "node --import tsx --test src/domain.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.6"
+  },
+  "devDependencies": {
+    "@dtm/typescript-config": "workspace:*",
+    "@types/node": "^20",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}
