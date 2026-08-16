@@ -20,6 +20,7 @@ export const clients = pgTable(
     name: text("name").notNull(),
     nationality: text("nationality").notNull(),
     lastClub: text("last_club").notNull(),
+    eurobasketLink: text("eurobasket_link"),
     visibility: clientVisibility("visibility").notNull().default("private"),
     trashedAt: timestamp("trashed_at", { withTimezone: true }),
     heightCm: integer("height_cm"),

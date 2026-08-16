@@ -1,1 +1,1 @@
-export { createDatabase, createDomain, schema } from "@dtm/database";
+export { createDatabase, schema } from "@dtm/database";

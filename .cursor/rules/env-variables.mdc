@@ -11,7 +11,7 @@ Three layers: **load** (root `.env*` via each app’s `next.config` `loadEnvConf
 
 | Consumer | File | Adapter |
 |---|---|---|
-| `@dtm/database` | `packages/database/src/env.ts` | `@t3-oss/env-core` |
+| `@dtm/database` | `packages/database/src/config/env.ts` | `@t3-oss/env-core` |
 | Dashboard | `apps/dashboard/src/config/env.ts` | `@t3-oss/env-nextjs`, `extends: [databaseEnv]` |
 | Landing | `apps/landing/src/config/env.ts` | `@t3-oss/env-nextjs`, `extends: [databaseEnv]` |
 

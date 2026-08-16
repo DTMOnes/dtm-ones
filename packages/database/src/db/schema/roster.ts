@@ -11,6 +11,7 @@ export const roster = pgView("roster").as((qb) =>
       name: clients.name,
       nationality: clients.nationality,
       lastClub: clients.lastClub,
+      eurobasketLink: clients.eurobasketLink,
       visibility: clients.visibility,
       heightCm: clients.heightCm,
       categoryId: clients.categoryId,
