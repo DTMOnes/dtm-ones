@@ -11,11 +11,11 @@ A person who signs in to the dashboard. A User is either an Owner or a Staff mem
 _Avoid_: Admin (as a type of person), account, operator, Client
 
 **Owner**:
-A User who can create other Users, change their role, and delete them.
+A User who can do everything Staff can, and can create other Users, change their role, and delete them.
 _Avoid_: Admin, superuser
 
 **Staff**:
-A User who can manage Clients and ContactRequests and cannot manage Users.
+A User who can manage Clients and ContactRequests and cannot manage Users. Managing Clients includes removing them to the Trash, restoring them, and deleting them from the Trash.
 
 ### Roster
 
@@ -36,8 +36,12 @@ A basketball player the agency represents. A Player is a Client, is not a User, 
 _Avoid_: User, account, athlete-as-login, Coach-as-Player
 
 **Coach**:
-A basketball coach the agency represents. A Coach is a Client, is not a Player, is not a User, and does not share a Player’s attributes (height and Category are Player facts). A public Coach has a complete profile: name, nationality, and last club.
+A basketball coach the agency represents. A Coach is a Client, is not a Player, is not a User, and does not share a Player’s attributes (height, Category, presentation image, gallery, and videos are Player facts). A public Coach has a complete profile: name, nationality, and last club.
 _Avoid_: Player, Player tagged “Coaches”
+
+**Trash**:
+Clients that Staff or an Owner have removed. A Client in the Trash is not on the Roster and is not listed with the other Clients. Restoring a Client keeps its Visibility; public means it returns to the Roster. Deleting from the Trash destroys the Client. The Trash holds only Clients.
+_Avoid_: Bucket, recycle bin, archive, trash bin, ContactRequest
 
 **Category**:
 A Player’s position on the court. Staff create and rename Categories. A Category cannot be deleted while any Player has it. A Coach does not have a Category.
