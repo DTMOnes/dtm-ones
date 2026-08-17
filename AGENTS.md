@@ -31,11 +31,12 @@ Decisions live in `docs/adr/`. Follow them for new work.
 - Two Next.js apps, one `@dtm/database` package (ADR 0004). Landing is the public Roster and ContactRequest form. Dashboard is Users and Staff work.
 - Neon Postgres and Vercel Blob. Leave InsForge (ADR 0002). Do not add InsForge tables, storage, Auth, or the JWT bridge. Remaining InsForge calls are cutover tickets.
 - `@dtm/database` holds the Drizzle schema and `createDatabase(connectionString)`. Apps own the connection. drizzle-kit lives in that package (ADR 0003, 0007).
-- Better Auth stays on the dashboard, Drizzle adapter, `public.users.role` `owner` / `staff` (ADR 0001, 0007).
-- Server Actions use next-safe-action (ADR 0011). Contacts, Categories, Clients, and Users load on the server and mutate via Server Actions.
+- Better Auth stays on the dashboard, Drizzle adapter. A User is a Better Auth user with role `owner` or `staff` (ADR 0001, 0007). There is no `public.users` table.
+- Server Actions use next-safe-action (ADR 0011). Throw `AppError` (or let libraries throw); `handleServerError` logs and shapes. Follow `.cursor/rules/next-safe-action.mdc`.
 - Staff upload Player images to Vercel Blob (ADR 0008).
 - Environment variables: t3-env per consumer, package presets via `extends`. Follow `.cursor/rules/env-variables.mdc`.
 - `page.tsx` exports only `Page`. Follow `.cursor/rules/nextjs-page-structure.mdc`.
+- App folders: libraries in `lib`, helpers in `utils`, config in `config`. Follow `.cursor/rules/nextjs-app-folders.mdc`.
 - Use existing CSS theme tokens for color.
 
 ## Skills

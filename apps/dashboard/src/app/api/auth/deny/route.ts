@@ -10,7 +10,7 @@ const BETTER_AUTH_COOKIES = [
 ] as const;
 
 /**
- * Clears a Better Auth session that has no public.users role, then sends
+ * Clears a Better Auth session that is not an Owner or Staff User, then sends
  * the browser to /signin with a denial flag. Used because Server Component
  * layouts cannot modify cookies.
  */

@@ -30,8 +30,6 @@ export const contactRequestStatus = pgEnum("contact_request_status", [
   "archived",
 ]);
 
-export const userRole = pgEnum("user_role", ["owner", "staff"]);
-
 export const categories = pgTable(
   "categories",
   {
@@ -231,18 +229,4 @@ export const verification = betterAuthSchema.table("verification", {
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
-});
-
-export const users = pgTable("users", {
-  id: text("id")
-    .primaryKey()
-    .references(() => user.id, { onDelete: "cascade" }),
-  email: text("email").notNull().unique(),
-  role: userRole("role").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
 });

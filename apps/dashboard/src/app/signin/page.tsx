@@ -3,17 +3,15 @@ import { redirect } from "next/navigation";
 import { SignInForm } from "@/components/auth/signin-form";
 import { getSession } from "@/utils/auth/get-session";
 
-export default async function SignInPage({
+export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ denied?: string; next?: string }>;
 }) {
   const params = await searchParams;
   const denied = params.denied === "1";
-
-  // Full role session (not cookie alone). Keeps AC-1 after proxy stopped
-  // bouncing cookie holders away from /signin.
   const session = await getSession();
+
   if (session && !denied) {
     const nextPath = params.next;
     if (nextPath?.startsWith("/") && !nextPath.startsWith("//")) {

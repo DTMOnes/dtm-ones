@@ -20,7 +20,7 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { roleLabel } from "@/lib/users/roles";
+import { roleLabel } from "@/utils/auth/roles";
 import type { DashboardUserRow } from "@/types/user";
 
 type UsersListViewProps = {

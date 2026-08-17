@@ -10,9 +10,8 @@ export async function proxy(request: NextRequest) {
   const signin = isSigninRoute(pathname);
 
   // Cookie presence only gates protected routes. Do not send cookie holders
-  // away from /signin here: a cookie can exist without a public.users role
-  // (or after the DB session was cleared). That bounce fights the dashboard
-  // layout and loops. Signed in Owner/Staff leave /signin via getSession.
+  // away from /signin here: a cookie can exist after the DB session was
+  // cleared. Signed in Owner/Staff leave /signin via getSession.
   const sessionCookie = getSessionCookie(request);
   const hasSessionCookie = Boolean(sessionCookie);
 

@@ -1,138 +1,46 @@
 "use server";
 
-import { APIError } from "better-auth/api";
 import { headers } from "next/headers";
-import { z } from "zod";
 
-import {
-  INVALID_CREDENTIALS,
-  NOT_AUTHORIZED,
-  type ActionResult,
-} from "@/lib/action-result";
 import { auth } from "@/lib/auth";
-import type { SignInSuccess, SignOutSuccess } from "@/lib/auth/types";
-import { createInsforgeServerWithUserId } from "@/lib/insforge-server";
+import { actionClient } from "@/lib/safe-action";
 import { signInSchema } from "@/lib/validation/auth";
+import { getSession } from "@/utils/auth/get-session";
+import { ConflictError } from "@/utils/errors";
 
-const SIGN_IN_UNAVAILABLE_MESSAGE =
-  "Sign in is temporarily unavailable. Please try again in a moment.";
+export const signInAction = actionClient
+  .metadata({ actionName: "signIn" })
+  .inputSchema(signInSchema)
+  .action(async ({ parsedInput }) => {
+    const session = await getSession();
+    if (session) {
+      throw new ConflictError("Already signed in.");
+    }
 
-const SIGN_OUT_UNAVAILABLE_MESSAGE =
-  "Sign out could not be confirmed. Please sign in again if needed.";
-
-const roleSchema = z.enum(["owner", "staff"]);
-
-async function cleanupSignInSession(): Promise<void> {
-  try {
-    await auth.api.signOut({
-      headers: await headers(),
-    });
-  } catch (cleanupError) {
-    console.error("[signIn]", cleanupError);
-  }
-}
-
-export async function signInAction(input: {
-  email: string;
-  password: string;
-}): Promise<ActionResult<SignInSuccess>> {
-  const parsed = signInSchema.safeParse(input);
-  if (!parsed.success) {
-    return {
-      data: null,
-      error: {
-        message:
-          "Sign in could not be validated. Please check your details and try again.",
-      },
-    };
-  }
-
-  try {
     const signedIn = await auth.api.signInEmail({
       body: {
-        email: parsed.data.email,
-        password: parsed.data.password,
+        email: parsedInput.email,
+        password: parsedInput.password,
       },
       headers: await headers(),
     });
 
-    const authUser = signedIn.user;
-    if (!authUser?.id || !authUser.email) {
-      console.error("[signIn]", "Better Auth sign in returned no user");
-      return {
-        data: null,
-        error: { message: SIGN_IN_UNAVAILABLE_MESSAGE },
-      };
-    }
-
-    // Use the signed-in user id directly. Do not wait for cookie round trip.
-    const insforge = createInsforgeServerWithUserId(authUser.id);
-    const { data, error } = await insforge.database
-      .from("users")
-      .select("id, email, role")
-      .eq("id", authUser.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("[signIn]", error);
-      await cleanupSignInSession();
-      return {
-        data: null,
-        error: { message: SIGN_IN_UNAVAILABLE_MESSAGE },
-      };
-    }
-
-    const role = roleSchema.safeParse(data?.role);
-    if (!data || !role.success) {
-      await cleanupSignInSession();
-      return {
-        data: null,
-        error: { message: NOT_AUTHORIZED },
-      };
-    }
-
     return {
-      data: {
-        ok: true,
-        user: {
-          id: data.id,
-          email: data.email,
-          role: role.data,
-        },
+      ok: true as const,
+      user: {
+        id: signedIn.user.id,
+        email: signedIn.user.email,
+        role: signedIn.user.role,
       },
-      error: null,
     };
-  } catch (error) {
-    if (error instanceof APIError) {
-      const status = error.statusCode ?? error.status;
-      if (status === 401 || status === 403) {
-        return {
-          data: null,
-          error: { message: INVALID_CREDENTIALS },
-        };
-      }
-    }
+  });
 
-    console.error("[signIn]", error);
-    return {
-      data: null,
-      error: { message: SIGN_IN_UNAVAILABLE_MESSAGE },
-    };
-  }
-}
-
-export async function signOutAction(): Promise<ActionResult<SignOutSuccess>> {
-  try {
+export const signOutAction = actionClient
+  .metadata({ actionName: "signOut" })
+  .action(async () => {
     await auth.api.signOut({
       headers: await headers(),
     });
-  } catch (error) {
-    console.error("[signOut]", error);
-    return {
-      data: null,
-      error: { message: SIGN_OUT_UNAVAILABLE_MESSAGE },
-    };
-  }
 
-  return { data: { ok: true }, error: null };
-}
+    return { ok: true as const };
+  });

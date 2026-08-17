@@ -1,0 +1,51 @@
+---
+description: Next.js app folder layout — lib, utils, config, components, hooks
+globs: apps/*/src/**
+alwaysApply: false
+---
+
+# Next.js app folders
+
+Dashboard and landing share this `src/` layout. New files go in the matching folder.
+
+| Folder | Holds |
+| --- | --- |
+| `app/` | App Router — pages, layouts, route handlers |
+| `components/` | UI |
+| `hooks/` | React hooks |
+| `config/` | Env and app config |
+| `lib/` | Wrappers around libraries (Drizzle, Better Auth, third-party SDKs) |
+| `utils/` | Helper functions we wrote |
+| `actions/` | Server Actions |
+| `types/` | Shared TS types that are not a library's |
+
+## lib vs utils
+
+`lib/` is the seam onto a library. `utils/` is ours.
+
+- `lib/db/index.ts` — the app's Drizzle connection (`export const db`)
+- `lib/auth/` — Better Auth server (`index.ts`) and client (`client.ts`)
+- `lib/safe-action/` — next-safe-action clients (`actionClient`, `staffActionClient`, `ownerActionClient`)
+- `utils/auth/` — session lookup, Owner/Staff gates, role labels
+
+shadcn CLI writes `cn` to `lib/utils.ts`. Leave that path so `shadcn add` keeps working.
+
+```ts
+// lib/db/index.ts
+import { createDatabase } from "@dtm/database";
+import { env } from "@/config/env";
+
+export const db = createDatabase(env.DATABASE_URL);
+```
+
+```ts
+// ✅
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { ownerActionClient } from "@/lib/safe-action";
+import { getSession } from "@/utils/auth/get-session";
+
+// ❌ app connection re-exported as a factory; session helpers parked in lib/
+import { createDatabase } from "@/lib/database";
+import { getSession } from "@/lib/require-staff";
+```
