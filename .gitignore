@@ -79,13 +79,6 @@ Desktop.ini
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# cursor / agent tooling (keep shared project rules committable)
-.cursor/*
-!.cursor/rules/
-!.cursor/rules/**
-.agents/**
-skills-lock.json
-
 # InsForge & AI agent skills
 .insforge
 .agent
