@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+import type { z } from "zod";
+
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 import { createPlayerAction } from "@/actions/players/createPlayer";
 import OptionsField from "@/components/form/options-field";
+import SubmitButton from "@/components/form/submit-button";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,63 +27,58 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
-import { Spinner } from "@/components/ui/spinner";
-import {
-  createPlayerSchema,
-  type CreatePlayerInput,
-} from "@/lib/validation/players";
-import { toast } from "sonner";
+import { createPlayerSchema } from "@/lib/validation/players";
 
-import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
+type FormValues = {
+  name: string;
+  nationality: string;
+  lastClub: string;
+  heightCm: string;
+  categoryId: string;
+};
 
-export default function CreatePlayerDialog({
+export function CreatePlayerDialog({
   categories,
 }: {
-  categories: { id: string; name: string }[];
+  categories: Array<{ id: string; name: string }>;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState(false);
 
-  const methods = useForm<CreatePlayerInput>({
-    resolver: zodResolver(createPlayerSchema),
+  const methods = useForm<FormValues, unknown, z.output<typeof createPlayerSchema>>({
+    resolver: zodResolver(createPlayerSchema) as Resolver<
+      FormValues,
+      unknown,
+      z.output<typeof createPlayerSchema>
+    >,
     defaultValues: {
-      fullName: "",
-      heightCm: "",
+      name: "",
       nationality: "",
       lastClub: "",
-      categoryIds: [],
+      heightCm: "",
+      categoryId: "",
     },
   });
 
-  const { handleSubmit, reset } = methods;
+  const { executeAsync, isExecuting } = useAction(createPlayerAction, {
+    onSuccess: () => {
+      toast.success("Player created successfully.");
+      methods.reset();
+      setOpen(false);
+      router.refresh();
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
 
   useEffect(() => {
     if (!open) {
-      reset();
+      methods.reset();
     }
-  }, [open, reset]);
-
-  async function onSubmit(data: CreatePlayerInput): Promise<void> {
-    setPending(true);
-    try {
-      const result = await createPlayerAction(data);
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
-      toast.success("Player created successfully.");
-      reset();
-      setOpen(false);
-      router.refresh();
-    } catch (error) {
-      console.error("[CreatePlayerDialog]", error);
-      toast.error("Could not create the player.");
-    } finally {
-      setPending(false);
-    }
-  }
+  }, [open, methods]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -87,67 +88,65 @@ export default function CreatePlayerDialog({
           New player
         </Button>
       </DialogTrigger>
-      <DialogContent
-        showCloseButton={!pending}
-        className="flex max-h-[90vh] max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg"
-      >
-        <DialogHeader className="shrink-0 border-b px-6 py-4">
+      <DialogContent showCloseButton={!isExecuting}>
+        <DialogHeader>
           <DialogTitle>New player</DialogTitle>
           <DialogDescription>
-            Fill in the basic details; you can expand the profile later from the
-            detail page.
+            A Player starts private. Public requires a complete profile.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex min-h-0 flex-1 flex-col"
+            onSubmit={methods.handleSubmit((values) => executeAsync(values))}
+            className="flex flex-col gap-4"
             noValidate
           >
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
-              <FieldGroup className="gap-4">
-                <TextField
-                  name="fullName"
-                  label="Full name"
-                  placeholder="John Doe"
-                  disabled={pending}
-                />
-                <TextField
-                  name="nationality"
-                  label="Nationality"
-                  placeholder="Argentina"
-                  disabled={pending}
-                />
-                <TextField
-                  name="heightCm"
-                  label="Height (cm)"
-                  placeholder="185"
-                  disabled={pending}
-                />
-                <TextField
-                  name="lastClub"
-                  label="Last club"
-                  placeholder="FC Barcelona"
-                  disabled={pending}
-                />
-                <OptionsField
-                  name="categoryIds"
-                  label="Categories"
-                  options={categories}
-                  emptyMessage="No categories created yet"
-                  disabled={pending}
-                />
-              </FieldGroup>
-            </div>
-            <DialogFooter className="shrink-0 gap-2 border-t px-6 py-4 sm:justify-end bg-muted/20">
+            <FieldGroup>
+              <TextField
+                name="name"
+                label="Name"
+                placeholder="Manu Ginobili"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="nationality"
+                label="Nationality"
+                placeholder="Argentina"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="lastClub"
+                label="Last club"
+                placeholder="San Antonio Spurs"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="heightCm"
+                label="Height (cm)"
+                placeholder="198"
+                disabled={isExecuting}
+              />
+              <OptionsField
+                name="categoryId"
+                label="Category"
+                options={categories}
+                emptyMessage="No categories created yet"
+                disabled={isExecuting}
+              />
+            </FieldGroup>
+            <DialogFooter className="gap-2 border-t pt-4 sm:justify-end">
               <Button
-                type="submit"
+                type="button"
                 variant="outline"
-                disabled={pending}
-                aria-label="submit"
+                className="flex-1 sm:flex-initial"
+                disabled={isExecuting}
+                onClick={() => setOpen(false)}
               >
-                {pending ? <Spinner /> : "Create player"}
+                Cancel
               </Button>
+              <div className="flex-1 sm:flex-initial">
+                <SubmitButton label="Create player" isExecuting={isExecuting} />
+              </div>
             </DialogFooter>
           </form>
         </FormProvider>

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --port 3001",
     "lint": "eslint .",
-    "test": "node --import tsx --conditions react-server --test 'src/**/*.test.ts'",
+    "test": "node --import tsx --conditions react-server --test --test-concurrency=1 'src/**/*.test.ts'",
     "typecheck": "tsc --noEmit",
     "db:migrate:better-auth": "tsx src/scripts/migrate-better-auth.ts",
     "db:seed": "tsx src/scripts/seed-better-auth-owner.ts"

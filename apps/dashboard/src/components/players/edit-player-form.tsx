@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
-
+import { FormProvider, useForm, type Resolver } from "react-hook-form";
 import { useRouter } from "next/navigation";
-
-import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+import type { z } from "zod";
 
 import { updatePlayerAction } from "@/actions/players/updatePlayer";
 import OptionsField from "@/components/form/options-field";
-import SubmitButton from "@/components/form/submit-button";
 import TextField from "@/components/form/text-field";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,14 +20,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FieldGroup } from "@/components/ui/field";
-import {
-  updatePlayerSchema,
-  type UpdatePlayerInput,
-} from "@/lib/validation/players";
+import { Spinner } from "@/components/ui/spinner";
+import { updatePlayerSchema } from "@/lib/validation/players";
 import type { PlayerDetail } from "@/types/player";
-import { toast } from "sonner";
 
-export default function EditPlayerForm({
+type FormValues = {
+  id: string;
+  name: string;
+  nationality: string;
+  lastClub: string;
+  heightCm: string;
+  categoryId: string;
+  presentationImageUrl: string;
+  eurobasketLink: string;
+};
+
+export function EditPlayerForm({
   player,
   categories,
 }: {
@@ -35,86 +43,111 @@ export default function EditPlayerForm({
   categories: Array<{ id: string; name: string }>;
 }) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
 
-  const methods = useForm<UpdatePlayerInput>({
-    resolver: zodResolver(updatePlayerSchema),
+  const methods = useForm<FormValues, unknown, z.output<typeof updatePlayerSchema>>({
+    resolver: zodResolver(updatePlayerSchema) as Resolver<
+      FormValues,
+      unknown,
+      z.output<typeof updatePlayerSchema>
+    >,
     defaultValues: {
       id: player.id,
-      fullName: player.full_name,
+      name: player.name,
       nationality: player.nationality,
-      heightCm: String(player.height_cm),
-      lastClub: player.last_club,
-      categoryIds: player.categories.map((category) => category.id),
+      lastClub: player.lastClub,
+      heightCm: player.heightCm == null ? "" : String(player.heightCm),
+      categoryId: player.categoryId ?? "",
+      presentationImageUrl: player.presentationImageUrl ?? "",
+      eurobasketLink: player.eurobasketLink ?? "",
     },
   });
 
-  async function onSubmit(data: UpdatePlayerInput): Promise<void> {
-    setPending(true);
-    try {
-      const result = await updatePlayerAction(data);
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
+  const { executeAsync, isExecuting } = useAction(updatePlayerAction, {
+    onSuccess: () => {
       toast.success("Player updated successfully.");
       router.refresh();
-    } catch (error) {
-      console.error("[EditPlayerForm]", error);
-      toast.error("Could not update the player.");
-    } finally {
-      setPending(false);
-    }
-  }
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
 
   return (
     <FormProvider {...methods}>
       <Card>
         <CardHeader className="border-b">
-          <CardTitle>General information</CardTitle>
+          <CardTitle>Profile</CardTitle>
           <CardDescription>
-            Update the player&apos;s profile details and category assignments.
+            A public Player needs name, Category, presentation image, height,
+            nationality, and last club.
           </CardDescription>
         </CardHeader>
-        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+        <form
+          onSubmit={methods.handleSubmit((values) => executeAsync(values))}
+          noValidate
+        >
           <CardContent className="pb-6">
             <FieldGroup className="gap-6">
+              <input type="hidden" {...methods.register("id")} />
               <TextField
-                name="fullName"
-                label="Full name"
-                placeholder="John Doe"
-                disabled={pending}
+                name="name"
+                label="Name"
+                placeholder="Manu Ginobili"
+                disabled={isExecuting}
               />
               <TextField
                 name="nationality"
                 label="Nationality"
                 placeholder="Argentina"
-                disabled={pending}
-              />
-              <TextField
-                name="heightCm"
-                label="Height (cm)"
-                placeholder="185"
-                disabled={pending}
+                disabled={isExecuting}
               />
               <TextField
                 name="lastClub"
                 label="Last club"
-                placeholder="FC Barcelona"
-                disabled={pending}
+                placeholder="San Antonio Spurs"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="heightCm"
+                label="Height (cm)"
+                placeholder="198"
+                disabled={isExecuting}
               />
               <OptionsField
-                name="categoryIds"
-                label="Categories"
+                name="categoryId"
+                label="Category"
                 options={categories}
                 emptyMessage="No categories created yet"
-                disabled={pending}
+                disabled={isExecuting}
+              />
+              <TextField
+                name="presentationImageUrl"
+                label="Presentation image URL"
+                placeholder="https://"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="eurobasketLink"
+                label="Eurobasket link"
+                placeholder="https://basketball.eurobasket.com/..."
+                disabled={isExecuting}
               />
             </FieldGroup>
           </CardContent>
-          <CardFooter className="justify-end">
-            <SubmitButton label="Save changes" isExecuting={pending} />
+          <CardFooter className="justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isExecuting}
+              onClick={() => methods.reset()}
+            >
+              Reset
+            </Button>
+            <Button type="submit" disabled={isExecuting}>
+              {isExecuting ? <Spinner /> : "Save profile"}
+            </Button>
           </CardFooter>
         </form>
       </Card>

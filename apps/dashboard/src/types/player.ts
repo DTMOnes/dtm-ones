@@ -1,48 +1,23 @@
-export type PlayerStatus = "draft" | "published";
-
-export type PlayerCategoryRef = {
-  id: string;
-  name: string;
-};
-
-export type PlayerGalleryImage = {
-  id: string;
-  player_id: string;
-  url: string;
-  storage_key: string | null;
-  sort_order: number;
-  created_at: string;
-};
+export type PlayerVisibility = "public" | "private";
 
 export type PlayerVideo = {
   id: string;
-  player_id: string;
-  youtube_url: string;
-  sort_order: number;
-  created_at: string;
+  youtubeUrl: string;
 };
 
 export type Player = {
   id: string;
-  slug: string;
-  full_name: string;
+  name: string;
   nationality: string;
-  height_cm: number;
-  last_club: string;
-  presentation_image_url: string | null;
-  presentation_image_key: string | null;
-  status: PlayerStatus;
-  deleted_at: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
-export type PlayerListItem = Player & {
-  categories: PlayerCategoryRef[];
+  lastClub: string;
+  eurobasketLink: string | null;
+  visibility: PlayerVisibility;
+  heightCm: number | null;
+  categoryId: string | null;
+  categoryName: string | null;
+  presentationImageUrl: string | null;
 };
 
 export type PlayerDetail = Player & {
-  categories: PlayerCategoryRef[];
-  gallery_images: PlayerGalleryImage[];
   videos: PlayerVideo[];
 };
