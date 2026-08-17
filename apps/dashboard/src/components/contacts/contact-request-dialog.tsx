@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CopyIcon } from "@phosphor-icons/react";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { archiveContactAction } from "@/actions/contacts/archiveContact";
-import { deleteContactAction } from "@/actions/contacts/deleteContact";
-import { unarchiveContactAction } from "@/actions/contacts/unarchiveContact";
+import { archiveContactRequestAction } from "@/actions/contacts/archiveContactRequest";
+import { deleteContactRequestAction } from "@/actions/contacts/deleteContactRequest";
+import { unarchiveContactRequestAction } from "@/actions/contacts/unarchiveContactRequest";
 import { ArchiveContactRequestButton } from "@/components/contacts/archive-contact-request-button";
 import { DeleteContactRequestButton } from "@/components/contacts/delete-contact-request-button";
 import { Badge } from "@/components/ui/badge";
@@ -20,20 +20,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  contactStatusLabel,
-  contactTypeLabel,
-  formatContactDate,
-} from "@/lib/contacts/format";
 import type { ContactRequest } from "@/types/contact-request";
+import {
+  contactRequestReasonLabel,
+  contactRequestStatusLabel,
+  formatContactRequestDate,
+} from "@/utils/contact-request-labels";
 
 type ContactRequestDialogProps = {
   request: ContactRequest | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
-
-type MutationPending = "archive" | "delete" | null;
 
 async function copyText(label: string, value: string): Promise<void> {
   try {
@@ -51,82 +49,67 @@ export function ContactRequestDialog({
   onOpenChange,
 }: ContactRequestDialogProps) {
   const router = useRouter();
-  const [pending, setPending] = useState<MutationPending>(null);
+
+  const { executeAsync: archive, isExecuting: isArchiving } = useAction(
+    archiveContactRequestAction,
+    {
+      onSuccess: () => {
+        toast.success("Contact request archived");
+        onOpenChange(false);
+        router.refresh();
+      },
+      onError: ({ error }) => {
+        if (error.serverError) {
+          toast.error(error.serverError.message);
+        }
+      },
+    },
+  );
+
+  const { executeAsync: unarchive, isExecuting: isUnarchiving } = useAction(
+    unarchiveContactRequestAction,
+    {
+      onSuccess: () => {
+        toast.success("Contact request moved back to Read");
+        onOpenChange(false);
+        router.refresh();
+      },
+      onError: ({ error }) => {
+        if (error.serverError) {
+          toast.error(error.serverError.message);
+        }
+      },
+    },
+  );
+
+  const { executeAsync: remove, isExecuting: isDeleting } = useAction(
+    deleteContactRequestAction,
+    {
+      onSuccess: () => {
+        toast.success("Contact request deleted");
+        onOpenChange(false);
+        router.refresh();
+      },
+      onError: ({ error }) => {
+        if (error.serverError) {
+          toast.error(error.serverError.message);
+        }
+      },
+    },
+  );
+
+  const isBusy = isArchiving || isUnarchiving || isDeleting;
 
   if (!request) {
     return null;
   }
-
-  const activeRequest = request;
-  const isBusy = pending !== null;
-  const isArchiving = pending === "archive";
-  const isDeleting = pending === "delete";
 
   function handleOpenChange(nextOpen: boolean): void {
     if (!nextOpen && isBusy) {
       return;
     }
 
-    if (!nextOpen) {
-      setPending(null);
-    }
-
     onOpenChange(nextOpen);
-  }
-
-  async function runStatusAction(
-    mode: "archive" | "unarchive",
-  ): Promise<void> {
-    setPending("archive");
-
-    try {
-      const { error } =
-        mode === "archive"
-          ? await archiveContactAction({ id: activeRequest.id })
-          : await unarchiveContactAction({ id: activeRequest.id });
-
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-
-      toast.success(
-        mode === "archive"
-          ? "Contact request archived"
-          : "Contact request moved back to Read",
-      );
-      onOpenChange(false);
-      router.refresh();
-    } catch (error) {
-      console.error(`[ContactRequestDialog/${mode}]`, error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setPending(null);
-    }
-  }
-
-  async function runDelete(): Promise<boolean> {
-    setPending("delete");
-
-    try {
-      const { error } = await deleteContactAction({ id: activeRequest.id });
-
-      if (error) {
-        toast.error(error.message);
-        return false;
-      }
-
-      toast.success("Contact request deleted");
-      onOpenChange(false);
-      router.refresh();
-      return true;
-    } catch (error) {
-      console.error("[ContactRequestDialog/delete]", error);
-      toast.error("Something went wrong. Please try again.");
-      return false;
-    } finally {
-      setPending(null);
-    }
   }
 
   return (
@@ -135,17 +118,15 @@ export function ContactRequestDialog({
         <DialogHeader>
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">
-              {contactTypeLabel(activeRequest.type)}
+              {contactRequestReasonLabel(request.reason)}
             </Badge>
-            <Badge
-              variant={activeRequest.status === "new" ? "default" : "outline"}
-            >
-              {contactStatusLabel(activeRequest.status)}
+            <Badge variant={request.status === "new" ? "default" : "outline"}>
+              {contactRequestStatusLabel(request.status)}
             </Badge>
           </div>
           <DialogTitle>Contact request</DialogTitle>
           <DialogDescription>
-            Received {formatContactDate(activeRequest.created_at)}
+            Received {formatContactRequestDate(request.createdAt)}
           </DialogDescription>
         </DialogHeader>
 
@@ -155,16 +136,14 @@ export function ContactRequestDialog({
               Email
             </p>
             <div className="flex items-center gap-2">
-              <p className="min-w-0 flex-1 truncate text-sm">
-                {activeRequest.email}
-              </p>
+              <p className="min-w-0 flex-1 truncate text-sm">{request.email}</p>
               <Button
                 type="button"
                 variant="outline"
                 size="icon-sm"
                 aria-label="Copy email"
                 disabled={isBusy}
-                onClick={() => void copyText("Email", activeRequest.email)}
+                onClick={() => void copyText("Email", request.email)}
               >
                 <CopyIcon />
               </Button>
@@ -176,16 +155,14 @@ export function ContactRequestDialog({
               Phone
             </p>
             <div className="flex items-center gap-2">
-              <p className="min-w-0 flex-1 truncate text-sm">
-                {activeRequest.phone}
-              </p>
+              <p className="min-w-0 flex-1 truncate text-sm">{request.phone}</p>
               <Button
                 type="button"
                 variant="outline"
                 size="icon-sm"
                 aria-label="Copy phone"
                 disabled={isBusy}
-                onClick={() => void copyText("Phone", activeRequest.phone)}
+                onClick={() => void copyText("Phone", request.phone)}
               >
                 <CopyIcon />
               </Button>
@@ -196,28 +173,29 @@ export function ContactRequestDialog({
             <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
               Message
             </p>
-            <p className="text-sm whitespace-pre-wrap">
-              {activeRequest.message}
-            </p>
+            <p className="text-sm whitespace-pre-wrap">{request.message}</p>
           </div>
         </div>
 
         <DialogFooter className="sm:justify-between">
           <DeleteContactRequestButton
             pending={isDeleting}
-            disabled={isArchiving}
-            onDelete={runDelete}
+            disabled={isArchiving || isUnarchiving}
+            onDelete={async () => {
+              const result = await remove({ id: request.id });
+              return result?.data?.ok === true;
+            }}
           />
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
             <ArchiveContactRequestButton
-              status={activeRequest.status}
-              pending={isArchiving}
+              status={request.status}
+              pending={isArchiving || isUnarchiving}
               disabled={isDeleting}
               onArchive={() => {
-                void runStatusAction("archive");
+                void archive({ id: request.id });
               }}
               onUnarchive={() => {
-                void runStatusAction("unarchive");
+                void unarchive({ id: request.id });
               }}
             />
           </div>

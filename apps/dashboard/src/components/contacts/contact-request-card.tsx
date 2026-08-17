@@ -8,13 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  contactStatusLabel,
-  contactTypeLabel,
-  formatContactDate,
-  messagePreview,
-} from "@/lib/contacts/format";
 import type { ContactRequest } from "@/types/contact-request";
+import {
+  contactRequestMessagePreview,
+  contactRequestReasonLabel,
+  contactRequestStatusLabel,
+  formatContactRequestDate,
+} from "@/utils/contact-request-labels";
 
 type ContactRequestCardProps = {
   request: ContactRequest;
@@ -41,9 +41,11 @@ export function ContactRequestCard({
     >
       <CardHeader className="gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{contactTypeLabel(request.type)}</Badge>
+          <Badge variant="secondary">
+            {contactRequestReasonLabel(request.reason)}
+          </Badge>
           <Badge variant={request.status === "new" ? "default" : "outline"}>
-            {contactStatusLabel(request.status)}
+            {contactRequestStatusLabel(request.status)}
           </Badge>
         </div>
         <CardTitle className="truncate">{request.email}</CardTitle>
@@ -51,10 +53,10 @@ export function ContactRequestCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <p className="text-muted-foreground line-clamp-3 text-sm">
-          {messagePreview(request.message)}
+          {contactRequestMessagePreview(request.message)}
         </p>
         <p className="text-muted-foreground text-xs">
-          {formatContactDate(request.created_at)}
+          {formatContactRequestDate(request.createdAt)}
         </p>
       </CardContent>
     </Card>

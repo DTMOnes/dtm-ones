@@ -1,16 +1,17 @@
-export type ContactRequestType = "player" | "recruiter";
+export type ContactRequestReason =
+  | "seeking_representation"
+  | "looking_for_a_player";
 
 export type ContactRequestStatus = "new" | "read" | "archived";
 
 export type ContactRequest = {
   id: string;
-  type: ContactRequestType;
+  reason: ContactRequestReason;
   email: string;
   phone: string;
   message: string;
   status: ContactRequestStatus;
-  created_at: string;
-  updated_at: string;
+  createdAt: Date;
 };
 
 export type ContactsInboxFilter = "active" | "new" | "read" | "archived";

@@ -3,9 +3,10 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { EnvelopeSimpleIcon } from "@phosphor-icons/react";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
-import { markContactReadAction } from "@/actions/contacts/markContactRead";
+import { markContactRequestReadAction } from "@/actions/contacts/markContactRequestRead";
 import { ContactRequestCard } from "@/components/contacts/contact-request-card";
 import { ContactRequestDialog } from "@/components/contacts/contact-request-dialog";
 import {
@@ -69,6 +70,13 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const { executeAsync: markRead } = useAction(markContactRequestReadAction, {
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
 
   const rawFilter = searchParams.get("filter");
   const filter: ContactsInboxFilter =
@@ -135,18 +143,9 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
     startTransition(async () => {
       setOptimisticStatus({ id: request.id, status: "read" });
 
-      try {
-        const { error } = await markContactReadAction({ id: request.id });
-
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-
+      const result = await markRead({ id: request.id });
+      if (result?.data?.ok) {
         router.refresh();
-      } catch (error) {
-        console.error("[ContactsInbox/markRead]", error);
-        toast.error("Something went wrong. Please try again.");
       }
     });
   }
