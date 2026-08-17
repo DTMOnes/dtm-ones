@@ -15,7 +15,7 @@ import {
   galleryImageKey,
   isExactUploadMatch,
 } from "@/lib/players/image-upload";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import {
   commitGalleryUploadedImageSchema,
   GALLERY_BUCKET,

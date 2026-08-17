@@ -8,7 +8,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { createInsforgeServer } from "@/lib/insforge-server";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import { contactRequestIdSchema } from "@/lib/validation/contacts";
 
 export async function deleteContactAction(input: {

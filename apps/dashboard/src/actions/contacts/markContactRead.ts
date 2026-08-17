@@ -2,7 +2,7 @@
 
 import { updateContact } from "@/actions/contacts/updateContact";
 import type { ActionResult } from "@/lib/action-result";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import type { ContactRequest } from "@/types/contact-request";
 import { contactRequestIdSchema } from "@/lib/validation/contacts";
 

@@ -13,7 +13,7 @@ import {
   CATEGORY_NAME_TAKEN,
 } from "@/lib/categories/assert-name-available";
 import { createInsforgeServer } from "@/lib/insforge-server";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import {
   parseCategory,
   updateCategorySchema,

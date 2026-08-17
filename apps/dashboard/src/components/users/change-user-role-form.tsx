@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import type { DashboardRole } from "@/lib/auth/types";
-import { roleLabel } from "@/lib/users/roles";
+import { roleLabel } from "@/utils/auth/roles";
 import { setUserRoleSchema } from "@/lib/validation/users";
 
 type ChangeUserRoleFormValues = z.infer<typeof setUserRoleSchema>;

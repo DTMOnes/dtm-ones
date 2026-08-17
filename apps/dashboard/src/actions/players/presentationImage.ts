@@ -13,7 +13,7 @@ import {
   isExactUploadMatch,
   presentationImageKey,
 } from "@/lib/players/image-upload";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import {
   commitUploadedImageSchema,
   PRESENTATION_BUCKET,

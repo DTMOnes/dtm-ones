@@ -1,5 +1,7 @@
 "use server";
 
+import { eq, sql } from "drizzle-orm";
+import { schema } from "@dtm/database";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
@@ -9,10 +11,9 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { auth } from "@/lib/auth";
-import type { DashboardRole } from "@/lib/auth/types";
-import { requireOwner } from "@/lib/require-owner";
-import { getUsersDb } from "@/lib/users/pool";
+import { db } from "@/lib/db";
 import { deleteUserSchema } from "@/lib/validation/users";
+import { requireOwner } from "@/utils/auth/require-owner";
 
 const LAST_OWNER =
   "You cannot delete the last owner. Promote another user first.";
@@ -40,38 +41,29 @@ export async function deleteUserAction(input: {
 
   const { id } = parsed.data;
   const actingOwnerId = gate.data.user.id;
-  const db = getUsersDb();
 
   try {
-    const existing = await db.query<{ role: DashboardRole }>(
-      `
-      SELECT role
-      FROM public.users
-      WHERE id = $1
-      LIMIT 1
-    `,
-      [id],
-    );
+    const [existingRow] = await db
+      .select({ role: schema.users.role })
+      .from(schema.users)
+      .where(eq(schema.users.id, id))
+      .limit(1);
 
-    const existingRow = existing.rows[0];
     if (!existingRow) {
       return { data: null, error: { message: NOT_FOUND } };
     }
 
     // Conditional delete enforces self delete and last owner in one statement.
-    const deleted = await db.query<{ id: string }>(
-      `
+    const deleted = await db.execute<{ id: string }>(sql`
       DELETE FROM public.users AS u
-      WHERE u.id = $1
-        AND u.id <> $2
+      WHERE u.id = ${id}
+        AND u.id <> ${actingOwnerId}
         AND NOT (
           u.role = 'owner'
           AND (SELECT count(*) FROM public.users WHERE role = 'owner') = 1
         )
       RETURNING u.id
-    `,
-      [id, actingOwnerId],
-    );
+    `);
 
     if (!deleted.rows[0]) {
       if (id === actingOwnerId) {

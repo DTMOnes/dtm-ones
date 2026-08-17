@@ -9,7 +9,7 @@ import {
 } from "@/lib/action-result";
 import { createInsforgeServer } from "@/lib/insforge-server";
 import { PLAYER_COLUMNS } from "@/lib/players/columns";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import {
   parsePlayer,
   updatePlayerStatusSchema,

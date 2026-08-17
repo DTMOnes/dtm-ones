@@ -2,7 +2,6 @@
 
 import { APIError } from "better-auth/api";
 import { headers } from "next/headers";
-import { z } from "zod";
 
 import {
   INVALID_CREDENTIALS,
@@ -11,16 +10,14 @@ import {
 } from "@/lib/action-result";
 import { auth } from "@/lib/auth";
 import type { SignInSuccess, SignOutSuccess } from "@/lib/auth/types";
-import { createInsforgeServerWithUserId } from "@/lib/insforge-server";
 import { signInSchema } from "@/lib/validation/auth";
+import { findDashboardUser } from "@/utils/auth/find-dashboard-user";
 
 const SIGN_IN_UNAVAILABLE_MESSAGE =
   "Sign in is temporarily unavailable. Please try again in a moment.";
 
 const SIGN_OUT_UNAVAILABLE_MESSAGE =
   "Sign out could not be confirmed. Please sign in again if needed.";
-
-const roleSchema = z.enum(["owner", "staff"]);
 
 async function cleanupSignInSession(): Promise<void> {
   try {
@@ -66,15 +63,11 @@ export async function signInAction(input: {
     }
 
     // Use the signed-in user id directly. Do not wait for cookie round trip.
-    const insforge = createInsforgeServerWithUserId(authUser.id);
-    const { data, error } = await insforge.database
-      .from("users")
-      .select("id, email, role")
-      .eq("id", authUser.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error("[signIn]", error);
+    let user;
+    try {
+      user = await findDashboardUser(authUser.id);
+    } catch (lookupError) {
+      console.error("[signIn]", lookupError);
       await cleanupSignInSession();
       return {
         data: null,
@@ -82,8 +75,7 @@ export async function signInAction(input: {
       };
     }
 
-    const role = roleSchema.safeParse(data?.role);
-    if (!data || !role.success) {
+    if (!user) {
       await cleanupSignInSession();
       return {
         data: null,
@@ -94,11 +86,7 @@ export async function signInAction(input: {
     return {
       data: {
         ok: true,
-        user: {
-          id: data.id,
-          email: data.email,
-          role: role.data,
-        },
+        user,
       },
       error: null,
     };

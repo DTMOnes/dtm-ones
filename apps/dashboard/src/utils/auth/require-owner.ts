@@ -2,7 +2,7 @@ import { FORBIDDEN, type ActionResult } from "@/lib/action-result";
 import {
   requireStaff,
   type StaffUser,
-} from "@/lib/require-staff";
+} from "@/utils/auth/require-staff";
 
 export async function requireOwner(): Promise<
   ActionResult<{ user: StaffUser }>

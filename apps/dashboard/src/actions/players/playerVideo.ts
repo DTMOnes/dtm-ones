@@ -9,7 +9,7 @@ import {
 } from "@/lib/action-result";
 import { createInsforgeServer } from "@/lib/insforge-server";
 import { assertActivePlayer } from "@/lib/players/assert-active-player";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import { addPlayerVideoSchema } from "@/lib/validation/player-media";
 import { videoIdSchema } from "@/lib/validation/players";
 import type { PlayerVideo } from "@/types/player";

@@ -1,5 +1,6 @@
 "use server";
 
+import { schema } from "@dtm/database";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
@@ -9,15 +10,15 @@ import {
 } from "@/lib/action-result";
 import { auth } from "@/lib/auth";
 import type { DashboardRole } from "@/lib/auth/types";
-import { requireOwner } from "@/lib/require-owner";
+import { db } from "@/lib/db";
+import { createUserSchema } from "@/lib/validation/users";
+import type { DashboardUserRow } from "@/types/user";
 import {
   getBetterAuthErrorMessage,
   isDuplicateEmailError,
-} from "@/lib/users/better-auth-error";
-import { getUsersDb } from "@/lib/users/pool";
-import { toPluginRole } from "@/lib/users/roles";
-import { createUserSchema } from "@/lib/validation/users";
-import type { DashboardUserRow } from "@/types/user";
+} from "@/utils/auth/better-auth-error";
+import { requireOwner } from "@/utils/auth/require-owner";
+import { toPluginRole } from "@/utils/auth/roles";
 
 const EMAIL_TAKEN = "An account with this email already exists.";
 
@@ -63,23 +64,15 @@ export async function createUserAction(input: {
 
     createdUserId = created.user.id;
 
-    const db = getUsersDb();
-    const inserted = await db.query<{
-      id: string;
-      email: string;
-      role: DashboardRole;
-      created_at: Date;
-      updated_at: Date;
-    }>(
-      `
-      INSERT INTO public.users (id, email, role)
-      VALUES ($1, $2, $3)
-      RETURNING id, email, role, created_at, updated_at
-    `,
-      [created.user.id, email.toLowerCase(), role],
-    );
+    const [row] = await db
+      .insert(schema.users)
+      .values({
+        id: created.user.id,
+        email: email.toLowerCase(),
+        role,
+      })
+      .returning();
 
-    const row = inserted.rows[0];
     if (!row) {
       throw new Error("public.users insert returned no row");
     }
@@ -92,8 +85,8 @@ export async function createUserAction(input: {
           email: row.email,
           name: created.user.name?.trim() ? created.user.name : name,
           role: row.role,
-          created_at: row.created_at.toISOString(),
-          updated_at: row.updated_at.toISOString(),
+          created_at: row.createdAt.toISOString(),
+          updated_at: row.updatedAt.toISOString(),
         },
       },
       error: null,

@@ -10,7 +10,7 @@ import {
 import { createInsforgeServer } from "@/lib/insforge-server";
 import { allocateUniquePlayerSlug } from "@/lib/players/allocate-slug";
 import { replacePlayerCategories } from "@/lib/players/replace-categories";
-import { requireStaff } from "@/lib/require-staff";
+import { requireStaff } from "@/utils/auth/require-staff";
 import {
   parseHeightCm,
   parsePlayer,

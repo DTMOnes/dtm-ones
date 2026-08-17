@@ -36,6 +36,7 @@ Decisions live in `docs/adr/`. Follow them for new work.
 - Staff upload Player images to Vercel Blob (ADR 0008).
 - Environment variables: t3-env per consumer, package presets via `extends`. Follow `.cursor/rules/env-variables.mdc`.
 - `page.tsx` exports only `Page`. Follow `.cursor/rules/nextjs-page-structure.mdc`.
+- App folders: libraries in `lib`, helpers in `utils`, config in `config`. Follow `.cursor/rules/nextjs-app-folders.mdc`.
 - Use existing CSS theme tokens for color.
 
 ## Skills

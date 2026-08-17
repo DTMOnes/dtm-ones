@@ -1,5 +1,8 @@
+import { count, eq } from "drizzle-orm";
+import { schema } from "@dtm/database";
+
 import type { DashboardRole } from "@/lib/auth/types";
-import { getUsersDb } from "@/lib/users/pool";
+import { db } from "@/lib/db";
 import type {
   DashboardUserDetail,
   DashboardUserRow,
@@ -9,62 +12,40 @@ type UserJoinRow = {
   id: string;
   email: string;
   name: string | null;
-  role: string;
-  created_at: Date | string;
-  updated_at: Date | string;
-  owner_count: number | string;
+  role: DashboardRole;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
-function toIso(value: Date | string): string {
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  return value;
-}
-
-function parseRole(role: string): DashboardRole | null {
-  if (role === "owner" || role === "staff") {
-    return role;
-  }
-  return null;
-}
-
-function mapUserRow(row: UserJoinRow): DashboardUserRow | null {
-  const role = parseRole(row.role);
-  if (!role) {
-    return null;
-  }
-
+function mapUserRow(row: UserJoinRow): DashboardUserRow {
   return {
     id: row.id,
     email: row.email,
     name: row.name?.trim() ? row.name : "Unnamed user",
-    role,
-    created_at: toIso(row.created_at),
-    updated_at: toIso(row.updated_at),
+    role: row.role,
+    created_at: row.createdAt.toISOString(),
+    updated_at: row.updatedAt.toISOString(),
   };
 }
 
-export async function listUsers(): Promise<DashboardUserRow[]> {
-  const db = getUsersDb();
-  try {
-    const result = await db.query<UserJoinRow>(`
-      SELECT
-        u.id,
-        u.email,
-        ba.name,
-        u.role,
-        u.created_at,
-        u.updated_at,
-        (SELECT count(*)::int FROM public.users WHERE role = 'owner') AS owner_count
-      FROM public.users u
-      LEFT JOIN better_auth."user" ba ON ba.id = u.id
-      ORDER BY u.created_at ASC
-    `);
+const userColumns = {
+  id: schema.users.id,
+  email: schema.users.email,
+  name: schema.user.name,
+  role: schema.users.role,
+  createdAt: schema.users.createdAt,
+  updatedAt: schema.users.updatedAt,
+};
 
-    return result.rows
-      .map((row) => mapUserRow(row))
-      .filter((row): row is DashboardUserRow => row !== null);
+export async function listUsers(): Promise<DashboardUserRow[]> {
+  try {
+    const rows = await db
+      .select(userColumns)
+      .from(schema.users)
+      .leftJoin(schema.user, eq(schema.user.id, schema.users.id))
+      .orderBy(schema.users.createdAt);
+
+    return rows.map(mapUserRow);
   } catch (error) {
     console.error("[users/queries/list]", error);
     throw new Error("Failed to load users");
@@ -74,37 +55,26 @@ export async function listUsers(): Promise<DashboardUserRow[]> {
 export async function getUserById(
   id: string,
 ): Promise<DashboardUserDetail | null> {
-  const db = getUsersDb();
   try {
-    const result = await db.query<UserJoinRow>(
-      `
-      SELECT
-        u.id,
-        u.email,
-        ba.name,
-        u.role,
-        u.created_at,
-        u.updated_at,
-        (SELECT count(*)::int FROM public.users WHERE role = 'owner') AS owner_count
-      FROM public.users u
-      LEFT JOIN better_auth."user" ba ON ba.id = u.id
-      WHERE u.id = $1
-      LIMIT 1
-    `,
-      [id],
-    );
+    const [row] = await db
+      .select(userColumns)
+      .from(schema.users)
+      .leftJoin(schema.user, eq(schema.user.id, schema.users.id))
+      .where(eq(schema.users.id, id))
+      .limit(1);
 
-    const row = result.rows[0];
     if (!row) {
       return null;
     }
 
-    const mapped = mapUserRow(row);
-    if (!mapped) {
-      return null;
-    }
+    const [ownerCountRow] = await db
+      .select({ value: count() })
+      .from(schema.users)
+      .where(eq(schema.users.role, "owner"));
 
-    const ownerCount = Number(row.owner_count);
+    const ownerCount = Number(ownerCountRow?.value ?? 0);
+    const mapped = mapUserRow(row);
+
     return {
       ...mapped,
       owner_count: ownerCount,
