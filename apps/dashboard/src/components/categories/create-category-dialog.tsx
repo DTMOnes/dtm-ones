@@ -6,8 +6,11 @@ import { useRouter } from "next/navigation";
 
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+import type { z } from "zod";
 
-import { z } from "zod";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 import { createCategoryAction } from "@/actions/categories/createCategory";
 import SubmitButton from "@/components/form/submit-button";
@@ -22,51 +25,44 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { FieldGroup } from "@/components/ui/field";
 import { createCategorySchema } from "@/lib/validation/categories";
-import { toast } from "sonner";
-
-import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 type FormValues = z.infer<typeof createCategorySchema>;
 
-export default function CreateCategoryDialog() {
+export function CreateCategoryDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(createCategorySchema),
     defaultValues: { name: "" },
   });
 
-  const { handleSubmit, reset } = methods;
-
-  useEffect(() => {
-    if (!open) {
-      reset();
-    }
-  }, [open, reset]);
-
-  async function onSubmit(data: FormValues): Promise<void> {
-    setPending(true);
-    try {
-      const result = await createCategoryAction(data);
-      if (result.error) {
-        toast.error(result.error.message);
+  const { executeAsync, isExecuting } = useAction(createCategoryAction, {
+    onSuccess: () => {
+      toast.success("Category created successfully.");
+      methods.reset();
+      setOpen(false);
+      router.refresh();
+    },
+    onError: ({ error }) => {
+      if (error.serverError?.code === "CONFLICT") {
+        methods.setError("name", { message: error.serverError.message });
         return;
       }
 
-      toast.success("Category created successfully.");
-      reset();
-      setOpen(false);
-      router.refresh();
-    } catch (error) {
-      console.error("[CreateCategoryDialog]", error);
-      toast.error("Could not create the category.");
-    } finally {
-      setPending(false);
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!open) {
+      methods.reset();
     }
-  }
+  }, [open, methods]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -76,36 +72,40 @@ export default function CreateCategoryDialog() {
           New category
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={!pending}>
+      <DialogContent showCloseButton={!isExecuting}>
         <DialogHeader>
           <DialogTitle>New category</DialogTitle>
           <DialogDescription>
-            Assign a short name that identifies the group well in filters and
-            cards.
+            A Category is a Player&apos;s position on the court.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={methods.handleSubmit((values) => executeAsync(values))}
             className="flex flex-col gap-4"
             noValidate
           >
-            <TextField
-              name="name"
-              label="Name"
-              placeholder="Ex. First division"
-              disabled={pending}
-            />
-            <DialogFooter>
+            <FieldGroup>
+              <TextField
+                name="name"
+                label="Name"
+                placeholder="Guards"
+                disabled={isExecuting}
+              />
+            </FieldGroup>
+            <DialogFooter className="gap-2 border-t pt-4 sm:justify-end">
               <Button
                 type="button"
                 variant="outline"
-                disabled={pending}
+                className="flex-1 sm:flex-initial"
+                disabled={isExecuting}
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
-              <SubmitButton label="Save" isExecuting={pending} />
+              <div className="flex-1 sm:flex-initial">
+                <SubmitButton label="Create category" isExecuting={isExecuting} />
+              </div>
             </DialogFooter>
           </form>
         </FormProvider>
