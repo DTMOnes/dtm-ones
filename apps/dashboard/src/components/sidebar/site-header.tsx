@@ -14,6 +14,7 @@ import {
 const routeLabels: Array<{ prefix: string; label: string }> = [
   { prefix: "/contacts", label: "Contacts" },
   { prefix: "/players", label: "Players" },
+  { prefix: "/coaches", label: "Coaches" },
   { prefix: "/categories", label: "Categories" },
   { prefix: "/users", label: "Users" },
 ];

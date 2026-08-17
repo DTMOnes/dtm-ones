@@ -1,0 +1,167 @@
+import assert from "node:assert/strict";
+import { before, beforeEach, test } from "node:test";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { sql } from "drizzle-orm";
+import { createDatabase } from "@dtm/database";
+
+import { ConflictError, NotFoundError } from "./errors";
+import {
+  createCoach,
+  getCoach,
+  setCoachVisibility,
+  updateCoach,
+} from "./coaches";
+import { addPlayerVideo, createPlayer, getPlayer } from "./players";
+
+const root = path.resolve(
+  fileURLToPath(new URL(".", import.meta.url)),
+  "../../../../",
+);
+process.loadEnvFile(path.join(root, ".env"));
+
+const connectionString = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL or TEST_DATABASE_URL is required");
+}
+
+const db = createDatabase(connectionString);
+
+before(async () => {
+  await db.execute(sql`select 1`);
+});
+
+beforeEach(async () => {
+  await db.execute(
+    sql`truncate table player_gallery_images, player_videos, clients, categories restart identity cascade`,
+  );
+});
+
+function coachInput() {
+  return {
+    name: "Pat Riley",
+    nationality: "USA",
+    lastClub: "Miami Heat",
+  };
+}
+
+function eurobasketLink() {
+  return "https://basketball.eurobasket.com/coach/Pat-Riley/1";
+}
+
+async function completeCoach() {
+  return createCoach(db, {
+    ...coachInput(),
+    eurobasketLink: eurobasketLink(),
+  });
+}
+
+test("create Coach makes a private Client retrievable by the returned id", async () => {
+  const created = await createCoach(db, coachInput());
+  const retrieved = await getCoach(db, created.id);
+
+  assert.equal(created.name, "Pat Riley");
+  assert.equal(created.visibility, "private");
+  assert.equal(created.eurobasketLink, null);
+  assert.equal(retrieved?.id, created.id);
+  assert.equal(retrieved?.name, "Pat Riley");
+  assert.equal(retrieved?.visibility, "private");
+});
+
+test("a Player and a Coach can exist as two Clients", async () => {
+  const player = await createPlayer(db, {
+    name: "Pat Riley",
+    nationality: "USA",
+    lastClub: "Miami Heat",
+  });
+  const coach = await createCoach(db, coachInput());
+
+  assert.notEqual(player.id, coach.id);
+  assert.equal(await getPlayer(db, coach.id), null);
+  assert.equal(await getCoach(db, player.id), null);
+  assert.equal((await getPlayer(db, player.id))?.name, "Pat Riley");
+  assert.equal((await getCoach(db, coach.id))?.name, "Pat Riley");
+});
+
+test("Player media cannot be stored on a Coach", async () => {
+  const coach = await createCoach(db, coachInput());
+
+  await assert.rejects(
+    () =>
+      addPlayerVideo(
+        db,
+        coach.id,
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      ),
+    (error: unknown) =>
+      error instanceof NotFoundError && error.message === "Player not found",
+  );
+});
+
+test("a Coach cannot be public unless the profile is complete", async () => {
+  const created = await createCoach(db, coachInput());
+
+  await assert.rejects(
+    () => setCoachVisibility(db, created.id, "public"),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Coach cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getCoach(db, created.id))?.visibility, "private");
+});
+
+test("a complete Coach can be public", async () => {
+  const created = await completeCoach();
+
+  const updated = await setCoachVisibility(db, created.id, "public");
+
+  assert.equal(updated.visibility, "public");
+  assert.equal(updated.eurobasketLink, eurobasketLink());
+  assert.equal((await getCoach(db, created.id))?.visibility, "public");
+});
+
+test("a public Coach can be made private", async () => {
+  const created = await completeCoach();
+  await setCoachVisibility(db, created.id, "public");
+
+  const updated = await setCoachVisibility(db, created.id, "private");
+
+  assert.equal(updated.visibility, "private");
+  assert.equal((await getCoach(db, created.id))?.visibility, "private");
+});
+
+test("editing a public Coach refuses an incomplete profile", async () => {
+  const created = await completeCoach();
+  await setCoachVisibility(db, created.id, "public");
+
+  await assert.rejects(
+    () => updateCoach(db, created.id, { eurobasketLink: null }),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Coach cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getCoach(db, created.id))?.eurobasketLink, eurobasketLink());
+});
+
+test("get Coach returns null for an id that does not exist", async () => {
+  assert.equal(
+    await getCoach(db, "00000000-0000-0000-0000-000000000000"),
+    null,
+  );
+});
+
+test("update Coach rejects an id that does not exist", async () => {
+  await assert.rejects(
+    () =>
+      updateCoach(db, "00000000-0000-0000-0000-000000000000", {
+        name: "Pat Riley",
+      }),
+    (error: unknown) =>
+      error instanceof NotFoundError && error.message === "Coach not found",
+  );
+});
