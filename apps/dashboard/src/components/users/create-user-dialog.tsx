@@ -8,13 +8,13 @@ import {
   Controller,
   FormProvider,
   useForm,
-  type UseFormSetError,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+import type { z } from "zod";
 
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
-import { toast } from "sonner";
 
 import { createUserAction } from "@/actions/users/createUser";
 import PasswordField from "@/components/form/password-field";
@@ -36,7 +36,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -48,29 +47,17 @@ import { createUserSchema } from "@/lib/validation/users";
 
 type FormValues = z.infer<typeof createUserSchema>;
 
-function setFieldErrors(
-  setError: UseFormSetError<FormValues>,
-  fieldErrors: Record<string, string[]> | undefined,
-): void {
-  if (!fieldErrors) {
-    return;
-  }
-
-  (["name", "email", "password", "role"] as const).forEach((field) => {
-    const messages = fieldErrors[field];
-    if (messages?.[0]) {
-      setError(field, { message: messages[0] });
-    }
-  });
-}
+const DUPLICATE_EMAIL_CODES = new Set([
+  "USER_ALREADY_EXISTS",
+  "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+]);
 
 export function CreateUserDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [pending, setPending] = useState(false);
 
   const methods = useForm<FormValues>({
-    resolver: zodResolver(createUserSchema as never),
+    resolver: zodResolver(createUserSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -79,50 +66,35 @@ export function CreateUserDialog() {
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    control,
-    formState: { errors },
-  } = methods;
-
-  useEffect(() => {
-    if (!open) {
-      reset();
-    }
-  }, [open, reset]);
-
-  const emailError = errors.email?.message;
-
-  async function onSubmit(data: FormValues): Promise<void> {
-    setPending(true);
-    try {
-      const result = await createUserAction(data);
-      if (result.error) {
-        setFieldErrors(setError, result.error.fieldErrors);
-        if (
-          result.error.fieldErrors &&
-          Object.keys(result.error.fieldErrors).length > 0
-        ) {
-          return;
-        }
-        toast.error(result.error.message);
+  const { executeAsync, isExecuting } = useAction(createUserAction, {
+    onSuccess: () => {
+      toast.success("User created successfully.");
+      methods.reset();
+      setOpen(false);
+      router.refresh();
+    },
+    onError: ({ error }) => {
+      if (
+        error.serverError &&
+        DUPLICATE_EMAIL_CODES.has(error.serverError.code)
+      ) {
+        methods.setError("email", {
+          message: "This email already belongs to a User.",
+        });
         return;
       }
 
-      toast.success("User created successfully.");
-      reset();
-      setOpen(false);
-      router.refresh();
-    } catch (error) {
-      console.error("[CreateUserDialog]", error);
-      toast.error("Could not create user.");
-    } finally {
-      setPending(false);
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!open) {
+      methods.reset();
     }
-  }
+  }, [open, methods]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -132,17 +104,17 @@ export function CreateUserDialog() {
           New user
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={!pending}>
+      <DialogContent showCloseButton={!isExecuting}>
         <DialogHeader>
           <DialogTitle>New user</DialogTitle>
           <DialogDescription>
-            Create an account with email and password. The user can sign in to
-            the dashboard according to the assigned role.
+            Create a User with email and password. They can sign in to the
+            dashboard with the assigned role.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={methods.handleSubmit((values) => executeAsync(values))}
             className="flex flex-col gap-4"
             noValidate
           >
@@ -151,43 +123,34 @@ export function CreateUserDialog() {
                 name="name"
                 label="Name"
                 placeholder="Full name"
-                disabled={pending}
+                disabled={isExecuting}
               />
-              <Field className="gap-2">
-                <FieldLabel htmlFor="create-user-email">Email</FieldLabel>
-                <Input
-                  id="create-user-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="user@email.com"
-                  disabled={pending}
-                  aria-invalid={!!emailError}
-                  {...register("email")}
-                />
-                {emailError ? (
-                  <FieldError errors={[{ message: emailError }]} />
-                ) : null}
-              </Field>
+              <TextField
+                name="email"
+                label="Email"
+                placeholder="user@email.com"
+                disabled={isExecuting}
+              />
               <PasswordField
                 name="password"
                 label="Password"
-                disabled={pending}
+                disabled={isExecuting}
               />
               <Field className="gap-2">
                 <FieldLabel htmlFor="create-user-role">Role</FieldLabel>
                 <Controller
                   name="role"
-                  control={control}
+                  control={methods.control}
                   render={({ field }) => (
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={pending}
+                      disabled={isExecuting}
                     >
                       <SelectTrigger
                         id="create-user-role"
                         className="w-full"
-                        aria-invalid={!!errors.role}
+                        aria-invalid={!!methods.formState.errors.role}
                       >
                         <SelectValue placeholder="Role" />
                       </SelectTrigger>
@@ -198,9 +161,11 @@ export function CreateUserDialog() {
                     </Select>
                   )}
                 />
-                {errors.role?.message ? (
+                {methods.formState.errors.role?.message ? (
                   <FieldError
-                    errors={[{ message: String(errors.role.message) }]}
+                    errors={[
+                      { message: String(methods.formState.errors.role.message) },
+                    ]}
                   />
                 ) : null}
               </Field>
@@ -210,13 +175,13 @@ export function CreateUserDialog() {
                 type="button"
                 variant="outline"
                 className="flex-1 sm:flex-initial"
-                disabled={pending}
+                disabled={isExecuting}
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create user" isExecuting={pending} />
+                <SubmitButton label="Create user" isExecuting={isExecuting} />
               </div>
             </DialogFooter>
           </form>

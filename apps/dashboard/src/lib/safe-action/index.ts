@@ -62,7 +62,11 @@ export const actionClient = createSafeActionClient({
       const code = e.body?.code;
       logActionError(actionName, e, { code: code ?? "INTERNAL" });
 
-      if (code === "INVALID_EMAIL_OR_PASSWORD") {
+      if (
+        code === "INVALID_EMAIL_OR_PASSWORD" ||
+        code === "USER_ALREADY_EXISTS" ||
+        code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"
+      ) {
         return { code, message: e.message };
       }
 

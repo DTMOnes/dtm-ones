@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
-import { useRouter } from "next/navigation";
-
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
+import type { z } from "zod";
 
 import { setUserRoleAction } from "@/actions/users/setUserRole";
 import { Button } from "@/components/ui/button";
@@ -34,7 +32,6 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import type { DashboardRole } from "@/lib/auth/types";
-import { roleLabel } from "@/utils/auth/roles";
 import { setUserRoleSchema } from "@/lib/validation/users";
 
 type ChangeUserRoleFormValues = z.infer<typeof setUserRoleSchema>;
@@ -42,19 +39,21 @@ type ChangeUserRoleFormValues = z.infer<typeof setUserRoleSchema>;
 type ChangeUserRoleFormProps = {
   userId: string;
   currentRole: DashboardRole;
-  isOnlyOwner: boolean;
+  isLastOwner: boolean;
+  isSelf: boolean;
 };
 
 export function ChangeUserRoleForm({
   userId,
   currentRole,
-  isOnlyOwner,
+  isLastOwner,
+  isSelf,
 }: ChangeUserRoleFormProps) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
+  const cannotDemote = isLastOwner || isSelf;
 
   const methods = useForm<ChangeUserRoleFormValues>({
-    resolver: zodResolver(setUserRoleSchema as never),
+    resolver: zodResolver(setUserRoleSchema),
     defaultValues: {
       userId,
       role: currentRole,
@@ -62,26 +61,19 @@ export function ChangeUserRoleForm({
   });
 
   const selectedRole = methods.watch("role");
-  const cannotDemote = isOnlyOwner && selectedRole === "staff";
+  const blockedDemotion = cannotDemote && selectedRole === "staff";
 
-  async function onSubmit(data: ChangeUserRoleFormValues): Promise<void> {
-    setPending(true);
-    try {
-      const result = await setUserRoleAction(data);
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
+  const { executeAsync, isExecuting } = useAction(setUserRoleAction, {
+    onSuccess: () => {
       toast.success("Role updated successfully.");
       router.refresh();
-    } catch (error) {
-      console.error("[ChangeUserRoleForm]", error);
-      toast.error("Could not update role.");
-    } finally {
-      setPending(false);
-    }
-  }
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
 
   return (
     <FormProvider {...methods}>
@@ -89,11 +81,14 @@ export function ChangeUserRoleForm({
         <CardHeader className="border-b">
           <CardTitle>Role</CardTitle>
           <CardDescription>
-            Current role: {roleLabel(currentRole)}. Owners can manage users;
-            Staff can access contacts, players, and categories.
+            Current role: {currentRole === "owner" ? "Owner" : "Staff"}. Owners
+            can manage Users; Staff can manage Clients and ContactRequests.
           </CardDescription>
         </CardHeader>
-        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+        <form
+          onSubmit={methods.handleSubmit((values) => executeAsync(values))}
+          noValidate
+        >
           <CardContent className="pb-6">
             <FieldGroup className="gap-6">
               <input type="hidden" {...methods.register("userId")} />
@@ -106,7 +101,7 @@ export function ChangeUserRoleForm({
                     <Select
                       value={field.value}
                       onValueChange={field.onChange}
-                      disabled={pending}
+                      disabled={isExecuting}
                     >
                       <SelectTrigger
                         id="change-user-role"
@@ -116,7 +111,7 @@ export function ChangeUserRoleForm({
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="staff" disabled={isOnlyOwner}>
+                        <SelectItem value="staff" disabled={cannotDemote}>
                           Staff
                         </SelectItem>
                         <SelectItem value="owner">Owner</SelectItem>
@@ -134,17 +129,22 @@ export function ChangeUserRoleForm({
                   />
                 ) : null}
               </Field>
-              {isOnlyOwner ? (
+              {isLastOwner ? (
                 <p className="text-muted-foreground text-xs">
-                  This is the only owner. You cannot assign the Staff role until
-                  you promote another user or create a new owner.
+                  This is the last Owner. You cannot assign the Staff role until
+                  you promote another User or create a new Owner.
+                </p>
+              ) : null}
+              {isSelf ? (
+                <p className="text-muted-foreground text-xs">
+                  You cannot change your own role. Another Owner must do it.
                 </p>
               ) : null}
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end">
-            <Button type="submit" disabled={pending || cannotDemote}>
-              {pending ? <Spinner /> : "Save role"}
+            <Button type="submit" disabled={isExecuting || blockedDemotion}>
+              {isExecuting ? <Spinner /> : "Save role"}
             </Button>
           </CardFooter>
         </form>
