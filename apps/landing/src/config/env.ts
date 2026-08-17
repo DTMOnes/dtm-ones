@@ -1,7 +1,9 @@
+import { env as databaseEnv } from "@dtm/database/env";
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 export const env = createEnv({
+  extends: [databaseEnv],
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
   },

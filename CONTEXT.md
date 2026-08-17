@@ -20,23 +20,27 @@ A User who can manage Clients and ContactRequests and cannot manage Users. Manag
 ### Roster
 
 **Client**:
-A Player or a Coach the agency represents. A Client is not a User. A Client is exactly one of Player or Coach; the same human doing both is two Clients. A Client has a Visibility.
+A Player or a Coach the agency represents. A Client is not a User. A Client is exactly one of Player or Coach; the same human doing both is two Clients. A Client has a Visibility and a Eurobasket link.
 _Avoid_: User, talent, represented being, super-entity
 
 **Visibility**:
 Whether a Client is on the Roster. Public means on the Roster. Private means not on the Roster. A Client may be public only when that kind’s profile is complete. Visibility is not a document-draft workflow.
 _Avoid_: draft, published, GitHub
 
+**Eurobasket link**:
+A URL to the Client’s profile on Eurobasket. Players and Coaches can both have one. A public Client has a Eurobasket link.
+_Avoid_: eurobasket url, scouting link, profile url
+
 **Roster**:
 The public Clients. A private Client is still a Client, not on the Roster.
 _Avoid_: team, catalog, all Clients, the database of Clients
 
 **Player**:
-A basketball player the agency represents. A Player is a Client, is not a User, does not sign in, and is not a Coach. A Player has at most one Category. A public Player has a complete profile: name, Category, presentation image, height, nationality, and last club. Gallery and videos may be empty.
+A basketball player the agency represents. A Player is a Client, is not a User, does not sign in, and is not a Coach. A Player has at most one Category. A public Player has a complete profile: name, Category, presentation image, height, nationality, last club, and Eurobasket link. Gallery and videos may be empty.
 _Avoid_: User, account, athlete-as-login, Coach-as-Player
 
 **Coach**:
-A basketball coach the agency represents. A Coach is a Client, is not a Player, is not a User, and does not share a Player’s attributes (height, Category, presentation image, gallery, and videos are Player facts). A public Coach has a complete profile: name, nationality, and last club.
+A basketball coach the agency represents. A Coach is a Client, is not a Player, is not a User, and does not share a Player’s attributes (height, Category, presentation image, gallery, and videos are Player facts). A public Coach has a complete profile: name, nationality, last club, and Eurobasket link.
 _Avoid_: Player, Player tagged “Coaches”
 
 **Trash**:

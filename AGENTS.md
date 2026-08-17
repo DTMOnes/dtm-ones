@@ -1,5 +1,5 @@
 ---
-description: Instructions building apps with MCP
+description: Instructions for agents working on DTM Ones
 globs: *
 alwaysApply: true
 ---
@@ -12,208 +12,45 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
-## Read Before Anything Else
+## Domain
 
-Read in this exact order before any implementation:
+Read `CONTEXT.md` before naming a domain concept. Read the ADRs in `docs/adr/` that touch the area you are changing. See `docs/agents/domain.md`.
 
-1. .cursor/context/project-overview.md
-2. .cursor/context/architecture.md
-3. .cursor/context/ui-tokens.md
-4. .cursor/context/ui-rules.md
-5. .cursor/context/ui-registry.md
-6. .cursor/context/code-standards.md
-7. .cursor/context/library-docs.md
-8. .cursor/context/build-plan.md
-9. .cursor/context/progress-tracker.md
+Use the glossary’s words: User, Owner, Staff, Client, Player, Coach, Roster, Visibility, Eurobasket link, Category, Trash, ContactRequest.
 
-## Rules That Never Change
+## Work
 
-- Never use hardcoded hex values or raw Tailwind color classes
-- Update `progress-tracker.md` and `ui-registry.md` after every feature
-- Before any third party library — load its installed skill first,
-  then read `context/library-docs.md` for project-specific rules
-- If the same problem persists after one corrective prompt —
-  stop immediately and run /recover
-- Server Actions return InsForge shaped `{ data, error }`. Never add `next-safe-action`
-- Dashboard Contacts, Categories, Players, and Users load via server queries and mutate via plain Server Actions under `actions/`; no TanStack Query on those surfaces. Repo wide TanStack and BFF purge remains a follow up while shared providers may still wrap QueryClient.
-- Dashboard staff identity is Better Auth on InsForge Postgres (`better_auth` schema) with an HS256 `/api/insforge-token` bridge for InsForge SDK and RLS. App roles come from `public.users.role` (`owner` / `staff`). Do not use InsForge Auth SSR cookies for dashboard login.
-- Owner Users admin ops use Better Auth `auth.api` (`createUser`, `setRole`, `removeUser`) on the server with the acting Owner session headers; keep plugin role `admin`/`user` aligned with app `owner`/`staff`. Do not add an InsForge `admin-users` edge function for this.
-- Dashboard `next.config` allows `https://*.insforge.app/api/storage/**` for Next.js `Image` on player media URLs
+GitHub Issues on `FrancoLedArg/dtm-ones` via `gh`. See `docs/agents/issue-tracker.md`.
 
-## Available Skills
+Triage labels (same strings): `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
 
-- `/architect` — before any complex feature. Think before building.
-- `/imprint` — after any new UI component. Capture patterns.
-- `/review` — before demo or when something feels off.
-- `/recover` — when something breaks after one failed correction.
-- `/remember save` — when a feature spans multiple sessions.
-- `/remember restore` — when returning after a multi-session feature.
+## Stack
 
-## Agent skills
+Decisions live in `docs/adr/`. Follow them for new work.
 
-### Issue tracker
+- Two Next.js apps, one `@dtm/database` package (ADR 0004). Landing is the public Roster and ContactRequest form. Dashboard is Users and Staff work.
+- Neon Postgres and Vercel Blob. Leave InsForge (ADR 0002). Do not add InsForge tables, storage, Auth, or the JWT bridge. Remaining InsForge calls are cutover tickets.
+- `@dtm/database` holds the Drizzle schema and `createDatabase(connectionString)`. Apps own the connection. drizzle-kit lives in that package (ADR 0003, 0007).
+- Better Auth stays on the dashboard, Drizzle adapter, `public.users.role` `owner` / `staff` (ADR 0001, 0007).
+- Server Actions use next-safe-action (ADR 0011). Contacts, Categories, Clients, and Users load on the server and mutate via Server Actions.
+- Staff upload Player images to Vercel Blob (ADR 0008).
+- Environment variables: t3-env per consumer, package presets via `extends`. Follow `.cursor/rules/env-variables.mdc`.
+- `page.tsx` exports only `Page`. Follow `.cursor/rules/nextjs-page-structure.mdc`.
+- Use existing CSS theme tokens for color.
 
-GitHub Issues on `FrancoLedArg/dtm-ones` via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+## Skills
 
-### Triage labels
+This repo uses [Matt Pocock’s engineering skills](https://github.com/mattpocock/skills). Reach for the named skill; do not improvise the process.
 
-Canonical roles, same strings: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context: root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
-
-# InsForge SDK Documentation - Overview
-
-## What is InsForge?
-
-Backend-as-a-service (BaaS) platform providing:
-
-- **Database**: PostgreSQL with PostgREST API
-- **Authentication**: Email/password + OAuth (Google, GitHub)
-- **Storage**: File upload/download
-- **AI**: OpenRouter key provisioning and model catalog for direct OpenAI-compatible integrations
-- **Functions**: Serverless function deployment
-- **Realtime**: WebSocket pub/sub (database + client events)
-
-## Installation
-
-The following is a step-by-step guide to installing and using the InsForge TypeScript SDK for Web applications. If you are building other types of applications, please refer to:
-
-- [Swift SDK documentation](/sdks/swift/overview) for iOS, macOS, tvOS, and watchOS applications.
-- [Kotlin SDK documentation](/sdks/kotlin/overview) for Android applications.
-- [REST API documentation](/sdks/rest/overview) for direct HTTP API access.
-
-### 🚨 CRITICAL: Follow these steps in order
-
-### Step 1: Download Template
-
-Use the `download-template` MCP tool to create a new project with your backend URL and anon key pre-configured.
-
-### Step 2: Install SDK
-
-```bash
-npm install @insforge/sdk@latest
-```
-
-### Step 3: Create SDK Client
-
-You must create a client instance using `createClient()` with your base URL and anon key:
-
-```javascript
-import { createClient } from "@insforge/sdk";
-
-const client = createClient({
-  baseUrl: "https://your-app.region.insforge.app", // Your InsForge backend URL
-  anonKey: "your-anon-key-here", // Get this from backend metadata
-});
-```
-
-**API BASE URL**: Your API base URL is `https://your-app.region.insforge.app`.
-
-## Getting Detailed Documentation
-
-### 🚨 CRITICAL: Always Fetch Documentation Before Writing Code
-
-InsForge provides official SDKs and REST APIs, use them to interact with InsForge services from your application code.
-
-- [TypeScript SDK](/sdks/typescript/overview) - JavaScript/TypeScript
-- [Swift SDK](/sdks/swift/overview) - iOS, macOS, tvOS, and watchOS
-- [Kotlin SDK](/sdks/kotlin/overview) - Android and Kotlin Multiplatform
-- [REST API](/sdks/rest/overview) - Direct HTTP API access
-
-Before writing or editing any InsForge integration code, you **MUST** call the `fetch-docs` or `fetch-sdk-docs` MCP tool to get the latest SDK documentation. This ensures you have accurate, up-to-date implementation patterns.
-
-### Use the InsForge `fetch-docs` MCP tool to get specific SDK documentation:
-
-Available documentation types:
-
-- `"instructions"` - Essential backend setup (START HERE)
-- `"real-time"` - Real-time pub/sub (database + client events) via WebSockets
-- `"db-sdk-typescript"` - Database operations with TypeScript SDK
-- **Authentication** - Choose based on implementation:
-  - `"auth-sdk-typescript"` - TypeScript SDK methods for custom auth flows
-  - `"auth-components-react"` - Pre-built auth UI for React+Vite (single-page app)
-  - `"auth-components-react-router"` - Pre-built auth UI for React(Vite+React Router) (multi-page app)
-  - `"auth-components-nextjs"` - Pre-built auth UI for Next.js (SSR app)
-- `"storage-sdk"` - File storage operations
-- `"functions-sdk"` - Serverless functions invocation
-- `"ai-integration-sdk"` - AI integration with the provisioned OpenRouter key and OpenAI SDK
-- `"deployment"` - Deploy frontend applications via MCP tool
-- `"payments"` - Stripe Checkout, Billing Portal, webhook projections, and fulfillment patterns
-
-These docs are mostly for the TypeScript SDK. For other languages, you can also use the `fetch-sdk-docs` MCP tool to get specific documentation.
-
-### Use the InsForge `fetch-sdk-docs` MCP tool to get specific SDK documentation
-
-You can fetch SDK documentation using the `fetch-sdk-docs` MCP tool with a specific feature type and language.
-
-Available feature types:
-
-- `db` - Database operations
-- `storage` - File storage operations
-- `functions` - Serverless functions invocation
-- `auth` - User authentication
-- `ai` - AI integration with the provisioned OpenRouter key and OpenAI SDK
-- `realtime` - Real-time pub/sub (database + client events) via WebSockets
-- `payments` - Stripe Checkout and Billing Portal with webhook-based fulfillment
-
-Available languages:
-
-- `typescript` - JavaScript/TypeScript SDK
-- `swift` - Swift SDK (for iOS, macOS, tvOS, and watchOS)
-- `kotlin` - Kotlin SDK (for Android and JVM applications)
-- `rest-api` - REST API
-
-Payments currently has TypeScript SDK docs only. Use the Payments API reference for non-TypeScript clients.
-
-## When to Use SDK vs MCP Tools
-
-### Always SDK for Application Logic:
-
-- Authentication (register, login, logout, profiles)
-- Database CRUD (select, insert, update, delete)
-- Storage operations (upload, download files)
-- AI integration via the provisioned OpenRouter key with the OpenAI SDK or OpenRouter HTTP API
-- Serverless function invocation
-- Payments checkout and customer portal session creation
-
-### Use MCP Tools for Infrastructure:
-
-- Project scaffolding (`download-template`) - Download starter templates with InsForge integration
-- Backend setup and metadata (`get-backend-metadata`)
-- Database schema management (`run-raw-sql`, `get-table-schema`)
-- Storage bucket creation (`create-bucket`, `list-buckets`, `delete-bucket`)
-- Serverless function deployment (`create-function`, `update-function`, `delete-function`)
-- Frontend deployment (`create-deployment`) - Deploy frontend apps to InsForge hosting
-
-## Important Notes
-
-- For auth: use `auth-sdk` for custom UI, or framework-specific components for pre-built UI
-- SDK returns `{data, error}` structure for all operations
-- Database inserts require array format: `[{...}]`
-- Serverless functions have one endpoint and do not support nested route paths
-- Storage: Upload files to buckets, store URLs in database
-- AI integrations should call OpenRouter directly with `baseURL: "https://openrouter.ai/api/v1"` and a server-side `OPENROUTER_API_KEY`
-- **EXTRA IMPORTANT**: Use Tailwind CSS 3.4 (do not upgrade to v4). Lock these dependencies in `package.json`
-
-<!-- INSFORGE:START -->
-## InsForge backend
-
-This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
-
-- **Project:** **DTM-ONES** (API base `https://6pu9isni.us-east.insforge.app`)
-- **Skills:** these InsForge skills are installed for supported coding agents. Reach for them before implementing any InsForge feature instead of guessing the API:
-  - `insforge`: app code with the `@insforge/sdk` client (database CRUD, auth, storage, edge functions, realtime, AI, email, and Stripe payments).
-  - `insforge-cli`: backend and infrastructure via the `insforge` CLI (projects, SQL, migrations, RLS policies, storage buckets, functions, secrets, payment setup, schedules, deploys).
-  - `insforge-debug`: diagnosing failures (SDK/HTTP errors, RLS denials, auth and OAuth issues) and running security or performance audits.
-  - `insforge-integrations`: wiring external auth providers (Clerk, Auth0, WorkOS, Better Auth, etc.) for JWT-based RLS, or the OKX x402 payment facilitator.
-  - `find-skills`: discovering additional skills on demand.
-- **Credentials:** app code reads keys from `.env.local`; the CLI reads `.insforge/project.json`. Never hardcode or commit keys.
-
-Key patterns:
-
-- Database inserts take an array: `insert([{ ... }])`.
-- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
-- For storage uploads, persist both the returned `url` and `key`.
-<!-- INSFORGE:END -->
+- `/tdd` — test-first, red-green-refactor, integration tests
+- `/diagnosing-bugs` — diagnose or debug a failure
+- `/code-review` — review since a commit, branch, or PR
+- `/codebase-design` — deep modules, seams, where an interface goes
+- `/domain-modeling` — change glossary terms or record an ADR
+- `/grilling` — stress-test a plan or decision
+- `/prototype` — throwaway prototype to answer a design question
+- `/research` — gather docs or facts into a markdown file
+- `/wizard` — interactive bash for steps only a human can do
+- `/resolving-merge-conflicts` — in-progress merge or rebase conflicts
+- `/writing-for-agents` — edit skills, `AGENTS.md`, or `CLAUDE.md`
+- `/find-skills` — find or install a skill

@@ -9,6 +9,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@dtm/database": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@insforge/sdk": "^1.4.4",
     "@phosphor-icons/react": "^2.1.10",

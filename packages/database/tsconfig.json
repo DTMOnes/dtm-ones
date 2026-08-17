@@ -1,0 +1,10 @@
+{
+  "extends": "@dtm/typescript-config/base.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "types": ["node"],
+    "noEmit": true,
+    "rootDir": "."
+  },
+  "include": ["src/**/*.ts"]
+}
