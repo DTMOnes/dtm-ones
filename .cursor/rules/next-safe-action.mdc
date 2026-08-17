@@ -1,0 +1,50 @@
+---
+description: next-safe-action — throw AppError or let libraries throw; handleServerError interprets
+globs: apps/*/src/{actions,lib/safe-action,lib/validation,utils/errors}/**
+alwaysApply: false
+---
+
+# next-safe-action
+
+Throw from the action. Interpret in the client.
+
+A throw from middleware or `.action()` is caught by next-safe-action and passed to `handleServerError`. The return value is `result.serverError`. Re-thrown `isNavigationError` values are Next navigation (`unauthorized`, `forbidden`, `redirect`, `notFound`). Domain and library failures use this throw path so they are logged and shaped together (`returnServerError` skips that). Zod failures stay on `validationErrors`.
+
+## handleServerError
+
+1. If `isNavigationError(e)`, rethrow (so an accidental `unauthorized()` still navigates).
+2. Map known library errors to `AppError` by **error code**, then `interpretActionError`.
+3. Log `interpreted.log`. Call `unauthorized()` / `forbidden()` only here, when `interpreted.navigation` is set.
+4. Return `interpreted.client` (`{ code, message }`). Unknown errors are `INTERNAL` — generic client message, real message only in the log.
+
+`authorize` throws `UnauthorizedError` / `ForbiddenError`. It does not call Next `unauthorized()` / `forbidden()`; those run after the log.
+
+## Actions
+
+Public: `actionClient`. Signed-in Staff or Owner: `staffActionClient`. Owner: `ownerActionClient`. Metadata is `{ actionName }` only. Zod in `lib/validation`. Dashboard forms: react-hook-form + Zod + `useAction` (`error.serverError.message`).
+
+```ts
+export const signInAction = actionClient
+  .metadata({ actionName: "signIn" })
+  .inputSchema(signInSchema)
+  .action(async ({ parsedInput }) => {
+    if (await getSession()) {
+      throw new ConflictError("Already signed in.");
+    }
+
+    const signedIn = await auth.api.signInEmail({
+      body: parsedInput,
+      headers: await headers(),
+    });
+
+    return { ok: true as const, user: { /* from signedIn.user */ } };
+  });
+```
+
+Domain failures throw `utils/errors` (`ConflictError`, `NotFoundError`, …).
+
+## Better Auth (`auth.api.*`)
+
+Server `auth.api` **throws `APIError` on failure** and returns the payload on success. Invalid email/password is `APIError` with code `INVALID_EMAIL_OR_PASSWORD` — Better Auth does not return `null`. A successful return has `user`; do not null-check it as a credentials failure.
+
+Let `APIError` reach `handleServerError`. Map known codes there once (`INVALID_EMAIL_OR_PASSWORD` → `InvalidCredentialsError`). Unmapped `APIError` is `INTERNAL`.

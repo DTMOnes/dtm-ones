@@ -1,6 +1,7 @@
 import "server-only";
 
 import { betterAuth } from "@next-safe-action/adapter-better-auth";
+import { APIError } from "better-auth/api";
 import { forbidden, unauthorized } from "next/navigation";
 import {
   createSafeActionClient,
@@ -9,9 +10,9 @@ import {
 import z from "zod";
 
 import { auth } from "@/lib/auth";
-import { isDashboardRole } from "@/utils/auth/user-from-better-auth";
 import {
   ForbiddenError,
+  InvalidCredentialsError,
   UnauthorizedError,
   interpretActionError,
 } from "@/utils/errors";
@@ -27,7 +28,14 @@ export const actionClient = createSafeActionClient({
       throw e;
     }
 
-    const interpreted = interpretActionError(e, metadata);
+    const error =
+      metadata.actionName === "signIn" &&
+      e instanceof APIError &&
+      (e.statusCode === 401 || e.statusCode === 403)
+        ? new InvalidCredentialsError()
+        : e;
+
+    const interpreted = interpretActionError(error, metadata);
     console.error(interpreted.log);
 
     if (interpreted.navigation === "unauthorized") {
@@ -45,7 +53,10 @@ export const actionClient = createSafeActionClient({
 export const staffActionClient = actionClient.use(
   betterAuth(auth, {
     authorize: ({ authData, next }) => {
-      if (!authData || !isDashboardRole(authData.user.role)) {
+      if (
+        !authData ||
+        (authData.user.role !== "owner" && authData.user.role !== "staff")
+      ) {
         throw new UnauthorizedError();
       }
 
@@ -57,7 +68,10 @@ export const staffActionClient = actionClient.use(
 export const ownerActionClient = actionClient.use(
   betterAuth(auth, {
     authorize: ({ authData, next }) => {
-      if (!authData || !isDashboardRole(authData.user.role)) {
+      if (
+        !authData ||
+        (authData.user.role !== "owner" && authData.user.role !== "staff")
+      ) {
         throw new UnauthorizedError();
       }
 

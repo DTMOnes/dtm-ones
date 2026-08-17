@@ -25,7 +25,7 @@ Dashboard and landing share this `src/` layout. New files go in the matching fol
 
 - `lib/db/index.ts` — the app's Drizzle connection (`export const db`)
 - `lib/auth/` — Better Auth server (`index.ts`) and client (`client.ts`)
-- `lib/safe-action/` — next-safe-action clients (`staffActionClient`, `ownerActionClient`)
+- `lib/safe-action/` — next-safe-action clients (`actionClient`, `staffActionClient`, `ownerActionClient`)
 - `utils/auth/` — session lookup, Owner/Staff gates, role labels
 
 shadcn CLI writes `cn` to `lib/utils.ts`. Leave that path so `shadcn add` keeps working.
