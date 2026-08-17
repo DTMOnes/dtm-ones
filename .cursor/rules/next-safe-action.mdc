@@ -17,7 +17,7 @@ Log every throw, then:
 1. `UnauthorizedError` → `unauthorized()`
 2. `ForbiddenError` → `forbidden()`
 3. Other `AppError` → `{ code, message }` from that error
-4. Better Auth `APIError` with a known user-facing code (`INVALID_EMAIL_OR_PASSWORD`) → `{ code, message }` from that error. Other `APIError` is `INTERNAL`.
+4. Better Auth `APIError` with a known user-facing code (`INVALID_EMAIL_OR_PASSWORD`, `USER_ALREADY_EXISTS`, `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL`) → `{ code, message }` from that error. Other `APIError` is `INTERNAL`.
 5. Anything else → `INTERNAL` — generic client message, real message only in the log
 
 `authorize` throws `UnauthorizedError` / `ForbiddenError`. It does not call Next `unauthorized()` / `forbidden()`; those run after the log.
@@ -48,6 +48,6 @@ Domain failures throw `utils/errors` (`ConflictError`, `NotFoundError`, …).
 
 ## Better Auth (`auth.api.*`)
 
-Server `auth.api` **throws `APIError` on failure** and returns the payload on success. Invalid email/password is `APIError` with code `INVALID_EMAIL_OR_PASSWORD` — Better Auth does not return `null`. A successful return has `user`; do not null-check it as a credentials failure.
+Server `auth.api` **throws `APIError` on failure** and returns the payload on success. Invalid email/password is `APIError` with code `INVALID_EMAIL_OR_PASSWORD` — Better Auth does not return `null`. A duplicate email is `USER_ALREADY_EXISTS` or `USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL`. A successful return has `user`; do not null-check it as a credentials failure.
 
 Let `APIError` reach `handleServerError`. Do not rewrite it as `AppError`. Inspect `body.code`; show known user-facing codes; unmapped `APIError` is `INTERNAL`.

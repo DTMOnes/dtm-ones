@@ -1,33 +1,35 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Controller, get, useFormContext } from "react-hook-form";
+
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import {
-  Combobox,
-  ComboboxContent,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
-import { get } from "react-hook-form";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function SelectField({
   name,
   label,
   disabled,
+  placeholder,
   options,
 }: {
   name: string;
   label: string;
   disabled?: boolean;
+  placeholder?: string;
   options: {
-    id: number;
+    id: string;
     name: string;
+    disabled?: boolean;
   }[];
 }) {
   const {
-    register,
-    trigger,
+    control,
     formState: { errors },
   } = useFormContext();
 
@@ -35,35 +37,38 @@ export default function SelectField({
 
   return (
     <Field className="flex flex-col gap-2">
-      <FieldLabel htmlFor={label}>{label}</FieldLabel>
-      <Combobox>
-        <ComboboxInput
-          type="text"
-          id={name}
-          placeholder={options.length === 0 ? "No hay opciones" : label}
-          autoComplete="off"
-          disabled={disabled || options.length === 0}
-          {...register(name, {
-            onChange: async () => {
-              await trigger(name);
-            },
-          })}
-        />
-        <ComboboxContent>
-          {options.length > 0 ? (
-            options.map((option) => (
-              <ComboboxItem key={option.id} value={option.id.toString()}>
-                {option.name}
-              </ComboboxItem>
-            ))
-          ) : (
-            <ComboboxItem key="no-options" value="no-options">
-              No se encontraron opciones
-            </ComboboxItem>
-          )}
-        </ComboboxContent>
-      </Combobox>
-      {error && <FieldError errors={[{ message: error as string }]} />}
+      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <Select
+            value={field.value}
+            onValueChange={field.onChange}
+            disabled={disabled}
+          >
+            <SelectTrigger
+              id={name}
+              className="w-full"
+              aria-invalid={!!error}
+            >
+              <SelectValue placeholder={placeholder || label} />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              {options.map((option) => (
+                <SelectItem
+                  key={option.id}
+                  value={option.id}
+                  disabled={option.disabled}
+                >
+                  {option.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
+      {error && <FieldError errors={[{ message: error }]} />}
     </Field>
   );
 }

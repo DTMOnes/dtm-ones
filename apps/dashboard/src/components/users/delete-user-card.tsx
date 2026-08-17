@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
 import { deleteUserAction } from "@/actions/users/deleteUser";
@@ -31,50 +32,61 @@ type DeleteUserCardProps = {
   userId: string;
   userEmail: string;
   userName: string;
-  isOnlyOwner: boolean;
+  isLastOwner: boolean;
+  isSelf: boolean;
 };
 
 export function DeleteUserCard({
   userId,
   userEmail,
   userName,
-  isOnlyOwner,
+  isLastOwner,
+  isSelf,
 }: DeleteUserCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [pending, setPending] = useState(false);
+  const isDisabled = isLastOwner || isSelf;
 
-  const isDisabled = pending || isOnlyOwner;
-
-  async function onConfirmDelete(): Promise<void> {
-    setPending(true);
-    try {
-      const result = await deleteUserAction({ id: userId });
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
+  const { executeAsync, isExecuting } = useAction(deleteUserAction, {
+    onSuccess: () => {
       toast.success("User deleted successfully.");
       setIsDeleteDialogOpen(false);
       router.push("/users");
-    } catch (error) {
-      console.error("[DeleteUserCard]", error);
-      toast.error("Could not delete user.");
-    } finally {
-      setPending(false);
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
+
+  function description(): string {
+    const parts: string[] = [];
+
+    if (isLastOwner) {
+      parts.push(
+        "You cannot delete the last Owner. Promote another User or create a new Owner first.",
+      );
     }
+
+    if (isSelf) {
+      parts.push(
+        "You cannot delete yourself. Another Owner must do it.",
+      );
+    }
+
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
+
+    return "Permanently remove this User. This cannot be undone.";
   }
 
   return (
     <Card className="border-destructive ring-destructive/30">
       <CardHeader className="border-b border-destructive/20">
         <CardTitle>Delete user</CardTitle>
-        <CardDescription>
-          {isOnlyOwner
-            ? "You cannot delete the only owner. Promote another user or create a new owner before removing this account."
-            : "Permanently remove this account from the system. This action cannot be undone."}
-        </CardDescription>
+        <CardDescription>{description()}</CardDescription>
       </CardHeader>
       <CardContent className="py-6">
         <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3">
@@ -87,13 +99,17 @@ export function DeleteUserCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!pending) {
+            if (!isExecuting) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" disabled={isDisabled}>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isDisabled || isExecuting}
+            >
               Delete user
             </Button>
           </AlertDialogTrigger>
@@ -101,19 +117,21 @@ export function DeleteUserCard({
             <AlertDialogHeader>
               <AlertDialogTitle>Delete user</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. The account for {userEmail} will
-                be permanently deleted.
+                This cannot be undone. The User {userEmail} will be permanently
+                deleted.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isExecuting}>
+                Cancel
+              </AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={pending}
-                onClick={onConfirmDelete}
+                disabled={isExecuting}
+                onClick={() => executeAsync({ id: userId })}
               >
-                {pending ? "Deleting..." : "Confirm deletion"}
+                {isExecuting ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

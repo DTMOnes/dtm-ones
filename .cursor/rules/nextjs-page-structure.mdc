@@ -1,19 +1,20 @@
 ---
-description: Next.js page files export only Page — no nested async components
+description: Next.js page files export only Page — small reads and HTML stay in the page
 globs: "**/app/**/page.tsx"
 alwaysApply: false
 ---
 
 # Next.js page structure
 
-A `page.tsx` file exports **one** route component: the default `Page` (plus optional `metadata` / `generateMetadata` / route config). Do not define sibling async components in the same file.
+A `page.tsx` file exports **one** route component: the default `Page` (plus optional `metadata` / `generateMetadata` / route config). Do not define sibling components in the same file.
 
 ## Rules
 
 - Put data fetching, `searchParams` / `params` awaiting, and JSX in the default `Page` itself.
 - Prefer `export default async function Page(...)` when the route needs async work.
-- Never add helpers like `PlayersGrid`, `PageContent`, or `AsyncSection` inside `page.tsx`.
-- Do not extract page fetches into sibling component files just to satisfy Suspense — keep the fetch in `Page` and wrap the rendered UI in `<Suspense>` when needed.
+- Small Drizzle reads live in `Page`. Extract a query helper only when the query is large enough to justify it.
+- Small route HTML lives in `Page`. Keep client forms and dialogs in `components/` — the page stays a server page. Extract a component when the page becomes hard to read.
+- Do not extract page fetches into sibling files just to satisfy Suspense — keep the fetch in `Page`.
 - Layout chrome, loading UI, and client wrappers stay in `layout.tsx`, `loading.tsx`, or `components/`.
 
 ## Examples
@@ -35,17 +36,22 @@ export default function Page({ searchParams }: Props) {
 ```
 
 ```tsx
-// ✅ GOOD — fetch in Page, Suspense around the UI
-export default async function Page({ searchParams }: Props) {
-  const sp = await searchParams;
-  const players = await listPublicRosterPlayers(/* ... */);
+// ✅ GOOD — Drizzle read and small HTML in Page; client dialog stays extracted
+export default async function Page() {
+  const players = await db
+    .select({ id: schema.clients.id, name: schema.clients.name })
+    .from(schema.clients);
 
   return (
-    <HomeRoster>
-      <Suspense fallback={<GridLoading />}>
-        <Grid players={players} />
-      </Suspense>
-    </HomeRoster>
+    <main>
+      <h1>Players</h1>
+      <CreatePlayerDialog />
+      {players.length === 0 ? (
+        <p>No players yet.</p>
+      ) : (
+        players.map((player) => <p key={player.id}>{player.name}</p>)
+      )}
+    </main>
   );
 }
 ```

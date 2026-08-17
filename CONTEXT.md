@@ -11,7 +11,7 @@ A person who signs in to the dashboard. A User is either an Owner or a Staff mem
 _Avoid_: Admin (as a type of person), account, operator, Client
 
 **Owner**:
-A User who can do everything Staff can, and can create other Users, change their role, and delete them.
+A User who can do everything Staff can, and can create other Users, change a User's name (including their own), change their role, and delete them — not their own role or themselves, which another Owner must change or delete. The dashboard always has at least one Owner.
 _Avoid_: Admin, superuser
 
 **Staff**:
