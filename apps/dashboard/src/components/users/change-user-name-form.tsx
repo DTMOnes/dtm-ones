@@ -79,7 +79,15 @@ export function ChangeUserNameForm({
               />
             </FieldGroup>
           </CardContent>
-          <CardFooter className="justify-end">
+          <CardFooter className="justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isExecuting}
+              onClick={() => methods.reset()}
+            >
+              Reset
+            </Button>
             <Button type="submit" disabled={isExecuting}>
               {isExecuting ? <Spinner /> : "Save name"}
             </Button>

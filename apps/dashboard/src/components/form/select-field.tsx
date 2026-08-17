@@ -54,7 +54,7 @@ export default function SelectField({
             >
               <SelectValue placeholder={placeholder || label} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent position="popper">
               {options.map((option) => (
                 <SelectItem
                   key={option.id}
