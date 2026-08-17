@@ -5,6 +5,7 @@ import { admin } from "better-auth/plugins";
 import { schema } from "@dtm/database";
 
 import { env } from "@/config/env";
+import { ac, owner, staff } from "@/lib/auth/access";
 import { db } from "@/lib/db";
 
 export const auth = betterAuth({
@@ -27,8 +28,13 @@ export const auth = betterAuth({
   },
   plugins: [
     admin({
-      defaultRole: "user",
-      adminRoles: ["admin"],
+      ac,
+      roles: {
+        owner,
+        staff,
+      },
+      defaultRole: "staff",
+      adminRoles: ["owner"],
     }),
     nextCookies(),
   ],

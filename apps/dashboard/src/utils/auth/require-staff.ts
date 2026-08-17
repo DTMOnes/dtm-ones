@@ -1,14 +1,5 @@
-import { headers } from "next/headers";
-
-import {
-  FORBIDDEN,
-  PLEASE_SIGN_IN,
-  UNAVAILABLE,
-  type ActionResult,
-} from "@/lib/action-result";
-import { auth } from "@/lib/auth";
 import type { DashboardRole } from "@/lib/auth/types";
-import { findDashboardUser } from "@/utils/auth/find-dashboard-user";
+import { getSession } from "@/utils/auth/get-session";
 
 export type StaffUser = {
   id: string;
@@ -16,30 +7,15 @@ export type StaffUser = {
   role: DashboardRole;
 };
 
-export async function requireStaff(): Promise<
-  ActionResult<{ user: StaffUser }>
-> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+export type StaffGate<T> =
+  | { data: T; error: null }
+  | { data: null; error: { message: string } };
 
-  if (!session?.user) {
-    return { data: null, error: { message: PLEASE_SIGN_IN } };
+export async function requireStaff(): Promise<StaffGate<{ user: StaffUser }>> {
+  const session = await getSession();
+  if (!session) {
+    return { data: null, error: { message: "You need to sign in again." } };
   }
 
-  if (!session.user.email) {
-    return { data: null, error: { message: FORBIDDEN } };
-  }
-
-  try {
-    const user = await findDashboardUser(session.user.id);
-    if (!user) {
-      return { data: null, error: { message: FORBIDDEN } };
-    }
-
-    return { data: { user }, error: null };
-  } catch (error) {
-    console.error("[requireStaff]", error);
-    return { data: null, error: { message: UNAVAILABLE } };
-  }
+  return { data: { user: session.user }, error: null };
 }

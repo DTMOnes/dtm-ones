@@ -1,0 +1,28 @@
+---
+description: Dashboard next-safe-action clients with Better Auth
+globs: apps/dashboard/src/{actions,lib/safe-action,lib/validation}/**
+alwaysApply: false
+---
+
+# Dashboard Server Actions
+
+`lib/safe-action` creates one public client and two Better Auth clients. The adapter loads the session; `authorize` throws our errors — it does not call Next `unauthorized()` / `forbidden()`. `handleServerError` logs, then does that.
+
+Every action sets metadata `{ actionName }` only.
+
+- Public (sign-in, sign-out): `actionClient`
+- Signed-in Staff or Owner: `staffActionClient` — missing User throws `UnauthorizedError`
+- Owner-only: `ownerActionClient` — Staff throws `ForbiddenError`
+
+Put Zod in `lib/validation`. Throw `utils/errors`. Dashboard forms: react-hook-form + Zod + `useAction`.
+
+```ts
+// ✅
+export const signInAction = actionClient
+  .metadata({ actionName: "signIn" })
+  .inputSchema(signInSchema)
+  .action(async ({ parsedInput }) => { /* ... */ });
+
+// ❌ role in metadata; calling unauthorized() inside the action
+.metadata({ actionName: "signIn", requiredRole: "admin" })
+```

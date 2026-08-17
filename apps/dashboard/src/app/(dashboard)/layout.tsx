@@ -1,38 +1,22 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SiteHeader } from "@/components/sidebar/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { auth } from "@/lib/auth";
-import { findDashboardUser } from "@/utils/auth/find-dashboard-user";
+import { getSession } from "@/utils/auth/get-session";
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const requestHeaders = await headers();
-  const baSession = await auth.api.getSession({
-    headers: requestHeaders,
-  });
+  const session = await getSession();
 
-  if (!baSession?.user) {
+  if (!session) {
     redirect("/signin");
   }
 
-  let user;
-  try {
-    user = await findDashboardUser(baSession.user.id);
-  } catch (error) {
-    console.error("[dashboard-layout]", error);
-    redirect("/signin");
-  }
-
-  if (!user) {
-    // Layouts cannot clear cookies. Route handler signs out and redirects.
-    redirect("/api/auth/deny");
-  }
+  const { user } = session;
 
   return (
     <SidebarProvider

@@ -49,10 +49,10 @@ export function NavUser({ user }: { user: NavUserData }) {
   async function handleSignOut() {
     setPending(true);
     try {
-      const { error } = await signOutAction();
+      const result = await signOutAction();
 
-      if (error) {
-        toast.error(error.message);
+      if (result.serverError) {
+        toast.error(result.serverError.message);
       }
 
       router.push("/signin");

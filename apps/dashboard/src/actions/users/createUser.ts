@@ -1,16 +1,10 @@
 "use server";
 
-import { schema } from "@dtm/database";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
-import {
-  UNAVAILABLE,
-  type ActionResult,
-} from "@/lib/action-result";
 import { auth } from "@/lib/auth";
 import type { DashboardRole } from "@/lib/auth/types";
-import { db } from "@/lib/db";
 import { createUserSchema } from "@/lib/validation/users";
 import type { DashboardUserRow } from "@/types/user";
 import {
@@ -18,9 +12,17 @@ import {
   isDuplicateEmailError,
 } from "@/utils/auth/better-auth-error";
 import { requireOwner } from "@/utils/auth/require-owner";
-import { toPluginRole } from "@/utils/auth/roles";
+
+type ActionResult<T> =
+  | { data: T; error: null }
+  | {
+      data: null;
+      error: { message: string; fieldErrors?: Record<string, string[]> };
+    };
 
 const EMAIL_TAKEN = "An account with this email already exists.";
+const UNAVAILABLE =
+  "This service is temporarily unavailable. Please try again in a moment.";
 
 export async function createUserAction(input: {
   name: string;
@@ -49,8 +51,6 @@ export async function createUserAction(input: {
   const { name, email, password, role } = parsed.data;
   const requestHeaders = await headers();
 
-  let createdUserId: string | null = null;
-
   try {
     const created = await auth.api.createUser({
       headers: requestHeaders,
@@ -58,58 +58,32 @@ export async function createUserAction(input: {
         name,
         email,
         password,
-        role: toPluginRole(role),
+        role,
       },
     });
 
-    createdUserId = created.user.id;
-
-    const [row] = await db
-      .insert(schema.users)
-      .values({
-        id: created.user.id,
-        email: email.toLowerCase(),
-        role,
-      })
-      .returning();
-
-    if (!row) {
-      throw new Error("public.users insert returned no row");
-    }
+    const now = new Date().toISOString();
 
     revalidatePath("/users");
     return {
       data: {
         user: {
-          id: row.id,
-          email: row.email,
+          id: created.user.id,
+          email: created.user.email,
           name: created.user.name?.trim() ? created.user.name : name,
-          role: row.role,
-          created_at: row.createdAt.toISOString(),
-          updated_at: row.updatedAt.toISOString(),
+          role,
+          created_at: created.user.createdAt
+            ? new Date(created.user.createdAt).toISOString()
+            : now,
+          updated_at: created.user.updatedAt
+            ? new Date(created.user.updatedAt).toISOString()
+            : now,
         },
       },
       error: null,
     };
   } catch (error) {
     console.error("[createUser]", error);
-
-    if (createdUserId) {
-      try {
-        await auth.api.removeUser({
-          headers: requestHeaders,
-          body: { userId: createdUserId },
-        });
-      } catch (compensationError) {
-        console.error(
-          "[createUser] compensation removeUser failed; manual cleanup required",
-          {
-            userId: createdUserId,
-            error: compensationError,
-          },
-        );
-      }
-    }
 
     if (isDuplicateEmailError(error)) {
       return {

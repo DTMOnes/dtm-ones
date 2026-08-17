@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useAction } from "next-safe-action/hooks";
+import { useEffect } from "react";
 import { toast } from "sonner";
+import type { z } from "zod";
 
 import { signInAction } from "@/actions/auth";
-import { NOT_AUTHORIZED } from "@/lib/action-result";
-import { signInSchema as schema } from "@/lib/validation/auth";
+import PasswordField from "@/components/form/password-field";
+import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,10 +20,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import TextField from "@/components/form/text-field";
-import PasswordField from "@/components/form/password-field";
+import { signInSchema } from "@/lib/validation/auth";
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof signInSchema>;
+
+function serverErrorMessage(serverError: unknown): string {
+  if (
+    typeof serverError === "object" &&
+    serverError !== null &&
+    "message" in serverError &&
+    typeof serverError.message === "string"
+  ) {
+    return serverError.message;
+  }
+
+  return "Something went wrong while executing the operation.";
+}
 
 export function SignInForm({
   showDenied = false,
@@ -30,13 +43,24 @@ export function SignInForm({
   showDenied?: boolean;
 }) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
-
   const methods = useForm<FormValues>({
-    resolver: zodResolver(schema as never),
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",
+    },
+  });
+
+  const { executeAsync, isExecuting } = useAction(signInAction, {
+    onSuccess: () => {
+      router.push("/contacts");
+      router.refresh();
+    },
+    onError: ({ error }) => {
+      methods.setValue("password", "");
+      if (error.serverError) {
+        toast.error(serverErrorMessage(error.serverError));
+      }
     },
   });
 
@@ -44,31 +68,8 @@ export function SignInForm({
     if (!showDenied) {
       return;
     }
-    toast.error(NOT_AUTHORIZED);
+    toast.error("You need to sign in again.");
   }, [showDenied]);
-
-  async function onSubmit(values: FormValues) {
-    setPending(true);
-    try {
-      const { data, error } = await signInAction(values);
-
-      if (error) {
-        methods.setValue("password", "");
-        toast.error(error.message);
-        return;
-      }
-
-      if (!data) {
-        return;
-      }
-
-      toast.success("Signed in successfully");
-      router.push("/contacts");
-      router.refresh();
-    } finally {
-      setPending(false);
-    }
-  }
 
   return (
     <Card className="gap-6">
@@ -82,7 +83,7 @@ export function SignInForm({
         <FormProvider {...methods}>
           <form
             id="signin-form"
-            onSubmit={methods.handleSubmit(onSubmit)}
+            onSubmit={methods.handleSubmit((values) => executeAsync(values))}
             className="flex flex-col gap-6"
           >
             <TextField name="email" label="Email" placeholder="you@email.com" />
@@ -95,9 +96,9 @@ export function SignInForm({
           type="submit"
           form="signin-form"
           className="w-full"
-          disabled={pending}
+          disabled={isExecuting}
         >
-          {pending ? "Signing in..." : "Sign In"}
+          {isExecuting ? "Signing in..." : "Sign In"}
         </Button>
       </CardFooter>
     </Card>
