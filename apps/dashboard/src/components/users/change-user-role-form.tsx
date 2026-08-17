@@ -1,6 +1,6 @@
 "use client";
 
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import type { z } from "zod";
 
 import { setUserRoleAction } from "@/actions/users/setUserRole";
+import SelectField from "@/components/form/select-field";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,19 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { DashboardRole } from "@/lib/auth/types";
 import { setUserRoleSchema } from "@/lib/validation/users";
@@ -92,43 +81,16 @@ export function ChangeUserRoleForm({
           <CardContent className="pb-6">
             <FieldGroup className="gap-6">
               <input type="hidden" {...methods.register("userId")} />
-              <Field className="gap-2">
-                <FieldLabel htmlFor="change-user-role">New role</FieldLabel>
-                <Controller
-                  name="role"
-                  control={methods.control}
-                  render={({ field }) => (
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      disabled={isExecuting}
-                    >
-                      <SelectTrigger
-                        id="change-user-role"
-                        className="w-full"
-                        aria-invalid={!!methods.formState.errors.role}
-                      >
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="staff" disabled={cannotDemote}>
-                          Staff
-                        </SelectItem>
-                        <SelectItem value="owner">Owner</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {methods.formState.errors.role?.message ? (
-                  <FieldError
-                    errors={[
-                      {
-                        message: String(methods.formState.errors.role.message),
-                      },
-                    ]}
-                  />
-                ) : null}
-              </Field>
+              <SelectField
+                name="role"
+                label="New role"
+                placeholder="Select role"
+                disabled={isExecuting}
+                options={[
+                  { id: "staff", name: "Staff", disabled: cannotDemote },
+                  { id: "owner", name: "Owner" },
+                ]}
+              />
               {isLastOwner ? (
                 <p className="text-muted-foreground text-xs">
                   This is the last Owner. You cannot assign the Staff role until

@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import {
-  Controller,
-  FormProvider,
-  useForm,
-} from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
@@ -18,6 +14,7 @@ import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
 import { createUserAction } from "@/actions/users/createUser";
 import PasswordField from "@/components/form/password-field";
+import SelectField from "@/components/form/select-field";
 import SubmitButton from "@/components/form/submit-button";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
@@ -30,19 +27,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FieldGroup } from "@/components/ui/field";
 import { createUserSchema } from "@/lib/validation/users";
 
 type FormValues = z.infer<typeof createUserSchema>;
@@ -136,39 +121,15 @@ export function CreateUserDialog() {
                 label="Password"
                 disabled={isExecuting}
               />
-              <Field className="gap-2">
-                <FieldLabel htmlFor="create-user-role">Role</FieldLabel>
-                <Controller
-                  name="role"
-                  control={methods.control}
-                  render={({ field }) => (
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      disabled={isExecuting}
-                    >
-                      <SelectTrigger
-                        id="create-user-role"
-                        className="w-full"
-                        aria-invalid={!!methods.formState.errors.role}
-                      >
-                        <SelectValue placeholder="Role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="staff">Staff</SelectItem>
-                        <SelectItem value="owner">Owner</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-                {methods.formState.errors.role?.message ? (
-                  <FieldError
-                    errors={[
-                      { message: String(methods.formState.errors.role.message) },
-                    ]}
-                  />
-                ) : null}
-              </Field>
+              <SelectField
+                name="role"
+                label="Role"
+                disabled={isExecuting}
+                options={[
+                  { id: "staff", name: "Staff" },
+                  { id: "owner", name: "Owner" },
+                ]}
+              />
             </FieldGroup>
             <DialogFooter className="gap-2 border-t pt-4 sm:justify-end">
               <Button
