@@ -4,6 +4,9 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useAction } from "next-safe-action/hooks";
+import { toast } from "sonner";
+
 import { deleteCategoryAction } from "@/actions/categories/deleteCategory";
 import {
   AlertDialog,
@@ -24,7 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "sonner";
 
 type DeleteCategoryCardProps = {
   categoryId: string;
@@ -32,43 +34,41 @@ type DeleteCategoryCardProps = {
   playerCount: number;
 };
 
-export default function DeleteCategoryCard({
+export function DeleteCategoryCard({
   categoryId,
   categoryName,
   playerCount,
 }: DeleteCategoryCardProps) {
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [pending, setPending] = useState(false);
+  const isDisabled = playerCount > 0;
 
-  async function onConfirmDelete(): Promise<void> {
-    setPending(true);
-    try {
-      const result = await deleteCategoryAction({ id: categoryId });
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
+  const { executeAsync, isExecuting } = useAction(deleteCategoryAction, {
+    onSuccess: () => {
       toast.success("Category deleted successfully.");
       setIsDeleteDialogOpen(false);
       router.push("/categories");
-    } catch (error) {
-      console.error("[DeleteCategoryCard]", error);
-      toast.error("Could not delete the category.");
-    } finally {
-      setPending(false);
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
+
+  function description(): string {
+    if (isDisabled) {
+      return "You cannot delete a Category while a Player has it.";
     }
+
+    return "Permanently remove this Category. This cannot be undone.";
   }
 
   return (
     <Card className="border-destructive ring-destructive/30">
       <CardHeader className="border-b border-destructive/20">
         <CardTitle>Delete category</CardTitle>
-        <CardDescription>
-          Delete the category from the system. Players are not deleted; they are
-          only removed from this category.
-        </CardDescription>
+        <CardDescription>{description()}</CardDescription>
       </CardHeader>
       <CardContent className="py-6">
         <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3">
@@ -80,13 +80,17 @@ export default function DeleteCategoryCard({
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
-            if (!pending) {
+            if (!isExecuting) {
               setIsDeleteDialogOpen(open);
             }
           }}
         >
           <AlertDialogTrigger asChild>
-            <Button type="button" variant="destructive" disabled={pending}>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isDisabled || isExecuting}
+            >
               Delete category
             </Button>
           </AlertDialogTrigger>
@@ -94,22 +98,21 @@ export default function DeleteCategoryCard({
             <AlertDialogHeader>
               <AlertDialogTitle>Delete category</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. The category &quot;
-                {categoryName}&quot; will be deleted and unassigned{" "}
-                {playerCount} player{playerCount === 1 ? "" : "s"}.
+                This cannot be undone. The Category {categoryName} will be
+                permanently deleted.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel disabled={isExecuting}>
+                Cancel
+              </AlertDialogCancel>
               <Button
                 type="button"
                 variant="destructive"
-                disabled={pending}
-                onClick={() => {
-                  void onConfirmDelete();
-                }}
+                disabled={isExecuting}
+                onClick={() => executeAsync({ id: categoryId })}
               >
-                {pending ? "Deleting..." : "Confirm deletion"}
+                {isExecuting ? "Deleting..." : "Confirm deletion"}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

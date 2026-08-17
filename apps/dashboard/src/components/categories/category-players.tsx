@@ -1,12 +1,5 @@
-"use client";
-
-// Next
 import Link from "next/link";
 
-// Components
-import DeletePlayerButton from "@/components/categories/delete-player-button";
-
-// Shadcn
 import {
   Card,
   CardContent,
@@ -23,38 +16,27 @@ import {
 } from "@/components/ui/empty";
 import {
   Item,
-  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
+import type { CategoryPlayerSummary } from "@/types/category";
 
-// Phosphor
-import { UserIcon } from "@phosphor-icons/react";
-
-type Player = {
-  id: string;
-  full_name: string;
-  last_club: string;
-};
+import { UserIcon } from "@phosphor-icons/react/ssr";
 
 type CategoryPlayersProps = {
-  categoryId: string;
-  players: Player[];
+  players: CategoryPlayerSummary[];
 };
 
-export default function CategoryPlayers({
-  categoryId,
-  players,
-}: CategoryPlayersProps) {
+export function CategoryPlayers({ players }: CategoryPlayersProps) {
   return (
     <Card>
       <CardHeader className="border-b">
         <CardTitle>Players in the category</CardTitle>
         <CardDescription>
-          Players assigned to this category. You can open their profile or
-          remove them from the group.
+          Players who have this Category. A Category cannot be deleted while any
+          Player has it.
         </CardDescription>
       </CardHeader>
       <CardContent className="py-6">
@@ -66,34 +48,25 @@ export default function CategoryPlayers({
               </EmptyMedia>
               <EmptyTitle>No players</EmptyTitle>
               <EmptyDescription>
-                No players have been assigned to this category yet.
+                No Player has this Category yet.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
           <ItemGroup className="gap-2">
             {players.map((player) => (
-              <Item
-                key={player.id}
-                variant="muted"
-                className="flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between"
-              >
+              <Item key={player.id} variant="muted">
                 <ItemContent>
                   <ItemTitle>
                     <Link
                       href={`/players/${player.id}`}
                       className="hover:underline"
                     >
-                      {player.full_name}
+                      {player.name}
                     </Link>
                   </ItemTitle>
-                  <ItemDescription>
-                    Last club: {player.last_club}
-                  </ItemDescription>
+                  <ItemDescription>Last club: {player.lastClub}</ItemDescription>
                 </ItemContent>
-                <ItemActions className="gap-2 justify-end sm:shrink-0">
-                  <DeletePlayerButton categoryId={categoryId} player={player} />
-                </ItemActions>
               </Item>
             ))}
           </ItemGroup>
