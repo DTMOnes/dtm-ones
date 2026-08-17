@@ -55,7 +55,7 @@ export default async function Page({
   const viewingSelf = isOwnUser(session.user.id, row.id);
 
   return (
-    <main className="flex flex-col gap-8 p-10">
+    <main className="flex h-full w-full flex-col gap-8 p-10">
       <div className="flex flex-col gap-4">
         <Button asChild variant="outline" className="w-fit">
           <Link href="/users">
@@ -71,7 +71,7 @@ export default async function Page({
         </div>
       </div>
 
-      <div className="flex w-full max-w-2xl flex-col gap-6">
+      <div className="flex w-full flex-col gap-6">
         <ChangeUserNameForm userId={row.id} currentName={row.name} />
         <ChangeUserRoleForm
           userId={row.id}
