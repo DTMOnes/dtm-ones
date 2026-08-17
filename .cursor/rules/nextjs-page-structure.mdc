@@ -1,0 +1,51 @@
+---
+description: Next.js page files export only Page — no nested async components
+globs: "**/app/**/page.tsx"
+alwaysApply: false
+---
+
+# Next.js page structure
+
+A `page.tsx` file exports **one** route component: the default `Page` (plus optional `metadata` / `generateMetadata` / route config). Do not define sibling async components in the same file.
+
+## Rules
+
+- Put data fetching, `searchParams` / `params` awaiting, and JSX in the default `Page` itself.
+- Prefer `export default async function Page(...)` when the route needs async work.
+- Never add helpers like `PlayersGrid`, `PageContent`, or `AsyncSection` inside `page.tsx`.
+- Do not extract page fetches into sibling component files just to satisfy Suspense — keep the fetch in `Page` and wrap the rendered UI in `<Suspense>` when needed.
+- Layout chrome, loading UI, and client wrappers stay in `layout.tsx`, `loading.tsx`, or `components/`.
+
+## Examples
+
+```tsx
+// ❌ BAD — nested async component in the page file
+async function PlayersGrid({ searchParams }: Props) {
+  const data = await fetchRoster(searchParams);
+  return <Grid players={data} />;
+}
+
+export default function Page({ searchParams }: Props) {
+  return (
+    <Suspense fallback={<GridLoading />}>
+      <PlayersGrid searchParams={searchParams} />
+    </Suspense>
+  );
+}
+```
+
+```tsx
+// ✅ GOOD — fetch in Page, Suspense around the UI
+export default async function Page({ searchParams }: Props) {
+  const sp = await searchParams;
+  const players = await listPublicRosterPlayers(/* ... */);
+
+  return (
+    <HomeRoster>
+      <Suspense fallback={<GridLoading />}>
+        <Grid players={players} />
+      </Suspense>
+    </HomeRoster>
+  );
+}
+```
