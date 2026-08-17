@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   EnvelopeSimpleIcon,
   FolderIcon,
+  StrategyIcon,
   UserGearIcon,
   UsersIcon,
 } from "@phosphor-icons/react";
@@ -26,11 +27,16 @@ const contactsItems: MenuItem[] = [
   },
 ];
 
-const playersItems: MenuItem[] = [
+const clientItems: MenuItem[] = [
   {
     title: "Players",
     url: "/players",
     icon: UsersIcon,
+  },
+  {
+    title: "Coaches",
+    url: "/coaches",
+    icon: StrategyIcon,
   },
   {
     title: "Categories",
@@ -64,7 +70,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavGroup label="Inbox" items={contactsItems} />
-        <NavGroup label="Players Content" items={playersItems} />
+        <NavGroup label="Clients" items={clientItems} />
         {isOwner ? (
           <NavGroup label="Administration" items={usersItems} />
         ) : null}
