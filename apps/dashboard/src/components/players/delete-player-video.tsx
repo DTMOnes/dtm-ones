@@ -1,59 +1,47 @@
 "use client";
 
-import { useState } from "react";
-
+import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-import { deletePlayerVideoAction } from "@/actions/players/playerVideo";
+import { removePlayerVideoAction } from "@/actions/players/playerVideo";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
 
 import { TrashIcon } from "@phosphor-icons/react";
 
-export default function DeletePlayerVideo({
-  id,
+export function DeletePlayerVideo({
+  videoId,
   playerId,
 }: {
-  id: string;
+  videoId: string;
   playerId: string;
 }) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
 
-  async function onDelete(): Promise<void> {
-    setPending(true);
-    try {
-      const result = await deletePlayerVideoAction({
-        videoId: id,
-        playerId,
-      });
-      if (result.error) {
-        toast.error(result.error.message);
-        return;
-      }
-
+  const { executeAsync, isExecuting } = useAction(removePlayerVideoAction, {
+    onSuccess: () => {
       router.refresh();
-    } catch (error) {
-      console.error("[DeletePlayerVideo]", error);
-      toast.error("There was an error deleting the video");
-    } finally {
-      setPending(false);
-    }
-  }
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        toast.error(error.serverError.message);
+      }
+    },
+  });
 
   return (
     <Button
       type="button"
       variant="destructive"
       size="icon"
-      disabled={pending}
+      disabled={isExecuting}
       aria-label="Delete video"
       onClick={() => {
-        void onDelete();
+        void executeAsync({ playerId, videoId });
       }}
     >
-      {pending ? <Spinner /> : <TrashIcon className="size-4" />}
+      {isExecuting ? <Spinner /> : <TrashIcon className="size-4" />}
     </Button>
   );
 }

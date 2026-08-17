@@ -1,20 +1,13 @@
-"use client";
-
-import DeletePlayerVideo from "@/components/players/delete-player-video";
+import { DeletePlayerVideo } from "@/components/players/delete-player-video";
 import {
   Item,
   ItemActions,
   ItemContent,
   ItemDescription,
-  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
-import {
-  getYouTubeThumbnailUrl,
-  parseYouTubeVideoId,
-} from "@/lib/youtube";
 
-export default function PlayerVideoListItem({
+export function PlayerVideoListItem({
   url,
   videoId,
   playerId,
@@ -23,19 +16,8 @@ export default function PlayerVideoListItem({
   videoId: string;
   playerId: string;
 }) {
-  const parsedVideoId = parseYouTubeVideoId(url);
-
   return (
     <Item variant="outline" className="items-center">
-      {parsedVideoId ? (
-        <ItemMedia variant="image">
-          <img
-            src={getYouTubeThumbnailUrl(parsedVideoId)}
-            alt=""
-            className="size-full object-cover"
-          />
-        </ItemMedia>
-      ) : null}
       <ItemContent className="min-w-0">
         <ItemTitle>
           <a
@@ -47,12 +29,10 @@ export default function PlayerVideoListItem({
             {url}
           </a>
         </ItemTitle>
-        {parsedVideoId ? (
-          <ItemDescription>YouTube video</ItemDescription>
-        ) : null}
+        <ItemDescription>YouTube video</ItemDescription>
       </ItemContent>
       <ItemActions>
-        <DeletePlayerVideo id={videoId} playerId={playerId} />
+        <DeletePlayerVideo videoId={videoId} playerId={playerId} />
       </ItemActions>
     </Item>
   );

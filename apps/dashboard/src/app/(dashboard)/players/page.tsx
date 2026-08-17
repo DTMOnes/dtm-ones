@@ -1,10 +1,29 @@
 import { Suspense } from "react";
+import Link from "next/link";
+import { UserIcon } from "@phosphor-icons/react/ssr";
+import { and, asc, eq, ilike, inArray, isNull } from "drizzle-orm";
+import { schema } from "@dtm/database";
 
+import { CreatePlayerDialog } from "@/components/players/create-player-dialog";
+import FilterButton from "@/components/players/filter-button";
 import { normalizePlayerCategoryIds } from "@/components/players/players-search";
-import PlayersListView from "@/components/players/players-list-view";
-import { Spinner } from "@/components/ui/spinner";
-import { listCategories } from "@/lib/categories/queries";
-import { listPlayers } from "@/lib/players/queries";
+import SearchBar from "@/components/players/search-bar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemTitle,
+} from "@/components/ui/item";
+import { db } from "@/lib/db";
 
 export default async function Page({
   searchParams,
@@ -12,24 +31,101 @@ export default async function Page({
   searchParams: Promise<{ q?: string; c?: string | string[] }>;
 }) {
   const sp = await searchParams;
-  const q = typeof sp.q === "string" ? sp.q : "";
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const rawC = sp.c === undefined ? [] : Array.isArray(sp.c) ? sp.c : [sp.c];
   const categoryIds = normalizePlayerCategoryIds(rawC);
 
   const [players, categories] = await Promise.all([
-    listPlayers({ q, categoryIds }),
-    listCategories(""),
+    db
+      .select({
+        id: schema.clients.id,
+        name: schema.clients.name,
+        nationality: schema.clients.nationality,
+        heightCm: schema.clients.heightCm,
+        visibility: schema.clients.visibility,
+        categoryId: schema.clients.categoryId,
+        categoryName: schema.categories.name,
+      })
+      .from(schema.clients)
+      .leftJoin(
+        schema.categories,
+        eq(schema.clients.categoryId, schema.categories.id),
+      )
+      .where(
+        and(
+          eq(schema.clients.kind, "player"),
+          isNull(schema.clients.trashedAt),
+          q ? ilike(schema.clients.name, `%${q}%`) : undefined,
+          categoryIds.length > 0
+            ? inArray(schema.clients.categoryId, categoryIds)
+            : undefined,
+        ),
+      )
+      .orderBy(asc(schema.clients.name)),
+    db
+      .select({
+        id: schema.categories.id,
+        name: schema.categories.name,
+      })
+      .from(schema.categories)
+      .orderBy(asc(schema.categories.name)),
   ]);
 
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-svh items-center justify-center">
-          <Spinner />
-        </div>
-      }
-    >
-      <PlayersListView players={players} categories={categories} />
-    </Suspense>
+    <main className="flex h-full w-full flex-col gap-10 p-10">
+      <h1 className="text-2xl font-bold">Players</h1>
+
+      <div className="flex items-center gap-2">
+        <Suspense>
+          <SearchBar placeholder="Search players by name..." />
+        </Suspense>
+        <Suspense>
+          <FilterButton categories={categories} />
+        </Suspense>
+        <CreatePlayerDialog categories={categories} />
+      </div>
+
+      <ItemGroup className="bg-background flex h-full w-full flex-col gap-4 rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">
+        {players.length === 0 ? (
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <UserIcon />
+              </EmptyMedia>
+              <EmptyTitle>No players found</EmptyTitle>
+              <EmptyDescription>
+                Get started by creating a new player with the &quot;New
+                player&quot; button.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
+          players.map((player) => (
+            <Item key={player.id} variant="muted" asChild>
+              <Link
+                href={`/players/${player.id}`}
+                className="flex w-full items-start justify-between gap-4"
+              >
+                <ItemContent>
+                  <ItemTitle>{player.name}</ItemTitle>
+                  <ItemDescription>
+                    {[
+                      player.heightCm != null ? `${player.heightCm} cm` : null,
+                      player.nationality,
+                      player.visibility === "public" ? "Public" : "Private",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </ItemDescription>
+                </ItemContent>
+                {player.categoryName ? (
+                  <Badge>{player.categoryName}</Badge>
+                ) : null}
+              </Link>
+            </Item>
+          ))
+        )}
+      </ItemGroup>
+    </main>
   );
 }

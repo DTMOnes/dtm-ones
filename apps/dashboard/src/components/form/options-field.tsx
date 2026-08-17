@@ -44,14 +44,14 @@ export default function OptionsField({
           control={control}
           render={({ field }) => (
             <ToggleGroup
-              type="multiple"
+              type="single"
               size="sm"
               variant="outline"
               spacing={2}
               className="flex flex-wrap gap-2"
               disabled={disabled}
-              onValueChange={(values) => field.onChange(values)}
-              value={field.value}
+              onValueChange={(value) => field.onChange(value)}
+              value={field.value ?? ""}
             >
               {options.map((option) => (
                 <ToggleGroupItem key={option.name} value={option.id.toString()}>
