@@ -24,19 +24,6 @@ import { signInSchema } from "@/lib/validation/auth";
 
 type FormValues = z.infer<typeof signInSchema>;
 
-function serverErrorMessage(serverError: unknown): string {
-  if (
-    typeof serverError === "object" &&
-    serverError !== null &&
-    "message" in serverError &&
-    typeof serverError.message === "string"
-  ) {
-    return serverError.message;
-  }
-
-  return "Something went wrong while executing the operation.";
-}
-
 export function SignInForm({
   showDenied = false,
 }: {
@@ -59,7 +46,7 @@ export function SignInForm({
     onError: ({ error }) => {
       methods.setValue("password", "");
       if (error.serverError) {
-        toast.error(serverErrorMessage(error.serverError));
+        toast.error(error.serverError.message);
       }
     },
   });

@@ -5,17 +5,29 @@ import { APIError } from "better-auth/api";
 import { forbidden, unauthorized } from "next/navigation";
 import {
   createSafeActionClient,
-  isNavigationError,
+  DEFAULT_SERVER_ERROR_MESSAGE,
 } from "next-safe-action";
 import z from "zod";
 
 import { auth } from "@/lib/auth";
 import {
+  AppError,
   ForbiddenError,
-  InvalidCredentialsError,
   UnauthorizedError,
-  interpretActionError,
 } from "@/utils/errors";
+
+function logActionError(
+  actionName: string,
+  error: Error,
+  fields: { code: string; userId?: string; role?: string },
+) {
+  console.error({
+    actionName,
+    message: error.message,
+    stack: error.stack,
+    ...fields,
+  });
+}
 
 export const actionClient = createSafeActionClient({
   defineMetadataSchema() {
@@ -23,30 +35,48 @@ export const actionClient = createSafeActionClient({
       actionName: z.string(),
     });
   },
-  handleServerError(e, { metadata }) {
-    if (isNavigationError(e)) {
-      throw e;
+  handleServerError(e, { metadata }): { code: string; message: string } {
+    const { actionName } = metadata;
+
+    if (e instanceof AppError) {
+      logActionError(
+        actionName,
+        e,
+        e instanceof ForbiddenError
+          ? { code: e.code, userId: e.userId, role: e.role }
+          : { code: e.code },
+      );
+
+      if (e instanceof UnauthorizedError) {
+        unauthorized();
+      }
+
+      if (e instanceof ForbiddenError) {
+        forbidden();
+      }
+
+      return { code: e.code, message: e.message };
     }
 
-    const error =
-      metadata.actionName === "signIn" &&
-      e instanceof APIError &&
-      (e.statusCode === 401 || e.statusCode === 403)
-        ? new InvalidCredentialsError()
-        : e;
+    if (e instanceof APIError) {
+      const code = e.body?.code;
+      logActionError(actionName, e, { code: code ?? "INTERNAL" });
 
-    const interpreted = interpretActionError(error, metadata);
-    console.error(interpreted.log);
+      if (code === "INVALID_EMAIL_OR_PASSWORD") {
+        return { code, message: e.message };
+      }
 
-    if (interpreted.navigation === "unauthorized") {
-      unauthorized();
+      return {
+        code: "INTERNAL",
+        message: DEFAULT_SERVER_ERROR_MESSAGE,
+      };
     }
 
-    if (interpreted.navigation === "forbidden") {
-      forbidden();
-    }
-
-    return interpreted.client;
+    logActionError(actionName, e, { code: "INTERNAL" });
+    return {
+      code: "INTERNAL",
+      message: DEFAULT_SERVER_ERROR_MESSAGE,
+    };
   },
 });
 
