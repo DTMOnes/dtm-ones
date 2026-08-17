@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { count, eq } from "drizzle-orm";
 import { schema } from "@dtm/database";
 
+import { ChangeUserNameForm } from "@/components/users/change-user-name-form";
 import { ChangeUserRoleForm } from "@/components/users/change-user-role-form";
 import { DeleteUserCard } from "@/components/users/delete-user-card";
 import { db } from "@/lib/db";
@@ -60,6 +61,7 @@ export default async function Page({
       </div>
 
       <div className="flex w-full max-w-2xl flex-col gap-6">
+        <ChangeUserNameForm userId={row.id} currentName={row.name} />
         <ChangeUserRoleForm
           userId={row.id}
           currentRole={role}

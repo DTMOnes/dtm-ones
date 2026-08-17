@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   createUserSchema,
   deleteUserSchema,
+  setUserNameSchema,
   setUserRoleSchema,
 } from "./users";
 
@@ -49,6 +50,46 @@ test("create User rejects a missing at-sign", () => {
   });
 
   assert.equal(parsed.success, false);
+});
+
+test("create User trims the name", () => {
+  const parsed = createUserSchema.safeParse({
+    name: "  Ana  ",
+    email: "ana@dtm.test",
+    password: "password",
+    role: "staff",
+  });
+
+  assert.equal(parsed.success, true);
+  if (parsed.success) {
+    assert.equal(parsed.data.name, "Ana");
+  }
+});
+
+test("create User rejects a name that is only spaces", () => {
+  const parsed = createUserSchema.safeParse({
+    name: "   ",
+    email: "ana@dtm.test",
+    password: "password",
+    role: "staff",
+  });
+
+  assert.equal(parsed.success, false);
+});
+
+test("set name trims and requires a User id", () => {
+  const parsed = setUserNameSchema.safeParse({
+    userId: "user-1",
+    name: "  Ana  ",
+  });
+
+  assert.equal(parsed.success, true);
+  if (parsed.success) {
+    assert.equal(parsed.data.name, "Ana");
+  }
+
+  const missing = setUserNameSchema.safeParse({ userId: "", name: "Ana" });
+  assert.equal(missing.success, false);
 });
 
 test("set role accepts Owner or Staff for another User id", () => {
