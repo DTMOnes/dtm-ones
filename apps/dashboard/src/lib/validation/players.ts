@@ -60,7 +60,6 @@ export const updatePlayerSchema = z.object({
   lastClub: requiredText,
   heightCm: optionalHeightCm,
   categoryId: optionalCategoryId,
-  presentationImageUrl: optionalUrl,
   eurobasketLink: optionalUrl,
 });
 
@@ -77,4 +76,24 @@ export const addPlayerVideoSchema = z.object({
 export const removePlayerVideoSchema = z.object({
   playerId: z.uuid(),
   videoId: z.uuid(),
+});
+
+export const playerBlobClientPayloadSchema = z.object({
+  playerId: z.uuid(),
+  slot: z.enum(["presentation", "gallery"]),
+});
+
+export const commitPlayerImageSchema = z.object({
+  playerId: z.uuid(),
+  url: z.url(),
+  pathname: z.string().trim().min(1),
+});
+
+export const clearPresentationImageSchema = z.object({
+  playerId: z.uuid(),
+});
+
+export const removePlayerGalleryImageSchema = z.object({
+  playerId: z.uuid(),
+  imageId: z.uuid(),
 });

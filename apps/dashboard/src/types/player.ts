@@ -5,6 +5,11 @@ export type PlayerVideo = {
   youtubeUrl: string;
 };
 
+export type PlayerGalleryImage = {
+  id: string;
+  url: string;
+};
+
 export type Player = {
   id: string;
   name: string;
@@ -19,5 +24,6 @@ export type Player = {
 };
 
 export type PlayerDetail = Player & {
+  gallery: PlayerGalleryImage[];
   videos: PlayerVideo[];
 };

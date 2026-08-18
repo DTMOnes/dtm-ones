@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { asc } from "drizzle-orm";
 import { schema } from "@dtm/database";
-import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeftIcon } from "@phosphor-icons/react/ssr";
 
 import { EditPlayerForm } from "@/components/players/edit-player-form";
 import { PlayerMedia } from "@/components/players/media/player-media";
+import { PlayerDetailTabs } from "@/components/players/player-detail-tabs";
 import { PlayerVisibilityCard } from "@/components/players/player-visibility-card";
 import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { Badge } from "@/components/ui/badge";
@@ -15,10 +16,14 @@ import { getPlayer, playerCompletenessGaps } from "@/utils/players";
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const tab = sp.tab === "media" ? "media" : "info";
 
   const [player, categories] = await Promise.all([
     getPlayer(db, id),
@@ -57,15 +62,21 @@ export default async function Page({
         </div>
       </div>
 
-      <div className="flex w-full flex-col gap-6">
-        <EditPlayerForm player={player} categories={categories} />
-        <PlayerVisibilityCard
-          player={player}
-          gaps={playerCompletenessGaps(player)}
-        />
-        <PlayerMedia player={player} />
-        <RemoveToTrashCard clientId={player.id} kind="player" />
-      </div>
+      <PlayerDetailTabs
+        playerId={player.id}
+        tab={tab}
+        info={
+          <>
+            <EditPlayerForm player={player} categories={categories} />
+            <PlayerVisibilityCard
+              player={player}
+              gaps={playerCompletenessGaps(player)}
+            />
+            <RemoveToTrashCard clientId={player.id} kind="player" />
+          </>
+        }
+        media={<PlayerMedia player={player} />}
+      />
     </main>
   );
 }

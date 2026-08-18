@@ -31,7 +31,6 @@ type FormValues = {
   lastClub: string;
   heightCm: string;
   categoryId: string;
-  presentationImageUrl: string;
   eurobasketLink: string;
 };
 
@@ -57,7 +56,6 @@ export function EditPlayerForm({
       lastClub: player.lastClub,
       heightCm: player.heightCm == null ? "" : String(player.heightCm),
       categoryId: player.categoryId ?? "",
-      presentationImageUrl: player.presentationImageUrl ?? "",
       eurobasketLink: player.eurobasketLink ?? "",
     },
   });
@@ -81,7 +79,7 @@ export function EditPlayerForm({
           <CardTitle>Profile</CardTitle>
           <CardDescription>
             A public Player needs name, Category, presentation image, height,
-            nationality, and last club.
+            nationality, and last club. Upload the presentation image on Media.
           </CardDescription>
         </CardHeader>
         <form
@@ -120,12 +118,6 @@ export function EditPlayerForm({
                 label="Category"
                 options={categories}
                 emptyMessage="No categories created yet"
-                disabled={isExecuting}
-              />
-              <TextField
-                name="presentationImageUrl"
-                label="Presentation image URL"
-                placeholder="https://"
                 disabled={isExecuting}
               />
               <TextField

@@ -2,6 +2,7 @@
 
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 
 import { setPlayerVisibilityAction } from "@/actions/players/setPlayerVisibility";
@@ -63,7 +64,18 @@ export function PlayerVisibilityCard({
             <p className="text-sm font-medium">Incomplete for the Roster</p>
             <ul className="text-muted-foreground mt-3 list-disc space-y-1 pl-4 text-sm">
               {gaps.map((gap) => (
-                <li key={gap}>{gap}</li>
+                <li key={gap}>
+                  {gap === "Presentation image" ? (
+                    <Link
+                      href={`/players/${player.id}?tab=media`}
+                      className="underline underline-offset-2"
+                    >
+                      {gap}
+                    </Link>
+                  ) : (
+                    gap
+                  )}
+                </li>
               ))}
             </ul>
           </div>

@@ -2,7 +2,15 @@ import { and, asc, eq, isNull } from "drizzle-orm";
 import { schema, type Database } from "@dtm/database";
 
 import type { PlayerDetail, PlayerVisibility } from "@/types/player";
-import { ConflictError, NotFoundError } from "@/utils/errors";
+import { ConflictError, NotFoundError } from "./errors";
+import { isPlayerBlobPathname } from "./player-blob-path";
+
+export type DeleteBlobs = (keys: string[]) => Promise<void>;
+
+export type PlayerImageBlob = {
+  url: string;
+  pathname: string;
+};
 
 export type PlayerWrite = {
   name: string;
@@ -14,7 +22,7 @@ export type PlayerWrite = {
   eurobasketLink?: string | null;
 };
 
-export type PlayerPatch = Partial<PlayerWrite>;
+export type PlayerPatch = Partial<Omit<PlayerWrite, "presentationImageUrl">>;
 
 export function playerCompletenessGaps(player: {
   name: string;
@@ -102,6 +110,16 @@ export async function getPlayer(
           name: true,
         },
       },
+      galleryImages: {
+        columns: {
+          id: true,
+          url: true,
+        },
+        orderBy: [
+          asc(schema.playerGalleryImages.sortOrder),
+          asc(schema.playerGalleryImages.createdAt),
+        ],
+      },
       videos: {
         columns: {
           id: true,
@@ -119,10 +137,11 @@ export async function getPlayer(
     return null;
   }
 
-  const { category, videos, ...player } = row;
+  const { category, galleryImages, videos, ...player } = row;
   return {
     ...player,
     categoryName: category?.name ?? null,
+    gallery: galleryImages,
     videos,
   };
 }
@@ -183,10 +202,7 @@ export async function updatePlayer(
     heightCm: patch.heightCm === undefined ? existing.heightCm : patch.heightCm,
     categoryId:
       patch.categoryId === undefined ? existing.categoryId : patch.categoryId,
-    presentationImageUrl:
-      patch.presentationImageUrl === undefined
-        ? existing.presentationImageUrl
-        : patch.presentationImageUrl,
+    presentationImageUrl: existing.presentationImageUrl,
     eurobasketLink:
       patch.eurobasketLink === undefined
         ? existing.eurobasketLink
@@ -296,5 +312,197 @@ export async function removePlayerVideo(
 
   if (!row) {
     throw new NotFoundError("Video");
+  }
+}
+
+export async function commitPresentationImage(
+  db: Database,
+  playerId: string,
+  blob: PlayerImageBlob,
+  deleteBlobs: DeleteBlobs,
+): Promise<PlayerDetail> {
+  if (!isPlayerBlobPathname(playerId, "presentation", blob.pathname)) {
+    await deleteBlobs([blob.pathname]);
+    throw new ConflictError("Invalid image path.");
+  }
+
+  const existing = await db.query.clients.findFirst({
+    columns: {
+      id: true,
+      presentationImageKey: true,
+    },
+    where: and(
+      eq(schema.clients.id, playerId),
+      eq(schema.clients.kind, "player"),
+      isNull(schema.clients.trashedAt),
+    ),
+  });
+
+  if (!existing) {
+    await deleteBlobs([blob.pathname]);
+    throw new NotFoundError("Player");
+  }
+
+  try {
+    await db
+      .update(schema.clients)
+      .set({
+        presentationImageUrl: blob.url,
+        presentationImageKey: blob.pathname,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.clients.id, playerId));
+  } catch (error) {
+    await deleteBlobs([blob.pathname]);
+    throw error;
+  }
+
+  const previousKey = existing.presentationImageKey;
+  if (previousKey && previousKey !== blob.pathname) {
+    try {
+      await deleteBlobs([previousKey]);
+    } catch {
+      // ponytail: old object may linger until Trash; the new URL is already stored.
+    }
+  }
+
+  const player = await getPlayer(db, playerId);
+  if (!player) {
+    throw new NotFoundError("Player");
+  }
+
+  return player;
+}
+
+export async function clearPresentationImage(
+  db: Database,
+  playerId: string,
+  deleteBlobs: DeleteBlobs,
+): Promise<PlayerDetail> {
+  const existing = await db.query.clients.findFirst({
+    columns: {
+      id: true,
+      name: true,
+      nationality: true,
+      lastClub: true,
+      visibility: true,
+      heightCm: true,
+      categoryId: true,
+      presentationImageUrl: true,
+      presentationImageKey: true,
+    },
+    where: and(
+      eq(schema.clients.id, playerId),
+      eq(schema.clients.kind, "player"),
+      isNull(schema.clients.trashedAt),
+    ),
+  });
+
+  if (!existing) {
+    throw new NotFoundError("Player");
+  }
+
+  const next = {
+    ...existing,
+    presentationImageUrl: null,
+  };
+
+  if (existing.visibility === "public" && !isPlayerComplete(next)) {
+    throw new ConflictError(
+      "A Player cannot be public unless the profile is complete.",
+    );
+  }
+
+  await db
+    .update(schema.clients)
+    .set({
+      presentationImageUrl: null,
+      presentationImageKey: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(schema.clients.id, playerId));
+
+  if (existing.presentationImageKey) {
+    await deleteBlobs([existing.presentationImageKey]);
+  }
+
+  const player = await getPlayer(db, playerId);
+  if (!player) {
+    throw new NotFoundError("Player");
+  }
+
+  return player;
+}
+
+export async function addPlayerGalleryImage(
+  db: Database,
+  playerId: string,
+  blob: PlayerImageBlob,
+  deleteBlobs: DeleteBlobs,
+): Promise<{ id: string; url: string }> {
+  if (!isPlayerBlobPathname(playerId, "gallery", blob.pathname)) {
+    await deleteBlobs([blob.pathname]);
+    throw new ConflictError("Invalid image path.");
+  }
+
+  const existing = await getPlayer(db, playerId);
+  if (!existing) {
+    await deleteBlobs([blob.pathname]);
+    throw new NotFoundError("Player");
+  }
+
+  try {
+    const [row] = await db
+      .insert(schema.playerGalleryImages)
+      .values({
+        clientId: playerId,
+        clientKind: "player",
+        url: blob.url,
+        storageKey: blob.pathname,
+        sortOrder: existing.gallery.length,
+      })
+      .returning({
+        id: schema.playerGalleryImages.id,
+        url: schema.playerGalleryImages.url,
+      });
+
+    if (!row) {
+      throw new Error("addPlayerGalleryImage returned no row");
+    }
+
+    return row;
+  } catch (error) {
+    await deleteBlobs([blob.pathname]);
+    throw error;
+  }
+}
+
+export async function removePlayerGalleryImage(
+  db: Database,
+  playerId: string,
+  imageId: string,
+  deleteBlobs: DeleteBlobs,
+): Promise<void> {
+  const image = await db.query.playerGalleryImages.findFirst({
+    columns: {
+      id: true,
+      storageKey: true,
+    },
+    where: and(
+      eq(schema.playerGalleryImages.id, imageId),
+      eq(schema.playerGalleryImages.clientId, playerId),
+    ),
+  });
+
+  if (!image) {
+    throw new NotFoundError("Image");
+  }
+
+  await db
+    .delete(schema.playerGalleryImages)
+    .where(eq(schema.playerGalleryImages.id, imageId));
+
+  if (image.storageKey) {
+    await deleteBlobs([image.storageKey]);
   }
 }

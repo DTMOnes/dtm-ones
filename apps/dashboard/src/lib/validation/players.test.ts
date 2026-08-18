@@ -69,7 +69,7 @@ test("create Player rejects a fractional height", () => {
   assert.equal(parsed.success, false);
 });
 
-test("update Player treats empty presentation and Eurobasket URLs as absent", () => {
+test("update Player treats empty Eurobasket URL as absent", () => {
   const parsed = updatePlayerSchema.safeParse({
     id: "00000000-0000-4000-8000-000000000001",
     name: "Manu Ginobili",
@@ -77,14 +77,13 @@ test("update Player treats empty presentation and Eurobasket URLs as absent", ()
     lastClub: "San Antonio Spurs",
     heightCm: "198",
     categoryId: "00000000-0000-4000-8000-000000000002",
-    presentationImageUrl: "",
     eurobasketLink: "",
   });
 
   assert.equal(parsed.success, true);
   if (parsed.success) {
-    assert.equal(parsed.data.presentationImageUrl, null);
     assert.equal(parsed.data.eurobasketLink, null);
+    assert.equal("presentationImageUrl" in parsed.data, false);
   }
 });
 
