@@ -71,17 +71,23 @@ export default async function Page({
   ]);
 
   return (
-    <main className="flex h-full w-full flex-col gap-10 p-10">
-      <h1 className="text-2xl font-bold">Players</h1>
+    <main className="flex h-full w-full flex-col gap-8 p-6 md:p-10">
+      <div className="flex flex-col gap-6">
+        <h1 className="text-2xl font-bold">Players</h1>
 
-      <div className="flex items-center gap-2">
-        <Suspense>
-          <SearchBar placeholder="Search players by name..." />
-        </Suspense>
-        <Suspense>
-          <FilterButton categories={categories} />
-        </Suspense>
-        <CreatePlayerDialog categories={categories} />
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="min-w-0 flex-1 basis-48">
+            <Suspense>
+              <SearchBar placeholder="Search players by name..." />
+            </Suspense>
+          </div>
+          <div className="flex items-center gap-2">
+            <Suspense>
+              <FilterButton categories={categories} />
+            </Suspense>
+            <CreatePlayerDialog categories={categories} />
+          </div>
+        </div>
       </div>
 
       <ItemGroup className="bg-background flex h-full w-full flex-col gap-4 rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">

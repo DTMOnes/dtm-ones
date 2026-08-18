@@ -134,7 +134,7 @@ export function CreatePlayerDialog({
                 disabled={isExecuting}
               />
             </FieldGroup>
-            <DialogFooter className="gap-2 border-t pt-4 sm:justify-end">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"

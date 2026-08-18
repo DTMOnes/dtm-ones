@@ -131,7 +131,7 @@ export function PlayerGallery({
   }
 
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader>
         <CardTitle>Gallery</CardTitle>
         <CardDescription>
@@ -172,7 +172,7 @@ export function PlayerGallery({
             </EmptyHeader>
           </Empty>
         ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {images.map((image) => (
               <li key={image.id} className="relative">
                 <Image
@@ -180,7 +180,7 @@ export function PlayerGallery({
                   alt=""
                   width={400}
                   height={400}
-                  className="aspect-square w-full rounded-md object-cover"
+                  className="aspect-square w-full rounded-lg object-cover"
                 />
                 <Button
                   type="button"

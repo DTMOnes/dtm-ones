@@ -19,11 +19,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
 import {
   PLAYER_IMAGE_CONTENT_TYPES,
   isAllowedPlayerImage,
 } from "@/utils/player-blob-path";
+
+import { ImageIcon } from "@phosphor-icons/react";
 
 export function PlayerPresentationImage({
   playerId,
@@ -98,8 +107,48 @@ export function PlayerPresentationImage({
     }
   }
 
+  const actions = (
+    <div className="flex flex-wrap gap-2">
+      <input
+        ref={inputRef}
+        type="file"
+        accept={PLAYER_IMAGE_CONTENT_TYPES.join(",")}
+        className="sr-only"
+        disabled={busy}
+        onChange={(event) => {
+          void onFile(event.target.files?.[0]);
+        }}
+      />
+      <Button
+        type="button"
+        disabled={busy}
+        onClick={() => inputRef.current?.click()}
+      >
+        {uploading || isCommitting ? (
+          <Spinner />
+        ) : url ? (
+          "Replace image"
+        ) : (
+          "Upload image"
+        )}
+      </Button>
+      {url ? (
+        <Button
+          type="button"
+          variant="outline"
+          disabled={busy}
+          onClick={() => {
+            void clear({ playerId });
+          }}
+        >
+          {isClearing ? <Spinner /> : "Remove"}
+        </Button>
+      ) : null}
+    </div>
+  );
+
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader>
         <CardTitle>Presentation image</CardTitle>
         <CardDescription>
@@ -109,53 +158,32 @@ export function PlayerPresentationImage({
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {url ? (
-          <Image
-            src={url}
-            alt="Presentation"
-            width={192}
-            height={192}
-            className="h-48 w-48 rounded-md object-cover"
-          />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+            <Image
+              src={url}
+              alt="Presentation"
+              width={192}
+              height={192}
+              className="h-48 w-48 shrink-0 rounded-lg object-cover"
+            />
+            {actions}
+          </div>
         ) : (
-          <p className="text-muted-foreground text-sm">No presentation image yet.</p>
+          <>
+            <Empty className="border border-dashed">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <ImageIcon />
+                </EmptyMedia>
+                <EmptyTitle>No presentation image yet</EmptyTitle>
+                <EmptyDescription>
+                  Upload a photo so this Player can be public on the Roster.
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+            {actions}
+          </>
         )}
-        <div className="flex flex-wrap gap-2">
-          <input
-            ref={inputRef}
-            type="file"
-            accept={PLAYER_IMAGE_CONTENT_TYPES.join(",")}
-            className="sr-only"
-            disabled={busy}
-            onChange={(event) => {
-              void onFile(event.target.files?.[0]);
-            }}
-          />
-          <Button
-            type="button"
-            disabled={busy}
-            onClick={() => inputRef.current?.click()}
-          >
-            {uploading || isCommitting ? (
-              <Spinner />
-            ) : url ? (
-              "Replace image"
-            ) : (
-              "Upload image"
-            )}
-          </Button>
-          {url ? (
-            <Button
-              type="button"
-              variant="outline"
-              disabled={busy}
-              onClick={() => {
-                void clear({ playerId });
-              }}
-            >
-              {isClearing ? <Spinner /> : "Remove"}
-            </Button>
-          ) : null}
-        </div>
       </CardContent>
     </Card>
   );

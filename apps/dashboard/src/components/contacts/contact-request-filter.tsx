@@ -1,52 +1,51 @@
 "use client";
 
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ContactsInboxFilter } from "@/types/contact-request";
+import {
+  FILTER_OPTIONS,
+  isContactsInboxFilter,
+} from "@/utils/contacts-inbox";
 
 type ContactRequestFilterProps = {
   value: ContactsInboxFilter;
+  counts: Record<ContactsInboxFilter, number>;
   onChange: (value: ContactsInboxFilter) => void;
 };
 
-export const FILTER_OPTIONS: {
-  value: ContactsInboxFilter;
-  label: string;
-}[] = [
-  { value: "active", label: "Active" },
-  { value: "new", label: "New" },
-  { value: "read", label: "Read" },
-  { value: "archived", label: "Archived" },
-];
-
-export function isContactsInboxFilter(
-  value: string,
-): value is ContactsInboxFilter {
-  return FILTER_OPTIONS.some((option) => option.value === value);
-}
-
 export function ContactRequestFilter({
   value,
+  counts,
   onChange,
 }: ContactRequestFilterProps) {
   return (
-    <ToggleGroup
-      type="single"
+    <Tabs
       value={value}
+      className="min-w-0"
       onValueChange={(next) => {
         if (isContactsInboxFilter(next)) {
           onChange(next);
         }
       }}
-      variant="outline"
-      size="sm"
-      spacing={0}
-      aria-label="Filter contact requests"
     >
-      {FILTER_OPTIONS.map((option) => (
-        <ToggleGroupItem key={option.value} value={option.value}>
-          {option.label}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+      <TabsList
+        variant="line"
+        aria-label="Filter contact requests"
+        className="h-8 w-full max-w-full justify-start overflow-x-auto rounded-none border-b border-border p-0"
+      >
+        {FILTER_OPTIONS.map((option) => (
+          <TabsTrigger
+            key={option.value}
+            value={option.value}
+            className="flex-none px-2.5 first:pl-0 group-data-horizontal/tabs:after:bottom-[-1px]"
+          >
+            {option.label}
+            <span className="text-muted-foreground text-xs font-medium tabular-nums">
+              {counts[option.value]}
+            </span>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
