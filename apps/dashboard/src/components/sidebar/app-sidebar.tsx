@@ -5,6 +5,7 @@ import {
   EnvelopeSimpleIcon,
   FolderIcon,
   StrategyIcon,
+  TrashIcon,
   UserGearIcon,
   UsersIcon,
 } from "@phosphor-icons/react";
@@ -42,6 +43,11 @@ const clientItems: MenuItem[] = [
     title: "Categories",
     url: "/categories",
     icon: FolderIcon,
+  },
+  {
+    title: "Trash",
+    url: "/trash",
+    icon: TrashIcon,
   },
 ];
 

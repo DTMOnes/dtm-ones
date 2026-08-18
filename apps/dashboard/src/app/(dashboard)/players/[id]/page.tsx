@@ -7,6 +7,7 @@ import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { EditPlayerForm } from "@/components/players/edit-player-form";
 import { PlayerMedia } from "@/components/players/media/player-media";
 import { PlayerVisibilityCard } from "@/components/players/player-visibility-card";
+import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
@@ -63,6 +64,7 @@ export default async function Page({
           gaps={playerCompletenessGaps(player)}
         />
         <PlayerMedia player={player} />
+        <RemoveToTrashCard clientId={player.id} kind="player" />
       </div>
     </main>
   );

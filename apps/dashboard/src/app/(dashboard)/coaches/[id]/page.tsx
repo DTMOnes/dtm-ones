@@ -4,6 +4,7 @@ import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 
 import { CoachVisibilityCard } from "@/components/coaches/coach-visibility-card";
 import { EditCoachForm } from "@/components/coaches/edit-coach-form";
+import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
@@ -49,6 +50,7 @@ export default async function Page({
           coach={coach}
           gaps={coachCompletenessGaps(coach)}
         />
+        <RemoveToTrashCard clientId={coach.id} kind="coach" />
       </div>
     </main>
   );
