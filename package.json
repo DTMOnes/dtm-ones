@@ -9,9 +9,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write .",
     "db:push": "pnpm --filter @dtm/database db:push",
-    "db:seed": "pnpm --filter @dtm/api db:seed",
-    "test": "turbo run test",
-    "test:api:e2e": "pnpm --filter @dtm/api test:e2e"
+    "db:seed": "pnpm --filter @dtm/dashboard db:seed",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@dtm/typescript-config": "workspace:*",

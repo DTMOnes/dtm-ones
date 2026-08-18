@@ -79,7 +79,7 @@ Desktop.ini
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# InsForge & AI agent skills
+# Local vendor / agent skill dirs
 .insforge
 .agent
 .agents
