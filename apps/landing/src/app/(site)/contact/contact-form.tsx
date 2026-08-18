@@ -4,8 +4,9 @@ import { useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 
-import { createContactRequest } from "@/actions/contact-requests";
+import { createContactRequestAction } from "@/actions/contact-requests";
 import {
   createContactRequestSchema,
   type CreateContactRequest,
@@ -20,10 +21,9 @@ export default function ContactForm() {
     register,
     handleSubmit,
     reset,
-    setError,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<CreateContactRequest>({
-    resolver: zodResolver(createContactRequestSchema as never),
+    resolver: zodResolver(createContactRequestSchema),
     defaultValues: {
       email: "",
       phone: "",
@@ -31,64 +31,55 @@ export default function ContactForm() {
     },
   });
 
-  const onSubmit = async (data: CreateContactRequest) => {
-    setSubmitError(null);
-    setSubmitMessage(null);
-
-    const { data: result, error } = await createContactRequest(data);
-
-    if (error) {
-      if (error.fieldErrors) {
-        for (const [field, messages] of Object.entries(error.fieldErrors)) {
-          const message = messages?.[0];
-          if (
-            message &&
-            (field === "type" ||
-              field === "email" ||
-              field === "phone" ||
-              field === "message")
-          ) {
-            setError(field, { message });
-          }
-        }
+  const { executeAsync, isExecuting } = useAction(createContactRequestAction, {
+    onSuccess: ({ data }) => {
+      setSubmitMessage(data?.message ?? "Your message was sent successfully.");
+      reset();
+    },
+    onError: ({ error }) => {
+      if (error.serverError) {
+        setSubmitError(error.serverError.message);
       }
-      setSubmitError(error.message);
-      return;
-    }
-
-    setSubmitMessage(result.message ?? "Your message was sent successfully.");
-    reset();
-  };
+    },
+  });
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form
+      className={styles.form}
+      onSubmit={handleSubmit((values) => {
+        setSubmitError(null);
+        setSubmitMessage(null);
+        return executeAsync(values);
+      })}
+      noValidate
+    >
       <fieldset className={styles.fieldset}>
         <legend className={styles.visuallyHidden}>Inquiry type</legend>
         <div className={styles.options}>
-          <label className={styles.option} htmlFor="contact-type-player">
+          <label className={styles.option} htmlFor="contact-reason-seeking">
             <input
-              id="contact-type-player"
+              id="contact-reason-seeking"
               type="radio"
-              value="player"
-              disabled={isSubmitting}
-              {...register("type")}
+              value="seeking_representation"
+              disabled={isExecuting}
+              {...register("reason")}
             />
             <span>Seeking representation</span>
           </label>
-          <label className={styles.option} htmlFor="contact-type-recruiter">
+          <label className={styles.option} htmlFor="contact-reason-looking">
             <input
-              id="contact-type-recruiter"
+              id="contact-reason-looking"
               type="radio"
-              value="recruiter"
-              disabled={isSubmitting}
-              {...register("type")}
+              value="looking_for_a_player"
+              disabled={isExecuting}
+              {...register("reason")}
             />
-            <span>Hire services</span>
+            <span>Looking for a player</span>
           </label>
         </div>
-        {errors.type?.message ? (
+        {errors.reason?.message ? (
           <p className={styles.error} role="alert">
-            {errors.type.message}
+            {errors.reason.message}
           </p>
         ) : null}
       </fieldset>
@@ -101,7 +92,7 @@ export default function ContactForm() {
             placeholder="you@email.com"
             autoComplete="email"
             aria-invalid={!!errors.email}
-            disabled={isSubmitting}
+            disabled={isExecuting}
             {...register("email")}
             className={styles.input}
           />
@@ -119,7 +110,7 @@ export default function ContactForm() {
             placeholder="+1 555 000 0000"
             autoComplete="tel"
             aria-invalid={!!errors.phone}
-            disabled={isSubmitting}
+            disabled={isExecuting}
             {...register("phone")}
             className={styles.input}
           />
@@ -137,7 +128,7 @@ export default function ContactForm() {
           placeholder="Tell us what you need"
           rows={5}
           aria-invalid={!!errors.message}
-          disabled={isSubmitting}
+          disabled={isExecuting}
           {...register("message")}
           className={styles.textarea}
         />
@@ -149,8 +140,8 @@ export default function ContactForm() {
       </label>
 
       <div className={styles.actions}>
-        <button type="submit" disabled={isSubmitting} className={styles.button}>
-          {isSubmitting ? "Sending…" : "Send message"}
+        <button type="submit" disabled={isExecuting} className={styles.button}>
+          {isExecuting ? "Sending…" : "Send message"}
         </button>
 
         {submitError ? (

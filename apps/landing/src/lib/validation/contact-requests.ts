@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const createContactRequestSchema = z.object({
-  type: z.enum(["player", "recruiter"], {
-    message: "Please select Player or Recruiter",
+  reason: z.enum(["seeking_representation", "looking_for_a_player"], {
+    message: "Please select seeking representation or looking for a player",
   }),
   email: z.email("Invalid email"),
   phone: z
