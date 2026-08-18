@@ -32,18 +32,16 @@ export function PlayerDetailTabs({
             : `/players/${playerId}`;
         router.replace(href, { scroll: false });
       }}
-      className="gap-6"
+      className="gap-8"
     >
       <TabsList variant="line">
         <TabsTrigger value="info">Info</TabsTrigger>
         <TabsTrigger value="media">Media</TabsTrigger>
       </TabsList>
-      <TabsContent value="info" className="flex flex-col gap-6">
+      <TabsContent value="info" className="flex flex-col gap-8">
         {info}
       </TabsContent>
-      <TabsContent value="media" className="flex flex-col gap-6">
-        {media}
-      </TabsContent>
+      <TabsContent value="media">{media}</TabsContent>
     </Tabs>
   );
 }

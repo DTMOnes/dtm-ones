@@ -9,6 +9,7 @@ import { archiveContactRequestAction } from "@/actions/contacts/archiveContactRe
 import { deleteContactRequestAction } from "@/actions/contacts/deleteContactRequest";
 import { unarchiveContactRequestAction } from "@/actions/contacts/unarchiveContactRequest";
 import { ArchiveContactRequestButton } from "@/components/contacts/archive-contact-request-button";
+import { ContactRequestField } from "@/components/contacts/contact-request-field";
 import { DeleteContactRequestButton } from "@/components/contacts/delete-contact-request-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,6 @@ import {
 import type { ContactRequest } from "@/types/contact-request";
 import {
   contactRequestReasonLabel,
-  contactRequestStatusLabel,
   formatContactRequestDate,
 } from "@/utils/contact-request-labels";
 
@@ -37,10 +37,32 @@ async function copyText(label: string, value: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(value);
     toast.success(`${label} copied`);
-  } catch (error) {
-    console.error("[ContactRequestDialog/copy]", error);
+  } catch {
     toast.error(`Could not copy ${label.toLowerCase()}`);
   }
+}
+
+function CopyValueButton({
+  label,
+  value,
+  disabled,
+}: {
+  label: string;
+  value: string;
+  disabled: boolean;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      aria-label={`Copy ${label.toLowerCase()}`}
+      disabled={disabled}
+      onClick={() => void copyText(label, value)}
+    >
+      <CopyIcon />
+    </Button>
+  );
 }
 
 export function ContactRequestDialog({
@@ -104,6 +126,8 @@ export function ContactRequestDialog({
     return null;
   }
 
+  const reasonLabel = contactRequestReasonLabel(request.reason);
+
   function handleOpenChange(nextOpen: boolean): void {
     if (!nextOpen && isBusy) {
       return;
@@ -114,79 +138,71 @@ export function ContactRequestDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">
-              {contactRequestReasonLabel(request.reason)}
-            </Badge>
-            <Badge variant={request.status === "new" ? "default" : "outline"}>
-              {contactRequestStatusLabel(request.status)}
-            </Badge>
-          </div>
-          <DialogTitle>Contact request</DialogTitle>
-          <DialogDescription>
-            Received {formatContactRequestDate(request.createdAt)}
+      <DialogContent
+        aria-busy={isBusy}
+        showCloseButton={!isBusy}
+        className="flex max-h-[min(90dvh,40rem)] flex-col gap-6 overflow-hidden p-5 sm:max-w-lg"
+      >
+        <DialogHeader className="w-full shrink-0 gap-6">
+          <Badge variant="secondary" className="w-fit max-w-[calc(100%-2.5rem)]">
+            {reasonLabel}
+          </Badge>
+          <DialogDescription className="sr-only">
+            {reasonLabel} contact request
           </DialogDescription>
+          <div className="flex w-full flex-col gap-4">
+            <ContactRequestField label="Email" className="w-full">
+              <div className="flex w-full min-w-0 items-center justify-between gap-1">
+                <DialogTitle className="min-w-0 flex-1 truncate">
+                  {request.email}
+                </DialogTitle>
+                <CopyValueButton
+                  label="Email"
+                  value={request.email}
+                  disabled={isBusy}
+                />
+              </div>
+            </ContactRequestField>
+            <ContactRequestField label="Phone" className="w-full">
+              <div className="flex w-full min-w-0 items-center justify-between gap-1">
+                <p className="min-w-0 flex-1 truncate text-sm">
+                  {request.phone}
+                </p>
+                <CopyValueButton
+                  label="Phone"
+                  value={request.phone}
+                  disabled={isBusy}
+                />
+              </div>
+            </ContactRequestField>
+          </div>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              Email
-            </p>
-            <div className="flex items-center gap-2">
-              <p className="min-w-0 flex-1 truncate text-sm">{request.email}</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                aria-label="Copy email"
-                disabled={isBusy}
-                onClick={() => void copyText("Email", request.email)}
-              >
-                <CopyIcon />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              Phone
-            </p>
-            <div className="flex items-center gap-2">
-              <p className="min-w-0 flex-1 truncate text-sm">{request.phone}</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                aria-label="Copy phone"
-                disabled={isBusy}
-                onClick={() => void copyText("Phone", request.phone)}
-              >
-                <CopyIcon />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-              Message
-            </p>
+        <ContactRequestField label="Message" className="min-h-0 overflow-hidden">
+          <div
+            tabIndex={0}
+            aria-label="Message"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
             <p className="text-sm whitespace-pre-wrap">{request.message}</p>
           </div>
-        </div>
+        </ContactRequestField>
 
-        <DialogFooter className="sm:justify-between">
-          <DeleteContactRequestButton
-            pending={isDeleting}
-            disabled={isArchiving || isUnarchiving}
-            onDelete={async () => {
-              const result = await remove({ id: request.id });
-              return result?.data?.ok === true;
-            }}
-          />
-          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+        <DialogFooter className="-mx-5 -mb-5 flex-col p-5 sm:justify-between">
+          <ContactRequestField label="Received">
+            <p className="text-sm">
+              {formatContactRequestDate(request.createdAt)}
+            </p>
+          </ContactRequestField>
+          <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+            <DeleteContactRequestButton
+              pending={isDeleting}
+              disabled={isArchiving || isUnarchiving}
+              onDelete={async () => {
+                const result = await remove({ id: request.id });
+                return result?.data?.ok === true;
+              }}
+            />
             <ArchiveContactRequestButton
               status={request.status}
               pending={isArchiving || isUnarchiving}

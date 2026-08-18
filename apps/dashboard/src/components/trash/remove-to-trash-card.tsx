@@ -39,7 +39,7 @@ export function RemoveToTrashCard({
   });
 
   return (
-    <Card>
+    <Card className="shadow-sm">
       <CardHeader className="border-b">
         <CardTitle>Trash</CardTitle>
         <CardDescription>
@@ -47,7 +47,7 @@ export function RemoveToTrashCard({
           Roster. Restore keeps Visibility.
         </CardDescription>
       </CardHeader>
-      <CardFooter className="justify-end py-4">
+      <CardFooter className="justify-end">
         <Button
           type="button"
           variant="outline"

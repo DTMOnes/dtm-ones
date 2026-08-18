@@ -9,10 +9,7 @@ import { toast } from "sonner";
 import { markContactRequestReadAction } from "@/actions/contacts/markContactRequestRead";
 import { ContactRequestCard } from "@/components/contacts/contact-request-card";
 import { ContactRequestDialog } from "@/components/contacts/contact-request-dialog";
-import {
-  ContactRequestFilter as ContactRequestFilterControl,
-  isContactsInboxFilter,
-} from "@/components/contacts/contact-request-filter";
+import { ContactRequestFilter } from "@/components/contacts/contact-request-filter";
 import {
   Empty,
   EmptyDescription,
@@ -24,6 +21,11 @@ import type {
   ContactRequest,
   ContactsInboxFilter,
 } from "@/types/contact-request";
+import {
+  inboxFilterCounts,
+  isContactsInboxFilter,
+  visibleInboxRequests,
+} from "@/utils/contacts-inbox";
 
 type ContactsInboxProps = {
   requests: ContactRequest[];
@@ -51,19 +53,6 @@ const EMPTY_COPY: Record<
     description: "Archived messages are kept here until you delete them.",
   },
 };
-
-function filterRequests(
-  requests: ContactRequest[],
-  filter: ContactsInboxFilter,
-): ContactRequest[] {
-  if (filter === "active") {
-    return requests.filter(
-      (request) => request.status === "new" || request.status === "read",
-    );
-  }
-
-  return requests.filter((request) => request.status === filter);
-}
 
 export function ContactsInbox({ requests }: ContactsInboxProps) {
   const router = useRouter();
@@ -100,7 +89,8 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
     null,
   );
 
-  const visibleRequests = filterRequests(optimisticRequests, filter);
+  const counts = inboxFilterCounts(optimisticRequests);
+  const visibleRequests = visibleInboxRequests(optimisticRequests, filter);
 
   const selectedRequest =
     selectedId === null
@@ -152,39 +142,41 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
 
   return (
     <div className="flex h-full w-full flex-col gap-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-1">
           <h1 className="text-2xl font-bold">Contacts</h1>
           <p className="text-muted-foreground text-sm">
             Messages submitted from the public contact form.
           </p>
         </div>
-        <ContactRequestFilterControl value={filter} onChange={setFilter} />
+        <ContactRequestFilter
+          value={filter}
+          counts={counts}
+          onChange={setFilter}
+        />
       </div>
 
-      <div className="bg-background rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">
-        {visibleRequests.length === 0 ? (
-          <Empty className="min-h-56">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <EnvelopeSimpleIcon />
-              </EmptyMedia>
-              <EmptyTitle>{empty.title}</EmptyTitle>
-              <EmptyDescription>{empty.description}</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {visibleRequests.map((request) => (
-              <ContactRequestCard
-                key={request.id}
-                request={request}
-                onOpen={openRequest}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {visibleRequests.length === 0 ? (
+        <Empty className="min-h-56 flex-1 border border-dashed">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <EnvelopeSimpleIcon />
+            </EmptyMedia>
+            <EmptyTitle>{empty.title}</EmptyTitle>
+            <EmptyDescription>{empty.description}</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {visibleRequests.map((request) => (
+            <ContactRequestCard
+              key={request.id}
+              request={request}
+              onOpen={openRequest}
+            />
+          ))}
+        </div>
+      )}
 
       <ContactRequestDialog
         request={displayRequest}

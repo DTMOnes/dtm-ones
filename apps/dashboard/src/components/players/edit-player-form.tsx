@@ -74,7 +74,7 @@ export function EditPlayerForm({
 
   return (
     <FormProvider {...methods}>
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader className="border-b">
           <CardTitle>Profile</CardTitle>
           <CardDescription>
@@ -86,8 +86,8 @@ export function EditPlayerForm({
           onSubmit={methods.handleSubmit((values) => executeAsync(values))}
           noValidate
         >
-          <CardContent className="pb-6">
-            <FieldGroup className="gap-6">
+          <CardContent>
+            <FieldGroup>
               <input type="hidden" {...methods.register("id")} />
               <TextField
                 name="name"

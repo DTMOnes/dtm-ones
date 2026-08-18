@@ -25,7 +25,6 @@ export function ArchiveContactRequestButton({
     return (
       <Button
         type="button"
-        variant="outline"
         disabled={isDisabled}
         onClick={onUnarchive}
       >
@@ -37,7 +36,6 @@ export function ArchiveContactRequestButton({
   return (
     <Button
       type="button"
-      variant="outline"
       disabled={isDisabled}
       onClick={onArchive}
     >

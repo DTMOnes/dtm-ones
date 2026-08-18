@@ -43,17 +43,17 @@ export default async function Page({
   const isPublic = player.visibility === "public";
 
   return (
-    <main className="flex h-full w-full flex-col gap-8 p-10">
-      <div className="flex flex-col gap-4">
-        <Button asChild variant="outline" className="w-fit">
+    <main className="flex h-full w-full flex-col gap-8 p-6 md:p-10">
+      <div className="flex flex-col gap-3">
+        <Button asChild variant="ghost" className="text-muted-foreground w-fit">
           <Link href="/players">
             <ArrowLeftIcon />
             Players
           </Link>
         </Button>
-        <div className="flex flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-bold">{player.name}</h1>
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-bold break-words">{player.name}</h1>
             <Badge variant={isPublic ? "default" : "secondary"}>
               {isPublic ? "Public" : "Private"}
             </Badge>
@@ -68,11 +68,13 @@ export default async function Page({
         info={
           <>
             <EditPlayerForm player={player} categories={categories} />
-            <PlayerVisibilityCard
-              player={player}
-              gaps={playerCompletenessGaps(player)}
-            />
-            <RemoveToTrashCard clientId={player.id} kind="player" />
+            <div className="flex flex-col gap-4">
+              <PlayerVisibilityCard
+                player={player}
+                gaps={playerCompletenessGaps(player)}
+              />
+              <RemoveToTrashCard clientId={player.id} kind="player" />
+            </div>
           </>
         }
         media={<PlayerMedia player={player} />}
