@@ -146,12 +146,40 @@ export const roster = pgView("roster").as((qb) =>
       visibility: clients.visibility,
       heightCm: clients.heightCm,
       categoryId: clients.categoryId,
+      categoryName: sql<string | null>`${categories.name}`.as("category_name"),
       presentationImageUrl: clients.presentationImageUrl,
       presentationImageKey: clients.presentationImageKey,
       createdAt: clients.createdAt,
       updatedAt: clients.updatedAt,
     })
     .from(clients)
+    .leftJoin(categories, eq(clients.categoryId, categories.id))
+    .where(and(eq(clients.visibility, "public"), isNull(clients.trashedAt))),
+);
+
+export const rosterGalleryImages = pgView("roster_gallery_images").as((qb) =>
+  qb
+    .select({
+      id: playerGalleryImages.id,
+      clientId: playerGalleryImages.clientId,
+      url: playerGalleryImages.url,
+      sortOrder: playerGalleryImages.sortOrder,
+    })
+    .from(playerGalleryImages)
+    .innerJoin(clients, eq(playerGalleryImages.clientId, clients.id))
+    .where(and(eq(clients.visibility, "public"), isNull(clients.trashedAt))),
+);
+
+export const rosterVideos = pgView("roster_videos").as((qb) =>
+  qb
+    .select({
+      id: playerVideos.id,
+      clientId: playerVideos.clientId,
+      youtubeUrl: playerVideos.youtubeUrl,
+      sortOrder: playerVideos.sortOrder,
+    })
+    .from(playerVideos)
+    .innerJoin(clients, eq(playerVideos.clientId, clients.id))
     .where(and(eq(clients.visibility, "public"), isNull(clients.trashedAt))),
 );
 

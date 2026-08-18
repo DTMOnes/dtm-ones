@@ -9,7 +9,8 @@
   },
   "scripts": {
     "db:push": "drizzle-kit push --config ./src/config/drizzle-kit.ts",
-    "test": "node --import tsx --test src/db/schema.test.ts",
+    "db:grant-landing": "tsx src/scripts/grant-landing-role.ts",
+    "test": "node --import tsx --test --test-concurrency=1 src/db/schema.test.ts src/db/landing-roster.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
