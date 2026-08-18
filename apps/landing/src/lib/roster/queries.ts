@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { connection } from "next/server";
 import {
   getPublicRosterPlayer as getRosterPlayer,
   listPublicRosterCategories as listRosterCategories,
@@ -59,6 +60,7 @@ function toPublicCategory(category: RosterCategory): PublicRosterCategory {
 
 export const getPublicRosterPlayer = cache(
   async (id: string): Promise<PublicRosterPlayer | null> => {
+    await connection();
     const player = await getRosterPlayer(db, id);
     return player ? toPublicPlayer(player) : null;
   },
@@ -67,6 +69,7 @@ export const getPublicRosterPlayer = cache(
 export async function listPublicRosterPlayers(
   params: ListPublicRosterPlayersParams = {},
 ): Promise<PublicRosterPlayer[]> {
+  await connection();
   const players = await listRosterPlayers(db, params);
   return players.map(toPublicPlayer);
 }
@@ -74,6 +77,7 @@ export async function listPublicRosterPlayers(
 export const listPublicRosterCategories = cache(async (): Promise<
   PublicRosterCategory[]
 > => {
+  await connection();
   const categories = await listRosterCategories(db);
   return categories.map(toPublicCategory);
 });
