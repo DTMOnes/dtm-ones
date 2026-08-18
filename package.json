@@ -9,6 +9,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write .",
     "db:push": "pnpm --filter @dtm/database db:push",
+    "db:grant-landing": "pnpm --filter @dtm/database db:grant-landing",
     "db:seed": "pnpm --filter @dtm/dashboard db:seed",
     "test": "turbo run test"
   },
