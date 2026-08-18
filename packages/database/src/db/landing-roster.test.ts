@@ -199,6 +199,32 @@ test("landing role can insert a ContactRequest and cannot read it back", async (
   await db.delete(contactRequests).where(eq(contactRequests.email, email));
 });
 
+test("looking for a player inserts a ContactRequest and does not create a Player", async () => {
+  const email = `looking-for-a-player-${Date.now()}@example.com`;
+  const playersBefore = await db.select({ id: clients.id }).from(clients);
+
+  await landingDb.insert(contactRequests).values({
+    reason: "looking_for_a_player",
+    email,
+    phone: "+10000000000",
+    message: "We are looking for a player.",
+  });
+
+  const playersAfter = await db.select({ id: clients.id }).from(clients);
+  assert.deepEqual(playersAfter, playersBefore);
+
+  const rows = await db
+    .select({
+      reason: contactRequests.reason,
+      email: contactRequests.email,
+    })
+    .from(contactRequests)
+    .where(eq(contactRequests.email, email));
+  assert.deepEqual(rows, [{ reason: "looking_for_a_player", email }]);
+
+  await db.delete(contactRequests).where(eq(contactRequests.email, email));
+});
+
 test("a private Client is not on the Roster", async () => {
   const category = await insertCategory("Guards");
   await insertPlayer({
