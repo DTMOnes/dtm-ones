@@ -27,4 +27,4 @@ Colocate a preset with the package that **reads** the var. Apps `extends` that p
 
 `experimental__runtimeEnv` lists **client** (`NEXT_PUBLIC_*`) keys only.
 
-Landing does not validate dashboard secrets (`BETTER_AUTH_*`, `INSFORGE_JWT_SECRET`). `SKIP_ENV_VALIDATION=true` is CI-only.
+Landing does not validate dashboard secrets (`BETTER_AUTH_*`, `BLOB_READ_WRITE_TOKEN`). `SKIP_ENV_VALIDATION=true` is CI-only.
