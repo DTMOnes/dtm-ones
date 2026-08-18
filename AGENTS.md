@@ -55,3 +55,5 @@ This repo uses [Matt Pocock’s engineering skills](https://github.com/mattpococ
 - `/resolving-merge-conflicts` — in-progress merge or rebase conflicts
 - `/writing-for-agents` — edit skills, `AGENTS.md`, or `CLAUDE.md`
 - `/find-skills` — find or install a skill
+
+Impeccable — landing or dashboard UI (design, redesign, critique, polish).
