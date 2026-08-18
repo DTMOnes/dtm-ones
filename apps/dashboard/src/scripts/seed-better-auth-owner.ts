@@ -64,11 +64,10 @@ async function main(): Promise<void> {
     ],
   });
 
-  const [existing] = await db
-    .select({ id: schema.user.id })
-    .from(schema.user)
-    .where(eq(schema.user.email, email))
-    .limit(1);
+  const existing = await db.query.user.findFirst({
+    columns: { id: true },
+    where: eq(schema.user.email, email),
+  });
 
   let userId: string;
 

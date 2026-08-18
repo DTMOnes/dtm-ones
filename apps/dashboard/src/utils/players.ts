@@ -79,50 +79,52 @@ export async function getPlayer(
   db: Database,
   id: string,
 ): Promise<PlayerDetail | null> {
-  const [row] = await db
-    .select({
-      id: schema.clients.id,
-      name: schema.clients.name,
-      nationality: schema.clients.nationality,
-      lastClub: schema.clients.lastClub,
-      eurobasketLink: schema.clients.eurobasketLink,
-      visibility: schema.clients.visibility,
-      heightCm: schema.clients.heightCm,
-      categoryId: schema.clients.categoryId,
-      categoryName: schema.categories.name,
-      presentationImageUrl: schema.clients.presentationImageUrl,
-    })
-    .from(schema.clients)
-    .leftJoin(
-      schema.categories,
-      eq(schema.clients.categoryId, schema.categories.id),
-    )
-    .where(
-      and(
-        eq(schema.clients.id, id),
-        eq(schema.clients.kind, "player"),
-        isNull(schema.clients.trashedAt),
-      ),
-    )
-    .limit(1);
+  const row = await db.query.clients.findFirst({
+    columns: {
+      id: true,
+      name: true,
+      nationality: true,
+      lastClub: true,
+      eurobasketLink: true,
+      visibility: true,
+      heightCm: true,
+      categoryId: true,
+      presentationImageUrl: true,
+    },
+    where: and(
+      eq(schema.clients.id, id),
+      eq(schema.clients.kind, "player"),
+      isNull(schema.clients.trashedAt),
+    ),
+    with: {
+      category: {
+        columns: {
+          name: true,
+        },
+      },
+      videos: {
+        columns: {
+          id: true,
+          youtubeUrl: true,
+        },
+        orderBy: [
+          asc(schema.playerVideos.sortOrder),
+          asc(schema.playerVideos.createdAt),
+        ],
+      },
+    },
+  });
 
   if (!row) {
     return null;
   }
 
-  const videos = await db
-    .select({
-      id: schema.playerVideos.id,
-      youtubeUrl: schema.playerVideos.youtubeUrl,
-    })
-    .from(schema.playerVideos)
-    .where(eq(schema.playerVideos.clientId, id))
-    .orderBy(
-      asc(schema.playerVideos.sortOrder),
-      asc(schema.playerVideos.createdAt),
-    );
-
-  return { ...row, videos };
+  const { category, videos, ...player } = row;
+  return {
+    ...player,
+    categoryName: category?.name ?? null,
+    videos,
+  };
 }
 
 export async function createPlayer(

@@ -19,14 +19,13 @@ export const deleteUserAction = ownerActionClient
   .metadata({ actionName: "deleteUser" })
   .inputSchema(deleteUserSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const [target] = await db
-      .select({
-        id: schema.user.id,
-        role: schema.user.role,
-      })
-      .from(schema.user)
-      .where(eq(schema.user.id, parsedInput.id))
-      .limit(1);
+    const target = await db.query.user.findFirst({
+      columns: {
+        id: true,
+        role: true,
+      },
+      where: eq(schema.user.id, parsedInput.id),
+    });
 
     const targetRole = toDashboardRole(target?.role);
     if (!target || !targetRole) {

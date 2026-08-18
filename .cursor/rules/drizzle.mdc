@@ -1,0 +1,30 @@
+---
+description: Drizzle 0.44 — declare relations(); read with findFirst/findMany
+alwaysApply: true
+---
+
+# Drizzle
+
+We are on drizzle-orm 0.44. Use `import { relations } from "drizzle-orm"` with `one()` / `many()`. Do not copy `defineRelations` from current orm.drizzle.team docs (that is 1.0 RC).
+
+Foreign keys stay on the tables. Every FK also gets a `relations()` export in `packages/database/src/db/schema.ts` (both sides — v1 needs the `one()` for a `many()`). `createDatabase` already passes `{ schema }`. ContactRequest has no FK. Roster views are not tables. Do not invent relations for those.
+
+## Reads
+
+`db.query.<table>.findFirst` (one row) or `findMany` (many). Load related rows with `with`. Use `columns` when the caller does not need the full row.
+
+```ts
+// ✅
+const player = await db.query.clients.findFirst({
+  where: and(eq(schema.clients.id, id), eq(schema.clients.kind, "player")),
+  with: { category: true, videos: true },
+});
+
+// ❌ select + leftJoin + extra query for videos
+```
+
+Search and filters stay in `where` (`ilike`, `inArray`). That is not a reason to join.
+
+## Query builder
+
+`insert` / `update` / `delete` / `.returning()`. Aggregations (`count`, `groupBy`) — e.g. Category player counts. Landing Roster views (`roster`, `roster_gallery_images`, `roster_videos`) — the landing role cannot `SELECT` `clients` (ADR 0005).

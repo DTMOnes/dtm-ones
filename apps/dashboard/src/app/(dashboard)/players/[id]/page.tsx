@@ -21,13 +21,13 @@ export default async function Page({
 
   const [player, categories] = await Promise.all([
     getPlayer(db, id),
-    db
-      .select({
-        id: schema.categories.id,
-        name: schema.categories.name,
-      })
-      .from(schema.categories)
-      .orderBy(asc(schema.categories.name)),
+    db.query.categories.findMany({
+      columns: {
+        id: true,
+        name: true,
+      },
+      orderBy: [asc(schema.categories.name)],
+    }),
   ]);
 
   if (!player) {

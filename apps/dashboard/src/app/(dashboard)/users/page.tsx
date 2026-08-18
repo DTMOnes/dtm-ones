@@ -23,16 +23,16 @@ import { db } from "@/lib/db";
 import { toDashboardRole } from "@/utils/auth/owner";
 
 export default async function Page() {
-  const rows = await db
-    .select({
-      id: schema.user.id,
-      name: schema.user.name,
-      email: schema.user.email,
-      role: schema.user.role,
-    })
-    .from(schema.user)
-    .where(inArray(schema.user.role, ["owner", "staff"]))
-    .orderBy(asc(schema.user.name));
+  const rows = await db.query.user.findMany({
+    columns: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+    },
+    where: inArray(schema.user.role, ["owner", "staff"]),
+    orderBy: [asc(schema.user.name)],
+  });
 
   const users = rows.flatMap((row) => {
     const role = toDashboardRole(row.role);

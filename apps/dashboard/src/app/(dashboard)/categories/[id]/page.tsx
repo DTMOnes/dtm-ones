@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { and, asc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { schema } from "@dtm/database";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 
@@ -17,34 +17,30 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  const [[category], players] = await Promise.all([
-    db
-      .select({
-        id: schema.categories.id,
-        name: schema.categories.name,
-      })
-      .from(schema.categories)
-      .where(eq(schema.categories.id, id))
-      .limit(1),
-    db
-      .select({
-        id: schema.clients.id,
-        name: schema.clients.name,
-        lastClub: schema.clients.lastClub,
-      })
-      .from(schema.clients)
-      .where(
-        and(
-          eq(schema.clients.categoryId, id),
-          eq(schema.clients.kind, "player"),
-        ),
-      )
-      .orderBy(asc(schema.clients.name)),
-  ]);
+  const category = await db.query.categories.findFirst({
+    columns: {
+      id: true,
+      name: true,
+    },
+    where: eq(schema.categories.id, id),
+    with: {
+      players: {
+        columns: {
+          id: true,
+          name: true,
+          lastClub: true,
+        },
+        where: eq(schema.clients.kind, "player"),
+        orderBy: [asc(schema.clients.name)],
+      },
+    },
+  });
 
   if (!category) {
     notFound();
   }
+
+  const players = category.players;
 
   return (
     <main className="flex h-full w-full flex-col gap-8 p-10">

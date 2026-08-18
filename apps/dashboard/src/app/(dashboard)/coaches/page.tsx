@@ -30,23 +30,21 @@ export default async function Page({
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
 
-  const coaches = await db
-    .select({
-      id: schema.clients.id,
-      name: schema.clients.name,
-      nationality: schema.clients.nationality,
-      lastClub: schema.clients.lastClub,
-      visibility: schema.clients.visibility,
-    })
-    .from(schema.clients)
-    .where(
-      and(
-        eq(schema.clients.kind, "coach"),
-        isNull(schema.clients.trashedAt),
-        q ? ilike(schema.clients.name, `%${q}%`) : undefined,
-      ),
-    )
-    .orderBy(asc(schema.clients.name));
+  const coaches = await db.query.clients.findMany({
+    columns: {
+      id: true,
+      name: true,
+      nationality: true,
+      lastClub: true,
+      visibility: true,
+    },
+    where: and(
+      eq(schema.clients.kind, "coach"),
+      isNull(schema.clients.trashedAt),
+      q ? ilike(schema.clients.name, `%${q}%`) : undefined,
+    ),
+    orderBy: [asc(schema.clients.name)],
+  });
 
   return (
     <main className="flex h-full w-full flex-col gap-10 p-10">
