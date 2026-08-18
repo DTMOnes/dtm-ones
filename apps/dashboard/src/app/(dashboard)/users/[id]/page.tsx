@@ -28,17 +28,16 @@ export default async function Page({
     redirect("/contacts");
   }
 
-  const [[row], [owners]] = await Promise.all([
-    db
-      .select({
-        id: schema.user.id,
-        name: schema.user.name,
-        email: schema.user.email,
-        role: schema.user.role,
-      })
-      .from(schema.user)
-      .where(eq(schema.user.id, id))
-      .limit(1),
+  const [row, [owners]] = await Promise.all([
+    db.query.user.findFirst({
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+      },
+      where: eq(schema.user.id, id),
+    }),
     db
       .select({ ownerCount: count() })
       .from(schema.user)

@@ -15,11 +15,10 @@ export const setUserNameAction = ownerActionClient
   .metadata({ actionName: "setUserName" })
   .inputSchema(setUserNameSchema)
   .action(async ({ parsedInput }) => {
-    const [target] = await db
-      .select({ id: schema.user.id })
-      .from(schema.user)
-      .where(eq(schema.user.id, parsedInput.userId))
-      .limit(1);
+    const target = await db.query.user.findFirst({
+      columns: { id: true },
+      where: eq(schema.user.id, parsedInput.userId),
+    });
 
     if (!target) {
       throw new NotFoundError("User");

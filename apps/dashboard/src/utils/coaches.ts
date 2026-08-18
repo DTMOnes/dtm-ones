@@ -47,24 +47,21 @@ function isCoachComplete(coach: {
 }
 
 export async function getCoach(db: Database, id: string): Promise<Coach | null> {
-  const [row] = await db
-    .select({
-      id: schema.clients.id,
-      name: schema.clients.name,
-      nationality: schema.clients.nationality,
-      lastClub: schema.clients.lastClub,
-      eurobasketLink: schema.clients.eurobasketLink,
-      visibility: schema.clients.visibility,
-    })
-    .from(schema.clients)
-    .where(
-      and(
-        eq(schema.clients.id, id),
-        eq(schema.clients.kind, "coach"),
-        isNull(schema.clients.trashedAt),
-      ),
-    )
-    .limit(1);
+  const row = await db.query.clients.findFirst({
+    columns: {
+      id: true,
+      name: true,
+      nationality: true,
+      lastClub: true,
+      eurobasketLink: true,
+      visibility: true,
+    },
+    where: and(
+      eq(schema.clients.id, id),
+      eq(schema.clients.kind, "coach"),
+      isNull(schema.clients.trashedAt),
+    ),
+  });
 
   return row ?? null;
 }

@@ -38,9 +38,13 @@ export default function Page({ searchParams }: Props) {
 ```tsx
 // ✅ GOOD — Drizzle read and small HTML in Page; client dialog stays extracted
 export default async function Page() {
-  const players = await db
-    .select({ id: schema.clients.id, name: schema.clients.name })
-    .from(schema.clients);
+  const players = await db.query.clients.findMany({
+    columns: { id: true, name: true },
+    where: and(
+      eq(schema.clients.kind, "player"),
+      isNull(schema.clients.trashedAt),
+    ),
+  });
 
   return (
     <main>

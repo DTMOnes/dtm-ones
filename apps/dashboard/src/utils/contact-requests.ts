@@ -21,11 +21,18 @@ export async function getContactRequest(
   db: Database,
   id: string,
 ): Promise<ContactRequest | null> {
-  const [row] = await db
-    .select(contactRequestColumns)
-    .from(schema.contactRequests)
-    .where(eq(schema.contactRequests.id, id))
-    .limit(1);
+  const row = await db.query.contactRequests.findFirst({
+    columns: {
+      id: true,
+      reason: true,
+      email: true,
+      phone: true,
+      message: true,
+      status: true,
+      createdAt: true,
+    },
+    where: eq(schema.contactRequests.id, id),
+  });
 
   return row ?? null;
 }

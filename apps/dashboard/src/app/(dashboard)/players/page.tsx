@@ -36,39 +36,38 @@ export default async function Page({
   const categoryIds = normalizePlayerCategoryIds(rawC);
 
   const [players, categories] = await Promise.all([
-    db
-      .select({
-        id: schema.clients.id,
-        name: schema.clients.name,
-        nationality: schema.clients.nationality,
-        heightCm: schema.clients.heightCm,
-        visibility: schema.clients.visibility,
-        categoryId: schema.clients.categoryId,
-        categoryName: schema.categories.name,
-      })
-      .from(schema.clients)
-      .leftJoin(
-        schema.categories,
-        eq(schema.clients.categoryId, schema.categories.id),
-      )
-      .where(
-        and(
-          eq(schema.clients.kind, "player"),
-          isNull(schema.clients.trashedAt),
-          q ? ilike(schema.clients.name, `%${q}%`) : undefined,
-          categoryIds.length > 0
-            ? inArray(schema.clients.categoryId, categoryIds)
-            : undefined,
-        ),
-      )
-      .orderBy(asc(schema.clients.name)),
-    db
-      .select({
-        id: schema.categories.id,
-        name: schema.categories.name,
-      })
-      .from(schema.categories)
-      .orderBy(asc(schema.categories.name)),
+    db.query.clients.findMany({
+      columns: {
+        id: true,
+        name: true,
+        nationality: true,
+        heightCm: true,
+        visibility: true,
+      },
+      where: and(
+        eq(schema.clients.kind, "player"),
+        isNull(schema.clients.trashedAt),
+        q ? ilike(schema.clients.name, `%${q}%`) : undefined,
+        categoryIds.length > 0
+          ? inArray(schema.clients.categoryId, categoryIds)
+          : undefined,
+      ),
+      orderBy: [asc(schema.clients.name)],
+      with: {
+        category: {
+          columns: {
+            name: true,
+          },
+        },
+      },
+    }),
+    db.query.categories.findMany({
+      columns: {
+        id: true,
+        name: true,
+      },
+      orderBy: [asc(schema.categories.name)],
+    }),
   ]);
 
   return (
@@ -118,8 +117,8 @@ export default async function Page({
                       .join(" · ")}
                   </ItemDescription>
                 </ItemContent>
-                {player.categoryName ? (
-                  <Badge>{player.categoryName}</Badge>
+                {player.category?.name ? (
+                  <Badge>{player.category.name}</Badge>
                 ) : null}
               </Link>
             </Item>

@@ -96,15 +96,14 @@ export async function getCategory(
   db: Database,
   id: string,
 ): Promise<Category | null> {
-  const [row] = await db
-    .select({
-      id: schema.categories.id,
-      name: schema.categories.name,
-      slug: schema.categories.slug,
-    })
-    .from(schema.categories)
-    .where(eq(schema.categories.id, id))
-    .limit(1);
+  const row = await db.query.categories.findFirst({
+    columns: {
+      id: true,
+      name: true,
+      slug: true,
+    },
+    where: eq(schema.categories.id, id),
+  });
 
   return row ?? null;
 }

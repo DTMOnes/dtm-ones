@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, relations, sql } from "drizzle-orm";
 import {
   boolean,
   check,
@@ -258,3 +258,52 @@ export const verification = betterAuthSchema.table("verification", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
 });
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  players: many(clients),
+}));
+
+export const clientsRelations = relations(clients, ({ one, many }) => ({
+  category: one(categories, {
+    fields: [clients.categoryId],
+    references: [categories.id],
+  }),
+  galleryImages: many(playerGalleryImages),
+  videos: many(playerVideos),
+}));
+
+export const playerGalleryImagesRelations = relations(
+  playerGalleryImages,
+  ({ one }) => ({
+    client: one(clients, {
+      fields: [playerGalleryImages.clientId, playerGalleryImages.clientKind],
+      references: [clients.id, clients.kind],
+    }),
+  }),
+);
+
+export const playerVideosRelations = relations(playerVideos, ({ one }) => ({
+  client: one(clients, {
+    fields: [playerVideos.clientId, playerVideos.clientKind],
+    references: [clients.id, clients.kind],
+  }),
+}));
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));
