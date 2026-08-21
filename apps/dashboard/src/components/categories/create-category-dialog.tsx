@@ -67,7 +67,7 @@ export function CreateCategoryDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <PlusIcon />
           New category
         </Button>
@@ -104,7 +104,11 @@ export function CreateCategoryDialog() {
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create category" isExecuting={isExecuting} />
+                <SubmitButton
+                  label="Create category"
+                  isExecuting={isExecuting}
+                  icon={<PlusIcon />}
+                />
               </div>
             </DialogFooter>
           </form>

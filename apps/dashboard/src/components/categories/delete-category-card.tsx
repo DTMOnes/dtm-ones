@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
+import { TrashIcon } from "@phosphor-icons/react";
+
 import { deleteCategoryAction } from "@/actions/categories/deleteCategory";
 import {
   AlertDialog,
@@ -65,18 +67,28 @@ export function DeleteCategoryCard({
   }
 
   return (
-    <Card className="border-destructive ring-destructive/30">
-      <CardHeader className="border-b border-destructive/20">
+    <Card className="ring-destructive/30">
+      <CardHeader className="border-destructive/20 bg-destructive/5">
         <CardTitle>Delete category</CardTitle>
         <CardDescription>{description()}</CardDescription>
       </CardHeader>
-      <CardContent className="py-6">
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3">
-          <p className="text-sm font-medium">{categoryName}</p>
-          <p className="text-muted-foreground text-xs">{categoryId}</p>
-        </div>
+      <CardContent>
+        <dl className="flex flex-col gap-3">
+          <div className="flex items-baseline justify-between gap-4">
+            <dt className="text-muted-foreground text-xs font-medium">Name</dt>
+            <dd className="min-w-0 text-right text-sm font-medium">
+              {categoryName}
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="text-muted-foreground text-xs font-medium">Id</dt>
+            <dd className="font-mono text-muted-foreground text-xs break-all">
+              {categoryId}
+            </dd>
+          </div>
+        </dl>
       </CardContent>
-      <CardFooter className="justify-end border-t border-destructive/20 bg-destructive/5 py-4">
+      <CardFooter className="border-destructive/20 bg-destructive/5">
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
@@ -91,6 +103,7 @@ export function DeleteCategoryCard({
               variant="destructive"
               disabled={isDisabled || isExecuting}
             >
+              <TrashIcon />
               Delete category
             </Button>
           </AlertDialogTrigger>
@@ -112,7 +125,14 @@ export function DeleteCategoryCard({
                 disabled={isExecuting}
                 onClick={() => executeAsync({ id: categoryId })}
               >
-                {isExecuting ? "Deleting..." : "Confirm deletion"}
+                {isExecuting ? (
+                  "Deleting..."
+                ) : (
+                  <>
+                    <TrashIcon />
+                    Confirm deletion
+                  </>
+                )}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

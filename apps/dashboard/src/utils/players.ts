@@ -24,6 +24,32 @@ export type PlayerWrite = {
 
 export type PlayerPatch = Partial<Omit<PlayerWrite, "presentationImageUrl">>;
 
+export type PlayerCompletenessCheck = {
+  label: string;
+  met: boolean;
+};
+
+export function playerCompletenessChecks(player: {
+  name: string;
+  nationality: string;
+  lastClub: string;
+  heightCm: number | null;
+  categoryId: string | null;
+  presentationImageUrl: string | null;
+}): PlayerCompletenessCheck[] {
+  return [
+    { label: "Name", met: Boolean(player.name.trim()) },
+    { label: "Nationality", met: Boolean(player.nationality.trim()) },
+    { label: "Last club", met: Boolean(player.lastClub.trim()) },
+    { label: "Height", met: player.heightCm != null },
+    { label: "Category", met: Boolean(player.categoryId) },
+    {
+      label: "Presentation image",
+      met: Boolean(player.presentationImageUrl),
+    },
+  ];
+}
+
 export function playerCompletenessGaps(player: {
   name: string;
   nationality: string;
@@ -32,28 +58,9 @@ export function playerCompletenessGaps(player: {
   categoryId: string | null;
   presentationImageUrl: string | null;
 }): string[] {
-  const gaps: string[] = [];
-
-  if (!player.name.trim()) {
-    gaps.push("Name");
-  }
-  if (!player.nationality.trim()) {
-    gaps.push("Nationality");
-  }
-  if (!player.lastClub.trim()) {
-    gaps.push("Last club");
-  }
-  if (player.heightCm == null) {
-    gaps.push("Height");
-  }
-  if (!player.categoryId) {
-    gaps.push("Category");
-  }
-  if (!player.presentationImageUrl) {
-    gaps.push("Presentation image");
-  }
-
-  return gaps;
+  return playerCompletenessChecks(player)
+    .filter((check) => !check.met)
+    .map((check) => check.label);
 }
 
 function isPlayerComplete(player: {

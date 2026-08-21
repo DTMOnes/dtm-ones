@@ -5,22 +5,26 @@ import { and, asc, eq, ilike, isNull } from "drizzle-orm";
 import { schema } from "@dtm/database";
 
 import { CreateCoachDialog } from "@/components/coaches/create-coach-dialog";
+import {
+  ListEmpty,
+  ListRowAvatar,
+  ListRowChevron,
+  ListRowMeta,
+  PageHeader,
+  PageShell,
+  PageToolbar,
+} from "@/components/page/page-frame";
 import SearchBar from "@/components/players/search-bar";
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
 import { db } from "@/lib/db";
+import { listFacts, visibilityLabel } from "@/utils/list-row";
 
 export default async function Page({
   searchParams,
@@ -47,54 +51,55 @@ export default async function Page({
   });
 
   return (
-    <main className="flex h-full w-full flex-col gap-10 p-10">
-      <h1 className="text-2xl font-bold">Coaches</h1>
-
-      <div className="flex items-center gap-2">
-        <Suspense>
-          <SearchBar placeholder="Search coaches by name..." />
-        </Suspense>
-        <CreateCoachDialog />
+    <PageShell>
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          title="Coaches"
+          description="Coaches the agency represents."
+          actions={<CreateCoachDialog />}
+        />
+        <PageToolbar>
+          <div className="min-w-0 flex-1 basis-48">
+            <Suspense>
+              <SearchBar placeholder="Search coaches by name..." />
+            </Suspense>
+          </div>
+        </PageToolbar>
       </div>
 
-      <ItemGroup className="bg-background flex h-full w-full flex-col gap-4 rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">
-        {coaches.length === 0 ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <StrategyIcon />
-              </EmptyMedia>
-              <EmptyTitle>No coaches found</EmptyTitle>
-              <EmptyDescription>
-                Get started by creating a new coach with the &quot;New
-                coach&quot; button.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          coaches.map((coach) => (
-            <Item key={coach.id} variant="muted" asChild>
-              <Link
-                href={`/coaches/${coach.id}`}
-                className="flex w-full items-start justify-between gap-4"
-              >
-                <ItemContent>
-                  <ItemTitle>{coach.name}</ItemTitle>
-                  <ItemDescription>
-                    {[
-                      coach.nationality,
-                      coach.lastClub,
-                      coach.visibility === "public" ? "Public" : "Private",
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </ItemDescription>
-                </ItemContent>
-              </Link>
-            </Item>
-          ))
-        )}
-      </ItemGroup>
-    </main>
+      {coaches.length === 0 ? (
+        <ListEmpty
+          icon={StrategyIcon}
+          title="No coaches found"
+          description='Get started by creating a new coach with the "New coach" button.'
+        />
+      ) : (
+        <ItemGroup>
+          {coaches.map((coach) => {
+            const facts = listFacts(coach.nationality, coach.lastClub);
+
+            return (
+              <Item key={coach.id} variant="muted" asChild>
+                <Link href={`/coaches/${coach.id}`}>
+                  <ListRowAvatar name={coach.name} />
+                  <ItemContent>
+                    <ItemTitle>{coach.name}</ItemTitle>
+                    {facts ? (
+                      <ItemDescription>{facts}</ItemDescription>
+                    ) : null}
+                  </ItemContent>
+                  <ItemActions>
+                    <ListRowMeta>
+                      {visibilityLabel(coach.visibility)}
+                    </ListRowMeta>
+                    <ListRowChevron />
+                  </ItemActions>
+                </Link>
+              </Item>
+            );
+          })}
+        </ItemGroup>
+      )}
+    </PageShell>
   );
 }

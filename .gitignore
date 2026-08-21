@@ -79,9 +79,6 @@ Desktop.ini
 !.vscode/extensions.json
 !.vscode/settings.json
 
-# Impeccable per-developer overrides
-.impeccable/config.local.json
-
 # Local vendor / agent skill dirs
 .insforge
 .agent

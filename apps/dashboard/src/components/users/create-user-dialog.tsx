@@ -84,7 +84,7 @@ export function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <PlusIcon />
           New user
         </Button>
@@ -142,7 +142,11 @@ export function CreateUserDialog() {
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create user" isExecuting={isExecuting} />
+                <SubmitButton
+                  label="Create user"
+                  isExecuting={isExecuting}
+                  icon={<PlusIcon />}
+                />
               </div>
             </DialogFooter>
           </form>

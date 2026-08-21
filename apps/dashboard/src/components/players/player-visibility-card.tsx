@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 
+import {
+  CheckCircleIcon,
+  CircleIcon,
+  EyeSlashIcon,
+  GlobeSimpleIcon,
+} from "@phosphor-icons/react";
+
 import { setPlayerVisibilityAction } from "@/actions/players/setPlayerVisibility";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,16 +25,73 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import type { PlayerDetail } from "@/types/player";
 
+function RequirementList({
+  heading,
+  checks,
+  playerId,
+  muted = false,
+}: {
+  heading: string;
+  checks: Array<{ label: string; met: boolean }>;
+  playerId: string;
+  muted?: boolean;
+}) {
+  if (checks.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <p
+        className={
+          muted
+            ? "text-muted-foreground text-sm font-medium"
+            : "text-sm font-medium"
+        }
+      >
+        {heading}
+      </p>
+      <ul className="flex flex-col gap-2">
+        {checks.map((check) => (
+          <li key={check.label} className="flex items-start gap-2 text-sm">
+            {check.met ? (
+              <CheckCircleIcon
+                aria-hidden
+                className="text-muted-foreground mt-0.5 size-4 shrink-0"
+              />
+            ) : (
+              <CircleIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
+            )}
+            <span className={muted ? "text-muted-foreground" : "font-medium"}>
+              {check.label === "Presentation image" && !check.met ? (
+                <Link
+                  href={`/players/${playerId}?tab=media`}
+                  className="underline underline-offset-2"
+                >
+                  {check.label}
+                </Link>
+              ) : (
+                check.label
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function PlayerVisibilityCard({
   player,
-  gaps,
+  checks,
 }: {
   player: PlayerDetail;
-  gaps: string[];
+  checks: Array<{ label: string; met: boolean }>;
 }) {
   const router = useRouter();
   const isPublic = player.visibility === "public";
   const nextVisibility = isPublic ? "private" : "public";
+  const gaps = checks.filter((check) => !check.met);
 
   const { executeAsync, isExecuting } = useAction(setPlayerVisibilityAction, {
     onSuccess: () => {
@@ -44,42 +108,39 @@ export function PlayerVisibilityCard({
   });
 
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="border-b">
-        <CardTitle>Visibility</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-baseline gap-2">
+          Visibility
+          <span className="text-sm font-semibold tracking-tight">
+            {isPublic ? "Public" : "Private"}
+          </span>
+        </CardTitle>
         <CardDescription>
-          Public means this Player is on the Roster. Private means not on the
-          Roster. A Player may be public only when the profile is complete.
+          Does this player show in the landing page? Private means no, public
+          means yes.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-2">
+      <CardContent className="flex flex-col gap-4">
         {gaps.length > 0 ? (
-          <>
-            <p className="text-sm font-medium">Incomplete for the Roster</p>
-            <ul className="text-muted-foreground list-disc space-y-1 pl-4 text-sm">
-              {gaps.map((gap) => (
-                <li key={gap}>
-                  {gap === "Presentation image" ? (
-                    <Link
-                      href={`/players/${player.id}?tab=media`}
-                      className="underline underline-offset-2"
-                    >
-                      {gap}
-                    </Link>
-                  ) : (
-                    gap
-                  )}
-                </li>
-              ))}
-            </ul>
-          </>
+          <RequirementList
+            heading="Still needed"
+            checks={gaps}
+            playerId={player.id}
+          />
         ) : (
           <p className="text-muted-foreground text-sm">
             This profile is complete. It can be public.
           </p>
         )}
+        <RequirementList
+          heading="Ready"
+          checks={checks.filter((check) => check.met)}
+          playerId={player.id}
+          muted
+        />
       </CardContent>
-      <CardFooter className="justify-end">
+      <CardFooter>
         <Button
           type="button"
           disabled={isExecuting || (!isPublic && gaps.length > 0)}
@@ -90,9 +151,15 @@ export function PlayerVisibilityCard({
           {isExecuting ? (
             <Spinner />
           ) : isPublic ? (
-            "Make private"
+            <>
+              <EyeSlashIcon />
+              Make private
+            </>
           ) : (
-            "Make public"
+            <>
+              <GlobeSimpleIcon />
+              Make public
+            </>
           )}
         </Button>
       </CardFooter>

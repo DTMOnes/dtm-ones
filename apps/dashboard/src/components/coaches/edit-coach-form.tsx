@@ -7,6 +7,8 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import type { z } from "zod";
 
+import { ArrowCounterClockwiseIcon, FloppyDiskIcon } from "@phosphor-icons/react";
+
 import { updateCoachAction } from "@/actions/coaches/updateCoach";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
@@ -64,7 +66,7 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
   return (
     <FormProvider {...methods}>
       <Card>
-        <CardHeader className="border-b">
+        <CardHeader>
           <CardTitle>Profile</CardTitle>
           <CardDescription>
             A public Coach needs name, nationality, last club, and a Eurobasket
@@ -72,11 +74,12 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
           </CardDescription>
         </CardHeader>
         <form
+          className="contents"
           onSubmit={methods.handleSubmit((values) => executeAsync(values))}
           noValidate
         >
-          <CardContent className="pb-6">
-            <FieldGroup className="gap-6">
+          <CardContent>
+            <FieldGroup>
               <input type="hidden" {...methods.register("id")} />
               <TextField
                 name="name"
@@ -104,17 +107,25 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
               />
             </FieldGroup>
           </CardContent>
-          <CardFooter className="justify-end gap-2">
+          <CardFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
               disabled={isExecuting}
               onClick={() => methods.reset()}
             >
+              <ArrowCounterClockwiseIcon />
               Reset
             </Button>
             <Button type="submit" disabled={isExecuting}>
-              {isExecuting ? <Spinner /> : "Save profile"}
+              {isExecuting ? (
+                <Spinner />
+              ) : (
+                <>
+                  <FloppyDiskIcon />
+                  Save profile
+                </>
+              )}
             </Button>
           </CardFooter>
         </form>

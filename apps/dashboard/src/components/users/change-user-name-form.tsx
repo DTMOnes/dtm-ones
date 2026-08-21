@@ -7,6 +7,8 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import type { z } from "zod";
 
+import { ArrowCounterClockwiseIcon, FloppyDiskIcon } from "@phosphor-icons/react";
+
 import { setUserNameAction } from "@/actions/users/setUserName";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
@@ -58,18 +60,19 @@ export function ChangeUserNameForm({
   return (
     <FormProvider {...methods}>
       <Card>
-        <CardHeader className="border-b">
+        <CardHeader>
           <CardTitle>Name</CardTitle>
           <CardDescription>
             Shown on the Users list and this page.
           </CardDescription>
         </CardHeader>
         <form
+          className="contents"
           onSubmit={methods.handleSubmit((values) => executeAsync(values))}
           noValidate
         >
-          <CardContent className="pb-6">
-            <FieldGroup className="gap-6">
+          <CardContent>
+            <FieldGroup>
               <input type="hidden" {...methods.register("userId")} />
               <TextField
                 name="name"
@@ -79,17 +82,25 @@ export function ChangeUserNameForm({
               />
             </FieldGroup>
           </CardContent>
-          <CardFooter className="justify-end gap-2">
+          <CardFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
               disabled={isExecuting}
               onClick={() => methods.reset()}
             >
+              <ArrowCounterClockwiseIcon />
               Reset
             </Button>
             <Button type="submit" disabled={isExecuting}>
-              {isExecuting ? <Spinner /> : "Save name"}
+              {isExecuting ? (
+                <Spinner />
+              ) : (
+                <>
+                  <FloppyDiskIcon />
+                  Save name
+                </>
+              )}
             </Button>
           </CardFooter>
         </form>

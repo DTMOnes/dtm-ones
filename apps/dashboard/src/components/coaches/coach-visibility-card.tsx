@@ -4,11 +4,13 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { EyeSlashIcon, GlobeSimpleIcon } from "@phosphor-icons/react";
+
 import { setCoachVisibilityAction } from "@/actions/coaches/setCoachVisibility";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -16,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import type { Coach } from "@/types/coach";
 
 export function CoachVisibilityCard({
@@ -45,25 +48,32 @@ export function CoachVisibilityCard({
 
   return (
     <Card>
-      <CardHeader className="border-b">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <CardTitle>Visibility</CardTitle>
-          <Badge variant={isPublic ? "default" : "secondary"}>
+      <CardHeader>
+        <CardTitle>Visibility</CardTitle>
+        <CardAction>
+          <span
+            className={cn(
+              "text-sm font-medium",
+              !isPublic && "text-muted-foreground",
+            )}
+          >
             {isPublic ? "Public" : "Private"}
-          </Badge>
-        </div>
+          </span>
+        </CardAction>
         <CardDescription>
           Public means this Coach is on the Roster. Private means not on the
           Roster. A Coach may be public only when the profile is complete.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4 py-6">
+      <CardContent className="flex flex-col gap-3">
         {gaps.length > 0 ? (
-          <div className="rounded-md border border-border bg-muted/40 px-4 py-3">
+          <div className="flex flex-col gap-2.5">
             <p className="text-sm font-medium">Incomplete for the Roster</p>
-            <ul className="text-muted-foreground mt-3 list-disc space-y-1 pl-4 text-sm">
+            <ul className="flex flex-col gap-2">
               {gaps.map((gap) => (
-                <li key={gap}>{gap}</li>
+                <li key={gap} className="text-sm">
+                  {gap}
+                </li>
               ))}
             </ul>
           </div>
@@ -73,7 +83,7 @@ export function CoachVisibilityCard({
           </p>
         )}
       </CardContent>
-      <CardFooter className="justify-end border-t py-4">
+      <CardFooter>
         <Button
           type="button"
           disabled={isExecuting || (!isPublic && gaps.length > 0)}
@@ -84,9 +94,15 @@ export function CoachVisibilityCard({
           {isExecuting ? (
             <Spinner />
           ) : isPublic ? (
-            "Make private"
+            <>
+              <EyeSlashIcon />
+              Make private
+            </>
           ) : (
-            "Make public"
+            <>
+              <GlobeSimpleIcon />
+              Make public
+            </>
           )}
         </Button>
       </CardFooter>

@@ -5,19 +5,21 @@ import { and, asc, count, eq, ilike } from "drizzle-orm";
 import { schema } from "@dtm/database";
 
 import { CreateCategoryDialog } from "@/components/categories/create-category-dialog";
+import {
+  ListEmpty,
+  ListRowChevron,
+  PageHeader,
+  PageShell,
+  PageToolbar,
+} from "@/components/page/page-frame";
 import SearchBar from "@/components/players/search-bar";
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
+  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
 import { db } from "@/lib/db";
@@ -54,37 +56,36 @@ export default async function Page({
   }));
 
   return (
-    <main className="flex h-full w-full flex-col gap-10 p-10">
-      <h1 className="text-2xl font-bold">Categories</h1>
-
-      <div className="flex items-center gap-2">
-        <Suspense>
-          <SearchBar placeholder="Search categories by name..." />
-        </Suspense>
-        <CreateCategoryDialog />
+    <PageShell>
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          title="Categories"
+          description="Court positions for Players."
+          actions={<CreateCategoryDialog />}
+        />
+        <PageToolbar>
+          <div className="min-w-0 flex-1 basis-48">
+            <Suspense>
+              <SearchBar placeholder="Search categories by name..." />
+            </Suspense>
+          </div>
+        </PageToolbar>
       </div>
 
-      <ItemGroup className="bg-background flex h-full w-full flex-col gap-4 rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">
-        {categories.length === 0 ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <TagSimpleIcon />
-              </EmptyMedia>
-              <EmptyTitle>No categories found</EmptyTitle>
-              <EmptyDescription>
-                Get started by creating a new category with the &quot;New
-                category&quot; button.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          categories.map((category) => (
+      {categories.length === 0 ? (
+        <ListEmpty
+          icon={TagSimpleIcon}
+          title="No categories found"
+          description='Get started by creating a new category with the "New category" button.'
+        />
+      ) : (
+        <ItemGroup>
+          {categories.map((category) => (
             <Item key={category.id} variant="muted" asChild>
-              <Link
-                href={`/categories/${category.id}`}
-                className="flex w-full items-start justify-between gap-4"
-              >
+              <Link href={`/categories/${category.id}`}>
+                <ItemMedia variant="icon">
+                  <TagSimpleIcon />
+                </ItemMedia>
                 <ItemContent>
                   <ItemTitle>{category.name}</ItemTitle>
                   <ItemDescription>
@@ -92,11 +93,14 @@ export default async function Page({
                     {category.playerCount === 1 ? "player" : "players"}
                   </ItemDescription>
                 </ItemContent>
+                <ItemActions>
+                  <ListRowChevron />
+                </ItemActions>
               </Link>
             </Item>
-          ))
-        )}
-      </ItemGroup>
-    </main>
+          ))}
+        </ItemGroup>
+      )}
+    </PageShell>
   );
 }

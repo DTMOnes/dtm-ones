@@ -10,7 +10,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { Input } from "@/components/ui/input";
 
 export default function SearchBar({
-  placeholder = "Buscar por nombre...",
+  placeholder = "Search by name...",
 }: {
   placeholder?: string;
 }) {

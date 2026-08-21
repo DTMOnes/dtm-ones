@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -26,6 +27,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { FieldDescription } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { PlayerGalleryImage } from "@/types/player";
 import {
@@ -33,7 +35,7 @@ import {
   isAllowedPlayerImage,
 } from "@/utils/player-blob-path";
 
-import { ImagesIcon, TrashIcon } from "@phosphor-icons/react";
+import { ImagesIcon, InfoIcon, TrashIcon } from "@phosphor-icons/react";
 
 export function PlayerGallery({
   playerId,
@@ -131,12 +133,11 @@ export function PlayerGallery({
   }
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader>
-        <CardTitle>Gallery</CardTitle>
+        <CardTitle>Gallery Pictures</CardTitle>
         <CardDescription>
-          Optional extra photos. JPEG, PNG, or WebP, 5 MB or less. You can
-          select more than one file.
+          All the pictures in the player&apos;s page gallery.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -151,16 +152,8 @@ export function PlayerGallery({
             void onFiles(event.target.files);
           }}
         />
-        <Button
-          type="button"
-          className="w-fit"
-          disabled={busy}
-          onClick={() => inputRef.current?.click()}
-        >
-          {uploading || isAdding ? <Spinner /> : "Add images"}
-        </Button>
         {images.length === 0 ? (
-          <Empty className="border border-dashed">
+          <Empty className="min-h-36 border border-dashed py-6">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <ImagesIcon />
@@ -172,15 +165,18 @@ export function PlayerGallery({
             </EmptyHeader>
           </Empty>
         ) : (
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {images.map((image) => (
-              <li key={image.id} className="relative">
+              <li
+                key={image.id}
+                className="relative overflow-hidden rounded-lg ring-1 ring-foreground/10"
+              >
                 <Image
                   src={image.url}
                   alt=""
                   width={400}
                   height={400}
-                  className="aspect-square w-full rounded-lg object-cover"
+                  className="aspect-square w-full object-cover"
                 />
                 <Button
                   type="button"
@@ -199,7 +195,27 @@ export function PlayerGallery({
             ))}
           </ul>
         )}
+        <FieldDescription className="text-muted-foreground flex items-center gap-1 text-sm">
+          <InfoIcon />
+          <span>Supported JPEG, PNG, or WebP. Max size 5 MB.</span>
+        </FieldDescription>
       </CardContent>
+      <CardFooter>
+        <Button
+          type="button"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+        >
+          {uploading || isAdding ? (
+            <Spinner />
+          ) : (
+            <>
+              <ImagesIcon />
+              Add images
+            </>
+          )}
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

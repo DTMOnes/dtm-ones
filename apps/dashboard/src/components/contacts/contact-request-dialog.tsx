@@ -11,7 +11,6 @@ import { unarchiveContactRequestAction } from "@/actions/contacts/unarchiveConta
 import { ArchiveContactRequestButton } from "@/components/contacts/archive-contact-request-button";
 import { ContactRequestField } from "@/components/contacts/contact-request-field";
 import { DeleteContactRequestButton } from "@/components/contacts/delete-contact-request-button";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -144,13 +143,13 @@ export function ContactRequestDialog({
         className="flex max-h-[min(90dvh,40rem)] flex-col gap-6 overflow-hidden p-5 sm:max-w-lg"
       >
         <DialogHeader className="w-full shrink-0 gap-6">
-          <Badge variant="secondary" className="w-fit max-w-[calc(100%-2.5rem)]">
-            {reasonLabel}
-          </Badge>
           <DialogDescription className="sr-only">
             {reasonLabel} contact request
           </DialogDescription>
           <div className="flex w-full flex-col gap-4">
+            <ContactRequestField label="Reason" className="w-full">
+              <p className="text-sm">{reasonLabel}</p>
+            </ContactRequestField>
             <ContactRequestField label="Email" className="w-full">
               <div className="flex w-full min-w-0 items-center justify-between gap-1">
                 <DialogTitle className="min-w-0 flex-1 truncate">

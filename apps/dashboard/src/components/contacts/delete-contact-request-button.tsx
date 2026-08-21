@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { TrashIcon } from "@phosphor-icons/react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,6 +38,7 @@ export function DeleteContactRequestButton({
         disabled={isDisabled}
         onClick={() => setConfirmOpen(true)}
       >
+        <TrashIcon />
         Delete
       </Button>
 
@@ -69,7 +72,14 @@ export function DeleteContactRequestButton({
                 });
               }}
             >
-              {pending ? "Deleting..." : "Delete"}
+              {pending ? (
+                "Deleting..."
+              ) : (
+                <>
+                  <TrashIcon />
+                  Delete
+                </>
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

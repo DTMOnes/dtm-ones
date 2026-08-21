@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -26,13 +27,20 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { FieldDescription } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import {
   PLAYER_IMAGE_CONTENT_TYPES,
   isAllowedPlayerImage,
 } from "@/utils/player-blob-path";
 
-import { ImageIcon } from "@phosphor-icons/react";
+import {
+  ArrowsClockwiseIcon,
+  ImageIcon,
+  InfoIcon,
+  TrashIcon,
+  UploadSimpleIcon,
+} from "@phosphor-icons/react";
 
 export function PlayerPresentationImage({
   playerId,
@@ -119,19 +127,6 @@ export function PlayerPresentationImage({
           void onFile(event.target.files?.[0]);
         }}
       />
-      <Button
-        type="button"
-        disabled={busy}
-        onClick={() => inputRef.current?.click()}
-      >
-        {uploading || isCommitting ? (
-          <Spinner />
-        ) : url ? (
-          "Replace image"
-        ) : (
-          "Upload image"
-        )}
-      </Button>
       {url ? (
         <Button
           type="button"
@@ -141,50 +136,77 @@ export function PlayerPresentationImage({
             void clear({ playerId });
           }}
         >
-          {isClearing ? <Spinner /> : "Remove"}
+          {isClearing ? (
+            <Spinner />
+          ) : (
+            <>
+              <TrashIcon />
+              Remove
+            </>
+          )}
         </Button>
       ) : null}
+      <Button
+        type="button"
+        disabled={busy}
+        onClick={() => inputRef.current?.click()}
+      >
+        {uploading || isCommitting ? (
+          <Spinner />
+        ) : url ? (
+          <>
+            <ArrowsClockwiseIcon />
+            Replace image
+          </>
+        ) : (
+          <>
+            <UploadSimpleIcon />
+            Upload image
+          </>
+        )}
+      </Button>
     </div>
   );
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle>Presentation image</CardTitle>
         <CardDescription>
-          A public Player needs a presentation image. JPEG, PNG, or WebP, 5 MB
-          or less.
+          This will be the first picture they see for the player, the one
+          displayed on the main roster grid.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {url ? (
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="bg-muted/30 w-fit rounded-lg p-2 ring-1 ring-foreground/10">
             <Image
               src={url}
               alt="Presentation"
-              width={192}
-              height={192}
-              className="h-48 w-48 shrink-0 rounded-lg object-cover"
+              width={352}
+              height={469}
+              className="aspect-[3/4] w-52 rounded-md object-cover"
             />
-            {actions}
           </div>
         ) : (
-          <>
-            <Empty className="border border-dashed">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <ImageIcon />
-                </EmptyMedia>
-                <EmptyTitle>No presentation image yet</EmptyTitle>
-                <EmptyDescription>
-                  Upload a photo so this Player can be public on the Roster.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-            {actions}
-          </>
+          <Empty className="aspect-[3/4] w-52 min-h-0 flex-none border border-dashed p-4">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <ImageIcon />
+              </EmptyMedia>
+              <EmptyTitle>No presentation image yet</EmptyTitle>
+              <EmptyDescription>
+                Upload a photo so this Player can be public on the Roster.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         )}
+        <FieldDescription className="text-muted-foreground flex items-center gap-1 text-sm">
+          <InfoIcon />
+          <span>Supported JPEG, PNG, or WebP. Max size 5 MB.</span>
+        </FieldDescription>
       </CardContent>
+      <CardFooter className="gap-2">{actions}</CardFooter>
     </Card>
   );
 }

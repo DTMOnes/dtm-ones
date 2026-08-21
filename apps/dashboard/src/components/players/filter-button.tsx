@@ -67,8 +67,7 @@ export default function FilterButton({
           aria-label="Filter by category"
           aria-pressed={selected.size > 0}
           className={cn(
-            selected.size > 0 &&
-              "border-1 border-white hover:border-white dark:border-white dark:hover:border-white",
+            selected.size > 0 && "border-foreground/40 bg-muted",
           )}
         >
           <FunnelSimpleIcon />
