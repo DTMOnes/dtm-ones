@@ -37,43 +37,63 @@ export function PageHeader({
   backLabel?: string;
   status?: string;
 }) {
-  return (
-    <div className="flex flex-col gap-3">
-      {backHref && backLabel ? (
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground -ml-2 w-fit"
-        >
-          <Link href={backHref}>
-            <ArrowLeftIcon />
-            {backLabel}
-          </Link>
-        </Button>
-      ) : null}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 flex-col gap-1">
-          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight break-words">
-              {title}
-            </h1>
-            {status ? (
-              <span className="text-muted-foreground text-sm font-medium">
-                {status}
-              </span>
-            ) : null}
-          </div>
-          {description ? (
-            <p className="text-muted-foreground text-sm">{description}</p>
+  const iconOnlyBack = Boolean(backHref) && !backLabel;
+  const backButton = backHref ? (
+    <Button
+      asChild
+      variant="ghost"
+      size={backLabel ? "sm" : "icon-sm"}
+      className={
+        backLabel
+          ? "text-muted-foreground -ml-2 w-fit"
+          : "text-muted-foreground -ml-2 mt-0.5 shrink-0"
+      }
+    >
+      <Link href={backHref} aria-label={backLabel ?? "Go back"}>
+        <ArrowLeftIcon />
+        {backLabel}
+      </Link>
+    </Button>
+  ) : null;
+
+  const heading = (
+    <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex min-w-0 flex-col gap-1">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight break-words">
+            {title}
+          </h1>
+          {status ? (
+            <span className="text-muted-foreground text-sm font-medium">
+              {status}
+            </span>
           ) : null}
         </div>
-        {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center gap-2">
-            {actions}
-          </div>
+        {description ? (
+          <p className="text-muted-foreground text-sm">{description}</p>
         ) : null}
       </div>
+      {actions ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {actions}
+        </div>
+      ) : null}
+    </div>
+  );
+
+  if (iconOnlyBack) {
+    return (
+      <div className="flex items-start gap-1">
+        {backButton}
+        {heading}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {backButton}
+      {heading}
     </div>
   );
 }
@@ -153,7 +173,13 @@ export function ListRowChevron() {
   );
 }
 
-export function ListRowSkeleton({ count = 5 }: { count?: number }) {
+export function ListRowSkeleton({
+  count = 5,
+  leading = true,
+}: {
+  count?: number;
+  leading?: boolean;
+}) {
   return (
     <ItemGroup role="presentation">
       {Array.from({ length: count }).map((_, index) => (
@@ -161,7 +187,9 @@ export function ListRowSkeleton({ count = 5 }: { count?: number }) {
           key={index}
           className="flex items-center gap-3 rounded-lg bg-muted/45 px-3.5 py-3"
         >
-          <Skeleton className="size-10 shrink-0 rounded-lg" />
+          {leading ? (
+            <Skeleton className="size-10 shrink-0 rounded-lg" />
+          ) : null}
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <Skeleton className="h-4 w-40" />
             <Skeleton className="h-3 w-28" />

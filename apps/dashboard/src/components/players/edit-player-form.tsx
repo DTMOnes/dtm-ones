@@ -78,10 +78,10 @@ export function EditPlayerForm({
     <FormProvider {...methods}>
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle>Player Information</CardTitle>
           <CardDescription>
-            A public Player needs name, Category, presentation image, height,
-            nationality, and last club. Upload the presentation image on Media.
+            Some general information about each player to display in their
+            landing page profile.
           </CardDescription>
         </CardHeader>
         <form
@@ -116,17 +116,17 @@ export function EditPlayerForm({
                 placeholder="198"
                 disabled={isExecuting}
               />
+              <TextField
+                name="eurobasketLink"
+                label="Eurobasket link"
+                placeholder="https://basketball.eurobasket.com/..."
+                disabled={isExecuting}
+              />
               <OptionsField
                 name="categoryId"
                 label="Category"
                 options={categories}
                 emptyMessage="No categories created yet"
-                disabled={isExecuting}
-              />
-              <TextField
-                name="eurobasketLink"
-                label="Eurobasket link"
-                placeholder="https://basketball.eurobasket.com/..."
                 disabled={isExecuting}
               />
             </FieldGroup>

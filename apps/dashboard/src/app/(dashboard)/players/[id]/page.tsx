@@ -13,7 +13,7 @@ import { PlayerDetailTabs } from "@/components/players/player-detail-tabs";
 import { PlayerVisibilityCard } from "@/components/players/player-visibility-card";
 import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { db } from "@/lib/db";
-import { getPlayer, playerCompletenessGaps } from "@/utils/players";
+import { getPlayer, playerCompletenessChecks } from "@/utils/players";
 
 export default async function Page({
   params,
@@ -41,16 +41,12 @@ export default async function Page({
     notFound();
   }
 
-  const isPublic = player.visibility === "public";
-
   return (
     <PageShell>
       <PageHeader
         backHref="/players"
-        backLabel="Players"
         title={player.name}
         description="Player profile"
-        status={isPublic ? "Public" : "Private"}
       />
 
       <PlayerDetailTabs
@@ -63,7 +59,7 @@ export default async function Page({
               <>
                 <PlayerVisibilityCard
                   player={player}
-                  gaps={playerCompletenessGaps(player)}
+                  checks={playerCompletenessChecks(player)}
                 />
                 <RemoveToTrashCard clientId={player.id} kind="player" />
               </>

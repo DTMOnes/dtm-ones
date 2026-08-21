@@ -6,7 +6,6 @@ import { schema } from "@dtm/database";
 
 import {
   ListEmpty,
-  ListRowAvatar,
   ListRowChevron,
   ListRowMeta,
   PageHeader,
@@ -110,7 +109,6 @@ export default async function Page({
             return (
               <Item key={player.id} variant="muted" asChild>
                 <Link href={`/players/${player.id}`}>
-                  <ListRowAvatar name={player.name} />
                   <ItemContent>
                     <ItemTitle>{player.name}</ItemTitle>
                     {facts ? (

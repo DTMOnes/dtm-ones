@@ -27,6 +27,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { FieldDescription } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { PlayerGalleryImage } from "@/types/player";
 import {
@@ -34,7 +35,7 @@ import {
   isAllowedPlayerImage,
 } from "@/utils/player-blob-path";
 
-import { ImagesIcon, TrashIcon } from "@phosphor-icons/react";
+import { ImagesIcon, InfoIcon, TrashIcon } from "@phosphor-icons/react";
 
 export function PlayerGallery({
   playerId,
@@ -134,13 +135,12 @@ export function PlayerGallery({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gallery</CardTitle>
+        <CardTitle>Gallery Pictures</CardTitle>
         <CardDescription>
-          Optional extra photos. JPEG, PNG, or WebP, 5 MB or less. You can
-          select more than one file.
+          All the pictures in the player&apos;s page gallery.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
         <input
           ref={inputRef}
           type="file"
@@ -195,6 +195,10 @@ export function PlayerGallery({
             ))}
           </ul>
         )}
+        <FieldDescription className="text-muted-foreground flex items-center gap-1 text-sm">
+          <InfoIcon />
+          <span>Supported JPEG, PNG, or WebP. Max size 5 MB.</span>
+        </FieldDescription>
       </CardContent>
       <CardFooter>
         <Button

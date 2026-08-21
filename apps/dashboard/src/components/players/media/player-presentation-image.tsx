@@ -27,13 +27,20 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { FieldDescription } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import {
   PLAYER_IMAGE_CONTENT_TYPES,
   isAllowedPlayerImage,
 } from "@/utils/player-blob-path";
 
-import { ArrowsClockwiseIcon, ImageIcon, TrashIcon, UploadSimpleIcon } from "@phosphor-icons/react";
+import {
+  ArrowsClockwiseIcon,
+  ImageIcon,
+  InfoIcon,
+  TrashIcon,
+  UploadSimpleIcon,
+} from "@phosphor-icons/react";
 
 export function PlayerPresentationImage({
   playerId,
@@ -166,11 +173,11 @@ export function PlayerPresentationImage({
       <CardHeader>
         <CardTitle>Presentation image</CardTitle>
         <CardDescription>
-          A public Player needs a presentation image. JPEG, PNG, or WebP, 5 MB
-          or less.
+          This will be the first picture they see for the player, the one
+          displayed on the main roster grid.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
         {url ? (
           <div className="bg-muted/30 w-fit rounded-lg p-2 ring-1 ring-foreground/10">
             <Image
@@ -194,6 +201,10 @@ export function PlayerPresentationImage({
             </EmptyHeader>
           </Empty>
         )}
+        <FieldDescription className="text-muted-foreground flex items-center gap-1 text-sm">
+          <InfoIcon />
+          <span>Supported JPEG, PNG, or WebP. Max size 5 MB.</span>
+        </FieldDescription>
       </CardContent>
       <CardFooter className="gap-2">{actions}</CardFooter>
     </Card>

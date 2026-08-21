@@ -18,7 +18,7 @@ export default function Loading() {
         </div>
       </div>
 
-      <ListRowSkeleton />
+      <ListRowSkeleton leading={false} />
     </PageShell>
   );
 }

@@ -57,21 +57,23 @@ Put shared look on `src/components/ui/card.tsx`. Call sites choose a recipe with
 
 ### 1. Work card
 
-Profile, Name, Role, Rename, sign-in form.
+Player Information, Name, Role, Rename, sign-in form.
 
-- Title names the field group (`Profile`, `Name`, `Role`)
+- Title names the field group (`Player Information`, `Name`, `Role`)
 - Description is one or two sentences of the completeness rule, glossary-true
-- Body is the form. Labels above inputs. No placeholder-as-label
+- Player Information description: "Some general information about each player to display in their landing page profile."
+- Body is the form. Labels above inputs. No placeholder-as-label. Player form: all text fields first (including Eurobasket link), Category last.
 - Footer: secondary Reset (if the form has one) then primary Save
 
 ### 2. Status card
 
-Player and Coach Visibility. Same component structure on both kinds.
+Player and Coach Visibility.
 
 - Title `Visibility`
-- `CardAction`: `Public` or `Private` as `text-sm font-medium`. Private is muted. Not a pill
-- Description: public means on the Roster; private means not; public only when complete
-- Body: if gaps, a stacked list of missing facts (presentation image links to Media). If complete, one muted sentence: "This profile is complete. It can be public."
+- Description: does this Client show on the landing page? Private means no, public means yes.
+- Player title row: `Visibility` then `Public` or `Private` as `text-sm font-semibold tracking-tight`, same baseline. Not a pill, not muted, not a far CardAction word, not a body heading.
+- Player body: two lists: `Still needed` (foreground, empty circle; presentation image links to Media) and `Ready` (muted, check). If nothing is missing, drop `Still needed` and use the muted sentence: "This profile is complete. It can be public."
+- Coach still uses `CardAction` for Public/Private and lists only missing gaps until it matches the Player card.
 - Footer: `Make public` / `Make private`. Disabled when making public and gaps remain
 - No nested inner card. Gaps are a list, not a box in a box
 
@@ -95,10 +97,11 @@ Delete User, Delete Category.
 
 ### 5. Media card
 
-Presentation image, Gallery, YouTube videos.
+Presentation image, Gallery Pictures, YouTube videos.
 
-- Same Work-card header
+- Same Work-card header. Description is what the media is for, not the file rules.
 - Body is the image, grid, or list. Empty uses `Empty` inside the card, not a blank hole
+- Under the image area: FieldDescription + InfoIcon, same pattern as YouTube. Image cards: "Supported JPEG, PNG, or WebP. Max size 5 MB."
 - Footer holds card-level actions (`Upload image` / `Replace image` / `Add images`). Item-level delete stays on the row
 - Presentation image is a portrait (`aspect-[3/4]`) in the body, not a square beside the buttons
 
@@ -118,7 +121,7 @@ ContactRequest rows only. Same list-row skeleton as recipe 7. Click opens the di
 
 Every list page (Players, Coaches, Categories, Users, Trash, Contacts). `Item variant="muted"` inside the well. Shared bits: `ListRowAvatar`, `ListRowMeta`, `ListRowChevron`, `ListRowSkeleton` from `page-frame.tsx`.
 
-- Leading `ItemMedia`: `ListRowAvatar` (Player photo when present, else initials). Initials for Coaches and Users. Phosphor icon for Categories and Contacts.
+- Leading `ItemMedia`: none on Players. Initials for Coaches, Users, and Trash. Phosphor icon for Categories and Contacts.
 - Title: the name (email on Contacts). `text-sm font-medium tracking-tight`
 - Description: supporting facts only, 13px muted. One ` · ` max. Height and nationality for Players. Nationality and last club for Coaches. Player count for Categories. Email for Users. Kind and nationality for Trash. Not Visibility, Category, Role, or Reason.
 - Trailing `ListRowMeta`: the classifier (Category, Role, Reason). Visibility is a second muted word on Player, Coach, and Trash rows. `ListRowChevron` on rows that open a detail or dialog. Trash keeps Restore / Delete instead of a chevron.
@@ -143,8 +146,8 @@ Use `PageHeader`, `PageToolbar`, `DetailLayout`, `ListEmpty`, `ListRowAvatar`, `
 
 **Detail pages** (Player, Coach, Category, User)
 
-1. Back: ghost `size="sm"` icon+label to the parent list. Same control on every detail page (`PageHeader` `backHref`).
-2. Title: entity name. Optional Public/Private status word beside Player and Coach names (`text-sm font-medium` muted). Lede is kind (`Player profile`), not a second headline.
+1. Back sits first. Player detail: ghost `size="icon-sm"` icon-only (`aria-label` Go back), then the name on the same row. Other detail pages still use ghost `size="sm"` icon+label on the row above the title.
+2. Title: entity name. Player pages do not put Public/Private in the header; that word lives on the Visibility card. Coach pages still show the status word beside the name (`text-sm font-medium` muted). Lede is kind (`Player profile`), not a second headline.
 3. Body uses `DetailLayout` (`grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]`):
    - Player Info: Work card in main. Status + Action cards stacked in the rail. Media tab is a column of Media cards, `gap-6`.
    - Coach: same grid (Profile | Visibility + Trash).
