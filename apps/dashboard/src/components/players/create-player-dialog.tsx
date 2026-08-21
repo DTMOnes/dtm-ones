@@ -83,7 +83,7 @@ export function CreatePlayerDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <PlusIcon />
           New player
         </Button>
@@ -145,7 +145,11 @@ export function CreatePlayerDialog({
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create player" isExecuting={isExecuting} />
+                <SubmitButton
+                  label="Create player"
+                  isExecuting={isExecuting}
+                  icon={<PlusIcon />}
+                />
               </div>
             </DialogFooter>
           </form>

@@ -10,13 +10,8 @@ import { markContactRequestReadAction } from "@/actions/contacts/markContactRequ
 import { ContactRequestCard } from "@/components/contacts/contact-request-card";
 import { ContactRequestDialog } from "@/components/contacts/contact-request-dialog";
 import { ContactRequestFilter } from "@/components/contacts/contact-request-filter";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
+import { ListEmpty, PageHeader } from "@/components/page/page-frame";
+import { ItemGroup } from "@/components/ui/item";
 import type {
   ContactRequest,
   ContactsInboxFilter,
@@ -141,14 +136,12 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
   }
 
   return (
-    <div className="flex h-full w-full flex-col gap-8">
+    <div className="flex min-h-0 w-full flex-1 flex-col gap-8">
       <div className="flex flex-col gap-6">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="text-2xl font-bold">Contacts</h1>
-          <p className="text-muted-foreground text-sm">
-            Messages submitted from the public contact form.
-          </p>
-        </div>
+        <PageHeader
+          title="Inbox"
+          description="Messages submitted from the public contact form."
+        />
         <ContactRequestFilter
           value={filter}
           counts={counts}
@@ -157,17 +150,13 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
       </div>
 
       {visibleRequests.length === 0 ? (
-        <Empty className="min-h-56 flex-1 border border-dashed">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <EnvelopeSimpleIcon />
-            </EmptyMedia>
-            <EmptyTitle>{empty.title}</EmptyTitle>
-            <EmptyDescription>{empty.description}</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <ListEmpty
+          icon={EnvelopeSimpleIcon}
+          title={empty.title}
+          description={empty.description}
+        />
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <ItemGroup>
           {visibleRequests.map((request) => (
             <ContactRequestCard
               key={request.id}
@@ -175,7 +164,7 @@ export function ContactsInbox({ requests }: ContactsInboxProps) {
               onOpen={openRequest}
             />
           ))}
-        </div>
+        </ItemGroup>
       )}
 
       <ContactRequestDialog

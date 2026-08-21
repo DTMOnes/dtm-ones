@@ -6,6 +6,8 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { ArrowCounterClockwiseIcon, TrashIcon } from "@phosphor-icons/react";
+
 import { deleteClientFromTrashAction } from "@/actions/trash/deleteClientFromTrash";
 import { restoreClientAction } from "@/actions/trash/restoreClient";
 import {
@@ -75,7 +77,14 @@ export function TrashClientActions({
           void restore({ id: clientId });
         }}
       >
-        {isRestoring ? <Spinner /> : "Restore"}
+        {isRestoring ? (
+          <Spinner />
+        ) : (
+          <>
+            <ArrowCounterClockwiseIcon />
+            Restore
+          </>
+        )}
       </Button>
       <Button
         type="button"
@@ -84,6 +93,7 @@ export function TrashClientActions({
         disabled={pending}
         onClick={() => setConfirmOpen(true)}
       >
+        <TrashIcon />
         Delete
       </Button>
 
@@ -112,7 +122,14 @@ export function TrashClientActions({
                 void destroy({ id: clientId });
               }}
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting ? (
+                "Deleting..."
+              ) : (
+                <>
+                  <TrashIcon />
+                  Delete
+                </>
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

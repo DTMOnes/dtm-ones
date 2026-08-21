@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
   EnvelopeSimpleIcon,
   FolderIcon,
@@ -20,9 +21,9 @@ import {
 import { NavGroup, type MenuItem } from "@/components/sidebar/nav-group";
 import { NavUser, type NavUserData } from "@/components/sidebar/nav-user";
 
-const contactsItems: MenuItem[] = [
+const inboxItems: MenuItem[] = [
   {
-    title: "Contacts",
+    title: "Inbox",
     url: "/contacts",
     icon: EnvelopeSimpleIcon,
   },
@@ -70,12 +71,18 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <div className="px-2 py-2">
-          <span className="text-lg font-semibold tracking-tight">DTM Ones</span>
+        <div className="flex items-center gap-2 px-2 py-2">
+          <Image
+            src="/assets/dtm-ones-logo.svg"
+            alt="DTM ONES"
+            width={25}
+            height={21}
+          />
+          <span className="text-base font-semibold tracking-tight">DTM ONES</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavGroup label="Inbox" items={contactsItems} />
+        <NavGroup items={inboxItems} />
         <NavGroup label="Clients" items={clientItems} />
         {isOwner ? (
           <NavGroup label="Administration" items={usersItems} />

@@ -21,7 +21,7 @@ export function ContactRequestFilter({
   return (
     <Tabs
       value={value}
-      className="min-w-0"
+      className="w-full min-w-0"
       onValueChange={(next) => {
         if (isContactsInboxFilter(next)) {
           onChange(next);
@@ -30,15 +30,11 @@ export function ContactRequestFilter({
     >
       <TabsList
         variant="line"
-        aria-label="Filter contact requests"
-        className="h-8 w-full max-w-full justify-start overflow-x-auto rounded-none border-b border-border p-0"
+        aria-label="Filter inbox"
+        className="w-full overflow-x-auto"
       >
         {FILTER_OPTIONS.map((option) => (
-          <TabsTrigger
-            key={option.value}
-            value={option.value}
-            className="flex-none px-2.5 first:pl-0 group-data-horizontal/tabs:after:bottom-[-1px]"
-          >
+          <TabsTrigger key={option.value} value={option.value}>
             {option.label}
             <span className="text-muted-foreground text-xs font-medium tabular-nums">
               {counts[option.value]}

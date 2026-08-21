@@ -1,18 +1,18 @@
+import { ListRowSkeleton, PageShell } from "@/components/page/page-frame";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <main className="flex h-full w-full flex-col gap-10 p-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-9 w-28" />
+    <PageShell>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-4 w-56" />
+        </div>
+        <Skeleton className="h-8 w-24 shrink-0" />
       </div>
 
-      <div className="bg-background flex h-full w-full flex-col gap-4 rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} className="h-16 w-full rounded-lg" />
-        ))}
-      </div>
-    </main>
+      <ListRowSkeleton />
+    </PageShell>
   );
 }

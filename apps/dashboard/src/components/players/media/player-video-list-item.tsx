@@ -17,7 +17,7 @@ export function PlayerVideoListItem({
   playerId: string;
 }) {
   return (
-    <Item variant="outline" className="items-center">
+    <Item variant="muted" className="items-center">
       <ItemContent className="min-w-0">
         <ItemTitle>
           <a

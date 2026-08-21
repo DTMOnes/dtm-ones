@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,7 +33,7 @@ import {
   isAllowedPlayerImage,
 } from "@/utils/player-blob-path";
 
-import { ImageIcon } from "@phosphor-icons/react";
+import { ArrowsClockwiseIcon, ImageIcon, TrashIcon, UploadSimpleIcon } from "@phosphor-icons/react";
 
 export function PlayerPresentationImage({
   playerId,
@@ -119,19 +120,6 @@ export function PlayerPresentationImage({
           void onFile(event.target.files?.[0]);
         }}
       />
-      <Button
-        type="button"
-        disabled={busy}
-        onClick={() => inputRef.current?.click()}
-      >
-        {uploading || isCommitting ? (
-          <Spinner />
-        ) : url ? (
-          "Replace image"
-        ) : (
-          "Upload image"
-        )}
-      </Button>
       {url ? (
         <Button
           type="button"
@@ -141,14 +129,40 @@ export function PlayerPresentationImage({
             void clear({ playerId });
           }}
         >
-          {isClearing ? <Spinner /> : "Remove"}
+          {isClearing ? (
+            <Spinner />
+          ) : (
+            <>
+              <TrashIcon />
+              Remove
+            </>
+          )}
         </Button>
       ) : null}
+      <Button
+        type="button"
+        disabled={busy}
+        onClick={() => inputRef.current?.click()}
+      >
+        {uploading || isCommitting ? (
+          <Spinner />
+        ) : url ? (
+          <>
+            <ArrowsClockwiseIcon />
+            Replace image
+          </>
+        ) : (
+          <>
+            <UploadSimpleIcon />
+            Upload image
+          </>
+        )}
+      </Button>
     </div>
   );
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle>Presentation image</CardTitle>
         <CardDescription>
@@ -156,35 +170,32 @@ export function PlayerPresentationImage({
           or less.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent>
         {url ? (
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+          <div className="bg-muted/30 w-fit rounded-lg p-2 ring-1 ring-foreground/10">
             <Image
               src={url}
               alt="Presentation"
-              width={192}
-              height={192}
-              className="h-48 w-48 shrink-0 rounded-lg object-cover"
+              width={352}
+              height={469}
+              className="aspect-[3/4] w-52 rounded-md object-cover"
             />
-            {actions}
           </div>
         ) : (
-          <>
-            <Empty className="border border-dashed">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <ImageIcon />
-                </EmptyMedia>
-                <EmptyTitle>No presentation image yet</EmptyTitle>
-                <EmptyDescription>
-                  Upload a photo so this Player can be public on the Roster.
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-            {actions}
-          </>
+          <Empty className="aspect-[3/4] w-52 min-h-0 flex-none border border-dashed p-4">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <ImageIcon />
+              </EmptyMedia>
+              <EmptyTitle>No presentation image yet</EmptyTitle>
+              <EmptyDescription>
+                Upload a photo so this Player can be public on the Roster.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         )}
       </CardContent>
+      <CardFooter className="gap-2">{actions}</CardFooter>
     </Card>
   );
 }

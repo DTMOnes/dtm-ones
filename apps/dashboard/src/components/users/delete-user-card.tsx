@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 
+import { TrashIcon } from "@phosphor-icons/react";
+
 import { deleteUserAction } from "@/actions/users/deleteUser";
 import {
   AlertDialog,
@@ -83,19 +85,26 @@ export function DeleteUserCard({
   }
 
   return (
-    <Card className="border-destructive ring-destructive/30">
-      <CardHeader className="border-b border-destructive/20">
+    <Card className="ring-destructive/30">
+      <CardHeader className="border-destructive/20 bg-destructive/5">
         <CardTitle>Delete user</CardTitle>
         <CardDescription>{description()}</CardDescription>
       </CardHeader>
-      <CardContent className="py-6">
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3">
-          <p className="text-sm font-medium">{userName}</p>
-          <p className="text-muted-foreground text-xs">{userEmail}</p>
-          <p className="text-muted-foreground text-xs">{userId}</p>
-        </div>
+      <CardContent>
+        <dl className="divide-y divide-border">
+          <div className="flex items-baseline justify-between gap-4 py-3 first:pt-0 last:pb-0">
+            <dt className="text-muted-foreground text-xs font-medium">Name</dt>
+            <dd className="min-w-0 text-right text-sm font-medium">
+              {userName}
+            </dd>
+          </div>
+          <div className="flex items-baseline justify-between gap-4 py-3 first:pt-0 last:pb-0">
+            <dt className="text-muted-foreground text-xs font-medium">Email</dt>
+            <dd className="min-w-0 truncate text-right text-sm">{userEmail}</dd>
+          </div>
+        </dl>
       </CardContent>
-      <CardFooter className="justify-end border-t border-destructive/20 bg-destructive/5 py-4">
+      <CardFooter className="border-destructive/20 bg-destructive/5">
         <AlertDialog
           open={isDeleteDialogOpen}
           onOpenChange={(open) => {
@@ -110,6 +119,7 @@ export function DeleteUserCard({
               variant="destructive"
               disabled={isDisabled || isExecuting}
             >
+              <TrashIcon />
               Delete user
             </Button>
           </AlertDialogTrigger>
@@ -131,7 +141,14 @@ export function DeleteUserCard({
                 disabled={isExecuting}
                 onClick={() => executeAsync({ id: userId })}
               >
-                {isExecuting ? "Deleting..." : "Confirm deletion"}
+                {isExecuting ? (
+                  "Deleting..."
+                ) : (
+                  <>
+                    <TrashIcon />
+                    Confirm deletion
+                  </>
+                )}
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

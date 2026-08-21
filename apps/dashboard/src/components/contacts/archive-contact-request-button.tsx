@@ -1,5 +1,7 @@
 "use client";
 
+import { ArchiveIcon } from "@phosphor-icons/react";
+
 import { Button } from "@/components/ui/button";
 import type { ContactRequestStatus } from "@/types/contact-request";
 
@@ -28,7 +30,14 @@ export function ArchiveContactRequestButton({
         disabled={isDisabled}
         onClick={onUnarchive}
       >
-        {pending ? "Unarchiving..." : "Unarchive"}
+        {pending ? (
+          "Unarchiving..."
+        ) : (
+          <>
+            <ArchiveIcon />
+            Unarchive
+          </>
+        )}
       </Button>
     );
   }
@@ -39,7 +48,14 @@ export function ArchiveContactRequestButton({
       disabled={isDisabled}
       onClick={onArchive}
     >
-      {pending ? "Archiving..." : "Archive"}
+      {pending ? (
+        "Archiving..."
+      ) : (
+        <>
+          <ArchiveIcon />
+          Archive
+        </>
+      )}
     </Button>
   );
 }

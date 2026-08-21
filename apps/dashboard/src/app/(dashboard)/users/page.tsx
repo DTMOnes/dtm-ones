@@ -3,17 +3,18 @@ import { UserCircleIcon } from "@phosphor-icons/react/ssr";
 import { asc, inArray } from "drizzle-orm";
 import { schema } from "@dtm/database";
 
-import { CreateUserDialog } from "@/components/users/create-user-dialog";
-import { Badge } from "@/components/ui/badge";
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
+  ListEmpty,
+  ListRowAvatar,
+  ListRowChevron,
+  ListRowMeta,
+  PageHeader,
+  PageShell,
+} from "@/components/page/page-frame";
+import { CreateUserDialog } from "@/components/users/create-user-dialog";
 import {
   Item,
+  ItemActions,
   ItemContent,
   ItemDescription,
   ItemGroup,
@@ -44,45 +45,40 @@ export default async function Page() {
   });
 
   return (
-    <main className="flex h-full w-full flex-col gap-10 p-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Users</h1>
-        <CreateUserDialog />
-      </div>
+    <PageShell>
+      <PageHeader
+        title="Users"
+        description="Owners and Staff who sign in."
+        actions={<CreateUserDialog />}
+      />
 
-      <ItemGroup className="bg-background flex h-full w-full flex-col gap-4 rounded-lg border border-border p-4 dark:border-input dark:bg-input/30">
-        {users.length === 0 ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <UserCircleIcon />
-              </EmptyMedia>
-              <EmptyTitle>No users found</EmptyTitle>
-              <EmptyDescription>
-                Get started by creating a new user with the &quot;New user&quot;
-                button.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          users.map((user) => (
+      {users.length === 0 ? (
+        <ListEmpty
+          icon={UserCircleIcon}
+          title="No users found"
+          description='Get started by creating a new user with the "New user" button.'
+        />
+      ) : (
+        <ItemGroup>
+          {users.map((user) => (
             <Item key={user.id} variant="muted" asChild>
-              <Link
-                href={`/users/${user.id}`}
-                className="flex w-full items-start justify-between gap-4"
-              >
+              <Link href={`/users/${user.id}`}>
+                <ListRowAvatar name={user.name} />
                 <ItemContent>
                   <ItemTitle>{user.name}</ItemTitle>
                   <ItemDescription>{user.email}</ItemDescription>
                 </ItemContent>
-                <Badge variant="secondary">
-                  {user.role === "owner" ? "Owner" : "Staff"}
-                </Badge>
+                <ItemActions>
+                  <ListRowMeta>
+                    {user.role === "owner" ? "Owner" : "Staff"}
+                  </ListRowMeta>
+                  <ListRowChevron />
+                </ItemActions>
               </Link>
             </Item>
-          ))
-        )}
-      </ItemGroup>
-    </main>
+          ))}
+        </ItemGroup>
+      )}
+    </PageShell>
   );
 }

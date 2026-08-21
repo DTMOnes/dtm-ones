@@ -74,7 +74,7 @@ export function CreateCoachDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <PlusIcon />
           New coach
         </Button>
@@ -124,7 +124,11 @@ export function CreateCoachDialog() {
                 Cancel
               </Button>
               <div className="flex-1 sm:flex-initial">
-                <SubmitButton label="Create coach" isExecuting={isExecuting} />
+                <SubmitButton
+                  label="Create coach"
+                  isExecuting={isExecuting}
+                  icon={<PlusIcon />}
+                />
               </div>
             </DialogFooter>
           </form>

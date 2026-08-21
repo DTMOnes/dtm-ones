@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -131,7 +132,7 @@ export function PlayerGallery({
   }
 
   return (
-    <Card className="shadow-sm">
+    <Card>
       <CardHeader>
         <CardTitle>Gallery</CardTitle>
         <CardDescription>
@@ -139,7 +140,7 @@ export function PlayerGallery({
           select more than one file.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent>
         <input
           ref={inputRef}
           type="file"
@@ -151,16 +152,8 @@ export function PlayerGallery({
             void onFiles(event.target.files);
           }}
         />
-        <Button
-          type="button"
-          className="w-fit"
-          disabled={busy}
-          onClick={() => inputRef.current?.click()}
-        >
-          {uploading || isAdding ? <Spinner /> : "Add images"}
-        </Button>
         {images.length === 0 ? (
-          <Empty className="border border-dashed">
+          <Empty className="min-h-36 border border-dashed py-6">
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <ImagesIcon />
@@ -172,15 +165,18 @@ export function PlayerGallery({
             </EmptyHeader>
           </Empty>
         ) : (
-          <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {images.map((image) => (
-              <li key={image.id} className="relative">
+              <li
+                key={image.id}
+                className="relative overflow-hidden rounded-lg ring-1 ring-foreground/10"
+              >
                 <Image
                   src={image.url}
                   alt=""
                   width={400}
                   height={400}
-                  className="aspect-square w-full rounded-lg object-cover"
+                  className="aspect-square w-full object-cover"
                 />
                 <Button
                   type="button"
@@ -200,6 +196,22 @@ export function PlayerGallery({
           </ul>
         )}
       </CardContent>
+      <CardFooter>
+        <Button
+          type="button"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+        >
+          {uploading || isAdding ? (
+            <Spinner />
+          ) : (
+            <>
+              <ImagesIcon />
+              Add images
+            </>
+          )}
+        </Button>
+      </CardFooter>
     </Card>
   );
 }

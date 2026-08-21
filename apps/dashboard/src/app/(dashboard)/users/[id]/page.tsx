@@ -1,13 +1,15 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { count, eq } from "drizzle-orm";
 import { schema } from "@dtm/database";
-import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 
+import {
+  DetailLayout,
+  PageHeader,
+  PageShell,
+} from "@/components/page/page-frame";
 import { ChangeUserNameForm } from "@/components/users/change-user-name-form";
 import { ChangeUserRoleForm } from "@/components/users/change-user-role-form";
 import { DeleteUserCard } from "@/components/users/delete-user-card";
-import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { getSession } from "@/utils/auth/get-session";
 import {
@@ -54,38 +56,36 @@ export default async function Page({
   const viewingSelf = isOwnUser(session.user.id, row.id);
 
   return (
-    <main className="flex h-full w-full flex-col gap-8 p-10">
-      <div className="flex flex-col gap-4">
-        <Button asChild variant="outline" className="w-fit">
-          <Link href="/users">
-            <ArrowLeftIcon />
-            Users
-          </Link>
-        </Button>
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold">{row.name}</h1>
-          <p className="text-muted-foreground text-sm">
-            User profile · {row.email}
-          </p>
-        </div>
-      </div>
+    <PageShell>
+      <PageHeader
+        backHref="/users"
+        backLabel="Users"
+        title={row.name}
+        description="User profile"
+      />
 
-      <div className="flex w-full flex-col gap-6">
-        <ChangeUserNameForm userId={row.id} currentName={row.name} />
-        <ChangeUserRoleForm
-          userId={row.id}
-          currentRole={role}
-          isLastOwner={lastOwner}
-          isSelf={viewingSelf}
-        />
-        <DeleteUserCard
-          userId={row.id}
-          userEmail={row.email}
-          userName={row.name}
-          isLastOwner={lastOwner}
-          isSelf={viewingSelf}
-        />
-      </div>
-    </main>
+      <DetailLayout
+        main={
+          <>
+            <ChangeUserNameForm userId={row.id} currentName={row.name} />
+            <ChangeUserRoleForm
+              userId={row.id}
+              currentRole={role}
+              isLastOwner={lastOwner}
+              isSelf={viewingSelf}
+            />
+          </>
+        }
+        rail={
+          <DeleteUserCard
+            userId={row.id}
+            userEmail={row.email}
+            userName={row.name}
+            isLastOwner={lastOwner}
+            isSelf={viewingSelf}
+          />
+        }
+      />
+    </PageShell>
   );
 }

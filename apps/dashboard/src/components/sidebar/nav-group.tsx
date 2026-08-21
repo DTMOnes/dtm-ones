@@ -25,7 +25,7 @@ function isItemActive(pathname: string, url: string) {
 }
 
 type NavGroupProps = {
-  label: string;
+  label?: string;
   items: MenuItem[];
 };
 
@@ -34,7 +34,7 @@ export function NavGroup({ label, items }: NavGroupProps) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      {label ? <SidebarGroupLabel>{label}</SidebarGroupLabel> : null}
       <SidebarGroupContent>
         <SidebarMenu className="gap-1">
           {items.map((item) => (

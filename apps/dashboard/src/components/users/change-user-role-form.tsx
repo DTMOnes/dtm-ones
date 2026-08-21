@@ -7,6 +7,8 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import type { z } from "zod";
 
+import { FloppyDiskIcon } from "@phosphor-icons/react";
+
 import { setUserRoleAction } from "@/actions/users/setUserRole";
 import SelectField from "@/components/form/select-field";
 import { Button } from "@/components/ui/button";
@@ -67,7 +69,7 @@ export function ChangeUserRoleForm({
   return (
     <FormProvider {...methods}>
       <Card>
-        <CardHeader className="border-b">
+        <CardHeader>
           <CardTitle>Role</CardTitle>
           <CardDescription>
             Current role: {currentRole === "owner" ? "Owner" : "Staff"}. Owners
@@ -75,11 +77,12 @@ export function ChangeUserRoleForm({
           </CardDescription>
         </CardHeader>
         <form
+          className="contents"
           onSubmit={methods.handleSubmit((values) => executeAsync(values))}
           noValidate
         >
-          <CardContent className="pb-6">
-            <FieldGroup className="gap-6">
+          <CardContent>
+            <FieldGroup>
               <input type="hidden" {...methods.register("userId")} />
               <SelectField
                 name="role"
@@ -104,9 +107,16 @@ export function ChangeUserRoleForm({
               ) : null}
             </FieldGroup>
           </CardContent>
-          <CardFooter className="justify-end">
+          <CardFooter>
             <Button type="submit" disabled={isExecuting || blockedDemotion}>
-              {isExecuting ? <Spinner /> : "Save role"}
+              {isExecuting ? (
+                <Spinner />
+              ) : (
+                <>
+                  <FloppyDiskIcon />
+                  Save role
+                </>
+              )}
             </Button>
           </CardFooter>
         </form>
