@@ -33,9 +33,9 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bigShoulders.variable} ${inter.variable} dark`}
+      className={`${bigShoulders.variable} ${inter.variable} dark font-sans`}
     >
-      <body className="antialiased font-inter">
+      <body className="antialiased">
         <NavigationProgress />
         <HeaderProvider>
           <SiteHeader />

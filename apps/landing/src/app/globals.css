@@ -1,7 +1,56 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-big-shoulders);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
 :root {
   --content-width: 1280px;
-  --font-title: var(--font-anton);
-  --font-body: var(--font-poppins);
+  --font-title: var(--font-big-shoulders);
+  --font-body: var(--font-inter);
   --anton-size-display: 84px;
   --anton-size-player: 32px;
   --anton-size-ui: 18px;
@@ -14,29 +63,65 @@
   --color-dark-gray: #1d1d1d;
   --color-light-blue: #0084ff;
   --color-red: #ff0000;
-  --background-base: #0F0F0F;
+  --background-base: #0f0f0f;
+  --font-anton: var(--font-big-shoulders);
+  --radius: 0.5rem;
+  --background: var(--color-black);
+  --foreground: var(--color-white);
+  --card: var(--color-dark-gray);
+  --card-foreground: var(--color-white);
+  --popover: var(--color-dark-gray);
+  --popover-foreground: var(--color-white);
+  --primary: var(--color-light-blue);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-dark-gray);
+  --secondary-foreground: var(--color-white);
+  --muted: var(--color-dark-gray);
+  --muted-foreground: var(--color-white);
+  --accent: var(--color-dark-gray);
+  --accent-foreground: var(--color-white);
+  --destructive: var(--color-red);
+  --border: var(--color-dark-gray);
+  --input: var(--color-dark-gray);
+  --ring: var(--color-light-blue);
+  --chart-1: var(--color-light-blue);
+  --chart-2: var(--color-white);
+  --chart-3: var(--color-dark-gray);
+  --chart-4: var(--background-base);
+  --chart-5: var(--color-black);
+  --sidebar: var(--color-black);
+  --sidebar-foreground: var(--color-white);
+  --sidebar-primary: var(--color-light-blue);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: var(--color-dark-gray);
+  --sidebar-accent-foreground: var(--color-white);
+  --sidebar-border: var(--color-dark-gray);
+  --sidebar-ring: var(--color-light-blue);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 html,
 body {
   overflow-x: hidden;
   scrollbar-width: none;
-  background-color: var(--color-black);
 }
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
-}
-
-body {
-  background-color: var(--color-black);
 }
 
 a {
