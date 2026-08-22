@@ -114,9 +114,10 @@ export default function PlayerHighlights({
 
   return (
     <div className={styles.container}>
-      <div className={playing ? `${styles.cinema} ${styles.cinemaPlay}` : styles.cinema}>
-        <div className={playing ? styles.ratio : styles.stage}>
-          <AnimatePresence mode="wait" custom={slideDir}>
+      <div className={styles.cinema}>
+        <div className={playing ? styles.playSafe : styles.stage}>
+          <div className={playing ? styles.ratio : styles.fill}>
+            <AnimatePresence mode="wait" custom={slideDir}>
             {playing ? (
               <motion.div
                 key={`play-${active.id}`}
@@ -185,6 +186,7 @@ export default function PlayerHighlights({
               </motion.button>
             )}
           </AnimatePresence>
+          </div>
 
           {canPager && showPager ? (
             <>

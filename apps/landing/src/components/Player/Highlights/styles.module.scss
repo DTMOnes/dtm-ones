@@ -8,25 +8,30 @@
 }
 
 .cinema {
-  container-type: size;
   width: 100%;
   height: 100%;
   min-height: 0;
-  display: grid;
-  place-items: stretch;
   background: var(--color-black);
 }
 
-.cinemaPlay {
-  place-items: center;
-}
-
-.stage {
+.stage,
+.fill {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   background: var(--color-dark-gray);
+}
+
+.playSafe {
+  position: relative;
+  box-sizing: border-box;
+  container-type: size;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 148px 20px 36px;
 }
 
 .ratio {
@@ -146,6 +151,10 @@
 }
 
 @media (width < 900px) {
+  .playSafe {
+    padding: 132px 12px 28px;
+  }
+
   .play {
     width: 56px;
     height: 56px;

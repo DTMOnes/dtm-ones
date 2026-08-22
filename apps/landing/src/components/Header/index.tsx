@@ -41,20 +41,31 @@ export default function Header({
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-[1000] overflow-visible px-7 group-data-[menu-open]/chrome:z-[1002] group-data-[menu-open]/chrome:bg-transparent",
-        overlay ? "bg-transparent pb-0" : "bg-background pb-10",
+        overlay
+          ? "pointer-events-none bg-transparent pb-0"
+          : "bg-background pb-10",
       )}
       style={{ paddingTop: 20 }}
     >
       <motion.div
+        className={overlay ? "pointer-events-none" : undefined}
         variants={reduce ? undefined : chromeVariants}
         initial={reduce ? false : "hidden"}
         animate="show"
       >
         <motion.div
-          className="flex items-center gap-4 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(0,440px)_1fr]"
+          className={cn(
+            "flex items-center gap-4 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(0,440px)_1fr]",
+            overlay && "pointer-events-none",
+          )}
           variants={reduce ? undefined : itemVariants}
         >
-          <div className="flex min-w-0 items-center">
+          <div
+            className={cn(
+              "flex min-w-0 items-center",
+              overlay && "pointer-events-auto",
+            )}
+          >
             <Logo />
           </div>
 
@@ -67,7 +78,12 @@ export default function Header({
             {search}
           </div>
 
-          <div className="flex items-center justify-end max-lg:ml-auto">
+          <div
+            className={cn(
+              "flex items-center justify-end max-lg:ml-auto",
+              overlay && "pointer-events-auto",
+            )}
+          >
             <Menu />
           </div>
         </motion.div>

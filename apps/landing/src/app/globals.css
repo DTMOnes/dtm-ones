@@ -120,6 +120,8 @@ body {
 
 .page-scroll {
   flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
 }
 
