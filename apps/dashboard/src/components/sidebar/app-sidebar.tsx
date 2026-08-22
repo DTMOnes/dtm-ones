@@ -5,7 +5,6 @@ import Image from "next/image";
 import {
   EnvelopeSimpleIcon,
   FolderIcon,
-  StrategyIcon,
   TrashIcon,
   UserGearIcon,
   UsersIcon,
@@ -31,14 +30,9 @@ const inboxItems: MenuItem[] = [
 
 const clientItems: MenuItem[] = [
   {
-    title: "Players",
-    url: "/players",
+    title: "Clients",
+    url: "/clients",
     icon: UsersIcon,
-  },
-  {
-    title: "Coaches",
-    url: "/coaches",
-    icon: StrategyIcon,
   },
   {
     title: "Categories",
@@ -83,7 +77,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavGroup items={inboxItems} />
-        <NavGroup label="Clients" items={clientItems} />
+        <NavGroup items={clientItems} />
         {isOwner ? (
           <NavGroup label="Administration" items={usersItems} />
         ) : null}

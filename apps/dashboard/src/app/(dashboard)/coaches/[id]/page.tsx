@@ -10,6 +10,7 @@ import {
 import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { db } from "@/lib/db";
 import { coachCompletenessGaps, getCoach } from "@/utils/coaches";
+import { clientDisplayName } from "@/utils/clients";
 
 export default async function Page({
   params,
@@ -28,9 +29,8 @@ export default async function Page({
   return (
     <PageShell>
       <PageHeader
-        backHref="/coaches"
-        backLabel="Coaches"
-        title={coach.name ?? ""}
+        backHref="/clients"
+        title={clientDisplayName("coach", coach.name)}
         description="Coach profile"
         status={isPublic ? "Public" : "Private"}
       />

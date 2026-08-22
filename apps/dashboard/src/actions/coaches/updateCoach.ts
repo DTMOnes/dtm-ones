@@ -14,7 +14,7 @@ export const updateCoachAction = staffActionClient
     const { id, ...patch } = parsedInput;
     const coach = await updateCoach(db, id, patch);
 
-    revalidatePath("/coaches");
+    revalidatePath("/clients");
     revalidatePath(`/coaches/${id}`);
 
     return { ok: true as const, coach };

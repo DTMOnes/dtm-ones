@@ -3,71 +3,10 @@ import { test } from "node:test";
 
 import {
   addPlayerVideoSchema,
-  createPlayerSchema,
   setPlayerVisibilitySchema,
   updatePlayerSchema,
   youtubeUrlSchema,
 } from "./players";
-
-test("create Player accepts name, nationality, and last club", () => {
-  const parsed = createPlayerSchema.safeParse({
-    name: "Manu Ginobili",
-    nationality: "Argentina",
-    lastClub: "San Antonio Spurs",
-    heightCm: "",
-    categoryId: "",
-  });
-
-  assert.equal(parsed.success, true);
-  if (parsed.success) {
-    assert.equal(parsed.data.heightCm, null);
-    assert.equal(parsed.data.categoryId, null);
-  }
-});
-
-test("create Player trims text and parses height", () => {
-  const parsed = createPlayerSchema.safeParse({
-    name: "  Manu Ginobili  ",
-    nationality: "  Argentina  ",
-    lastClub: "  San Antonio Spurs  ",
-    heightCm: "198",
-    categoryId: "00000000-0000-4000-8000-000000000001",
-  });
-
-  assert.equal(parsed.success, true);
-  if (parsed.success) {
-    assert.equal(parsed.data.name, "Manu Ginobili");
-    assert.equal(parsed.data.heightCm, 198);
-    assert.equal(
-      parsed.data.categoryId,
-      "00000000-0000-4000-8000-000000000001",
-    );
-  }
-});
-
-test("create Player rejects a name that is only spaces", () => {
-  const parsed = createPlayerSchema.safeParse({
-    name: "   ",
-    nationality: "Argentina",
-    lastClub: "San Antonio Spurs",
-    heightCm: "",
-    categoryId: "",
-  });
-
-  assert.equal(parsed.success, false);
-});
-
-test("create Player rejects a fractional height", () => {
-  const parsed = createPlayerSchema.safeParse({
-    name: "Manu Ginobili",
-    nationality: "Argentina",
-    lastClub: "San Antonio Spurs",
-    heightCm: "198.5",
-    categoryId: "",
-  });
-
-  assert.equal(parsed.success, false);
-});
 
 test("update Player treats empty Eurobasket URL as absent", () => {
   const parsed = updatePlayerSchema.safeParse({

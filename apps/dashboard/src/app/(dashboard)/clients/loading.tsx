@@ -12,7 +12,10 @@ export default function Loading() {
           </div>
           <Skeleton className="h-8 w-28 shrink-0" />
         </div>
-        <Skeleton className="h-8 min-w-0 w-full" />
+        <div className="flex flex-wrap items-center gap-2">
+          <Skeleton className="h-8 min-w-0 flex-1 basis-48" />
+          <Skeleton className="h-8 w-48 shrink-0" />
+        </div>
       </div>
 
       <ListRowSkeleton />

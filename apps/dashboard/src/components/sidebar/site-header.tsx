@@ -14,10 +14,15 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-const routeLabels: Array<{ prefix: string; label: string }> = [
+const routeLabels: Array<{
+  prefix: string;
+  label: string;
+  parentHref?: string;
+}> = [
   { prefix: "/contacts", label: "Inbox" },
-  { prefix: "/players", label: "Players" },
-  { prefix: "/coaches", label: "Coaches" },
+  { prefix: "/clients", label: "Clients" },
+  { prefix: "/players", label: "Clients", parentHref: "/clients" },
+  { prefix: "/coaches", label: "Clients", parentHref: "/clients" },
   { prefix: "/categories", label: "Categories" },
   { prefix: "/trash", label: "Trash" },
   { prefix: "/users", label: "Users" },
@@ -41,7 +46,7 @@ function crumbsForPath(pathname: string): {
   }
 
   return {
-    parent: { href: match.prefix, label: match.label },
+    parent: { href: match.parentHref ?? match.prefix, label: match.label },
     page: "Profile",
   };
 }

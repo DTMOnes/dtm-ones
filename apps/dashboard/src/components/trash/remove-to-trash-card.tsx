@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
+import { kindLabel } from "@/utils/clients";
 
 export function RemoveToTrashCard({
   clientId,
@@ -25,13 +26,12 @@ export function RemoveToTrashCard({
   kind: "player" | "coach";
 }) {
   const router = useRouter();
-  const kindLabel = kind === "player" ? "Player" : "Coach";
-  const listPath = kind === "player" ? "/players" : "/coaches";
+  const label = kindLabel(kind);
 
   const { executeAsync, isExecuting } = useAction(trashClientAction, {
     onSuccess: () => {
-      toast.success(`${kindLabel} moved to the Trash.`);
-      router.push(listPath);
+      toast.success(`${label} moved to the Trash.`);
+      router.push("/clients");
     },
     onError: ({ error }) => {
       if (error.serverError) {
@@ -45,7 +45,7 @@ export function RemoveToTrashCard({
       <CardHeader className="border-destructive/20 bg-destructive/5">
         <CardTitle>Trash</CardTitle>
         <CardDescription>
-          Remove this {kindLabel} to the Trash. They leave this list and the
+          Remove this {label} to the Trash. They leave this list and the
           Roster. Restore keeps Visibility.
         </CardDescription>
       </CardHeader>

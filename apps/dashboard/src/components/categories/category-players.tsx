@@ -23,6 +23,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import type { CategoryPlayerSummary } from "@/types/category";
+import { clientDisplayName } from "@/utils/clients";
 
 type CategoryPlayersProps = {
   players: CategoryPlayerSummary[];
@@ -65,7 +66,9 @@ export function CategoryPlayers({ players }: CategoryPlayersProps) {
                   className="flex w-full items-start justify-between gap-4"
                 >
                   <ItemContent>
-                    <ItemTitle>{player.name}</ItemTitle>
+                    <ItemTitle>
+                      {clientDisplayName("player", player.name)}
+                    </ItemTitle>
                     <ItemDescription>Last club: {player.lastClub}</ItemDescription>
                   </ItemContent>
                 </Link>

@@ -28,7 +28,7 @@ export const commitPresentationImageAction = staffActionClient
       deleteBlobs,
     );
 
-    revalidatePath("/players");
+    revalidatePath("/clients");
     revalidatePath(`/players/${parsedInput.playerId}`);
 
     return { ok: true as const, player };
@@ -44,7 +44,7 @@ export const clearPresentationImageAction = staffActionClient
       deleteBlobs,
     );
 
-    revalidatePath("/players");
+    revalidatePath("/clients");
     revalidatePath(`/players/${parsedInput.playerId}`);
 
     return { ok: true as const, player };
