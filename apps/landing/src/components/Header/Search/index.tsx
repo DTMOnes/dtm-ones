@@ -1,93 +1,102 @@
 "use client";
 
-// Next
-import Image from "next/image";
+import { useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-// React
-import { useRef } from "react";
-
-// Utils
+import { MagnifyingGlass, X } from "@phosphor-icons/react";
+import { useReducedMotion } from "motion/react";
 import { useDebouncedCallback } from "use-debounce";
 
-// Components
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
-
-// Styles
-import styles from "./styles.module.scss";
-
-const buttonVariants = {
-  initial: {
-    opacity: 0.5,
-  },
-  hover: {
-    opacity: 1,
-  },
-  tap: {
-    opacity: 1,
-    scale: 0.8,
-  },
-} as const;
+import ShinyText from "@/components/ShinyText";
+import { cn } from "@/lib/utils";
 
 export default function Search() {
   const inputRef = useRef<HTMLInputElement>(null);
-
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { startRosterTransition } = useHeaderOverride();
+  const reduce = useReducedMotion() ?? false;
+  const [value, setValue] = useState(searchParams.get("q") ?? "");
+  const [focused, setFocused] = useState(false);
 
-  const handleSearch = useDebouncedCallback((value: string) => {
+  const showHint = !focused && value.length === 0;
+
+  const handleSearch = useDebouncedCallback((next: string) => {
     const params = new URLSearchParams(searchParams);
 
-    if (value) {
-      params.set("q", value);
+    if (next) {
+      params.set("q", next);
     } else {
       params.delete("q");
     }
 
-    const next = `${pathname}?${params.toString()}`;
     startRosterTransition(() => {
-      replace(next);
+      replace(`${pathname}?${params.toString()}`);
     });
   }, 300);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.icon}>
-        <Image
-          src="/assets/icons/magnifying-glass-bold-light.svg"
-          alt="magnifying glass"
-          width={20}
-          height={20}
+    <div className="w-full">
+      <label className="search-pill">
+        <MagnifyingGlass
+          className={cn(
+            "relative size-5 shrink-0 text-neutral-500 transition-colors duration-200",
+            (focused || value.length > 0) && "text-neutral-300",
+          )}
+          weight="bold"
+          aria-hidden
         />
-      </div>
 
-      <input
-        ref={inputRef}
-        className={styles.input}
-        type="text"
-        placeholder="Search by name"
-        onChange={(e) => handleSearch(e.target.value)}
-        defaultValue={searchParams.get("q")?.toString()}
-      />
+        <span className="relative min-w-0 flex-1">
+          {showHint ? (
+            <span className="pointer-events-none absolute inset-0 flex items-center">
+              <ShinyText
+                text="Search by name"
+                speed={2.2}
+                delay={0.35}
+                color="#a3a3a3"
+                shineColor="#ffffff"
+                disabled={reduce}
+                className="text-[15px]"
+              />
+            </span>
+          ) : null}
+          <input
+            ref={inputRef}
+            className="relative z-10 w-full appearance-none bg-transparent text-[15px] text-white outline-none [&::-webkit-search-cancel-button]:hidden"
+            type="search"
+            aria-label="Search by name"
+            value={value}
+            onChange={(event) => {
+              const next = event.target.value;
+              setValue(next);
+              handleSearch(next);
+            }}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+          />
+        </span>
 
-      <div
-        className={styles.icon}
-        onClick={() => {
-          handleSearch("");
-          if (inputRef.current) {
-            inputRef.current.value = "";
-          }
-        }}
-      >
-        <Image
-          src="/assets/icons/x-bold-light.svg"
-          alt="Menu"
-          width={20}
-          height={20}
-        />
-      </div>
+        <button
+          type="button"
+          className={cn(
+            "relative shrink-0 cursor-pointer text-neutral-500 transition-all duration-200 hover:text-white",
+            value.length === 0
+              ? "pointer-events-none opacity-0"
+              : "opacity-100",
+          )}
+          aria-label="Clear search"
+          tabIndex={value.length === 0 ? -1 : 0}
+          onClick={() => {
+            setValue("");
+            handleSearch("");
+            inputRef.current?.focus();
+          }}
+        >
+          <X className="size-5" weight="bold" aria-hidden />
+        </button>
+      </label>
     </div>
   );
 }

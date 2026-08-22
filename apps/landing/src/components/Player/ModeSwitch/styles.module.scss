@@ -1,0 +1,97 @@
+.nav {
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  width: fit-content;
+  height: 42px;
+  padding: 3px;
+  pointer-events: auto;
+  border-radius: 999px;
+  background: rgb(10 10 10 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    0 8px 24px rgb(0 0 0 / 0.4);
+}
+
+.pill {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 18px;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  border-radius: 999px;
+  font-family: var(--font-inter);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.82);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pill:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 0.8);
+  outline-offset: 2px;
+}
+
+.circle {
+  position: absolute;
+  left: 50%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  border-radius: 999px;
+  background: var(--color-white);
+  transform: translateX(-50%) scale(0);
+}
+
+.stack {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.label,
+.labelHover {
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.labelHover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #111;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pillActive {
+    background: var(--color-white);
+    color: #111;
+  }
+
+  .circle,
+  .labelHover {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav {
+    background: rgb(18 18 18 / 0.94);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

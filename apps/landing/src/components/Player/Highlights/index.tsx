@@ -4,7 +4,7 @@
 import Image from "next/image";
 
 // React
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Motion
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -35,9 +35,13 @@ const easeOut = [0.16, 1, 0.3, 1] as const;
 export default function PlayerHighlights({
   videos,
   playerName,
+  showPager = true,
+  onPlayingChange,
 }: {
   videos: PublicRosterVideo[];
   playerName: string;
+  showPager?: boolean;
+  onPlayingChange?: (playing: boolean) => void;
 }) {
   const reduce = useReducedMotion();
   const items: HighlightItem[] = [];
@@ -52,16 +56,25 @@ export default function PlayerHighlights({
   const [slideDir, setSlideDir] = useState(0);
   const activeIndexRef = useRef(activeIndex);
 
-  activeIndexRef.current = activeIndex;
+  const setClipPlaying = useCallback(
+    (next: boolean) => {
+      setPlaying(next);
+      onPlayingChange?.(next);
+    },
+    [onPlayingChange],
+  );
+
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
 
   const canPager = items.length > 1;
-  const thumbRatio = canPager ? 1 / items.length : 1;
 
   const selectClip = (index: number) => {
     if (index === activeIndexRef.current) return;
     setSlideDir(index > activeIndexRef.current ? 1 : -1);
     setActiveIndex(index);
-    setPlaying(false);
+    setClipPlaying(false);
   };
 
   const step = (delta: number) => {
@@ -82,12 +95,12 @@ export default function PlayerHighlights({
       if (next === current) return;
       setSlideDir(delta);
       setActiveIndex(next);
-      setPlaying(false);
+      setClipPlaying(false);
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [canPager, items.length]);
+  }, [canPager, items.length, setClipPlaying]);
 
   if (items.length === 0) {
     return (
@@ -99,19 +112,10 @@ export default function PlayerHighlights({
 
   const active = items[activeIndex] ?? items[0];
 
-  const seek = (clientX: number, target: HTMLElement) => {
-    const rect = target.getBoundingClientRect();
-    const ratio = Math.min(
-      1,
-      Math.max(0, (clientX - rect.left) / rect.width),
-    );
-    selectClip(Math.min(items.length - 1, Math.floor(ratio * items.length)));
-  };
-
   return (
     <div className={styles.container}>
-      <div className={styles.cinema}>
-        <div className={styles.ratio}>
+      <div className={playing ? `${styles.cinema} ${styles.cinemaPlay}` : styles.cinema}>
+        <div className={playing ? styles.ratio : styles.stage}>
           <AnimatePresence mode="wait" custom={slideDir}>
             {playing ? (
               <motion.div
@@ -148,7 +152,7 @@ export default function PlayerHighlights({
                 type="button"
                 className={styles.poster}
                 aria-label={`Play highlight ${activeIndex + 1}`}
-                onClick={() => setPlaying(true)}
+                onClick={() => setClipPlaying(true)}
                 custom={slideDir}
                 initial={
                   reduce
@@ -171,7 +175,7 @@ export default function PlayerHighlights({
                   alt=""
                   width={1280}
                   height={720}
-                  sizes="(max-width: 900px) 92vw, min(100vw, 1200px)"
+                  sizes="100vw"
                   priority
                   draggable={false}
                 />
@@ -182,7 +186,7 @@ export default function PlayerHighlights({
             )}
           </AnimatePresence>
 
-          {canPager ? (
+          {canPager && showPager ? (
             <>
               <button
                 type="button"
@@ -199,23 +203,6 @@ export default function PlayerHighlights({
                 onClick={() => step(1)}
               >
                 <CaretRight weight="bold" size={22} />
-              </button>
-              <button
-                type="button"
-                className={styles.index}
-                aria-label={`Highlight ${activeIndex + 1} of ${items.length}`}
-                onClick={(event) => seek(event.clientX, event.currentTarget)}
-              >
-                <motion.span
-                  className={styles.indexThumb}
-                  animate={{ left: `${activeIndex * thumbRatio * 100}%` }}
-                  transition={
-                    reduce
-                      ? { duration: 0 }
-                      : { type: "spring", stiffness: 380, damping: 32 }
-                  }
-                  style={{ width: `${thumbRatio * 100}%` }}
-                />
               </button>
             </>
           ) : null}

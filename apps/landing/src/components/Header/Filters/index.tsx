@@ -1,16 +1,10 @@
 "use client";
 
-// Next
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-// Motion
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
-// Styles
-import styles from "./styles.module.scss";
-
-// Components
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+import { cn } from "@/lib/utils";
 
 export type FilterItem = {
   id: string;
@@ -35,16 +29,24 @@ const chipVariants: Variants = {
   },
 };
 
+const ALL_ID = "all";
+
+function chipClass(active: boolean) {
+  return cn(
+    "shrink-0 cursor-pointer rounded-full px-3.5 py-1.5 text-[15px] font-medium whitespace-nowrap transition-colors duration-200",
+    "active:scale-[0.98]",
+    active
+      ? "bg-white text-black"
+      : "text-neutral-400 hover:text-white",
+  );
+}
+
 function CategoriesFilters({
   items,
   param = "c",
-  label = "Categories",
-  name = "filter",
 }: {
   items: FilterItem[];
   param?: string;
-  label?: string;
-  name?: string;
 }) {
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -53,80 +55,63 @@ function CategoriesFilters({
   const reduce = useReducedMotion();
   const selected = searchParams.get(param);
 
-  const handleSelect = (id: string) => {
+  const setFilter = (id: string) => {
     const params = new URLSearchParams(searchParams);
-    if (selected === id) {
+    if (id === ALL_ID) {
       params.delete(param);
     } else {
       params.set(param, id);
     }
-    const next = `${pathname}?${params.toString()}`;
     startRosterTransition(() => {
-      replace(next);
-    });
-  };
-
-  const handleClear = () => {
-    const params = new URLSearchParams(searchParams);
-    params.delete(param);
-    const next = `${pathname}?${params.toString()}`;
-    startRosterTransition(() => {
-      replace(next);
+      replace(`${pathname}?${params.toString()}`);
     });
   };
 
   return (
     <motion.div
-      className={styles.container}
+      className="flex gap-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      role="radiogroup"
+      aria-label="Categories"
       variants={reduce ? undefined : rowVariants}
       initial={reduce ? false : "hidden"}
       animate="show"
     >
-      <motion.p className={styles.meta} variants={reduce ? undefined : chipVariants}>
-        <span>{label}</span>
-      </motion.p>
-
-      <motion.div
-        className={styles.categories}
-        variants={reduce ? undefined : rowVariants}
-      >
-        {items.map((item) => (
-          <motion.label
-            key={item.id}
-            htmlFor={`${name}-${item.id}`}
-            variants={reduce ? undefined : chipVariants}
-          >
-            <input
-              type="radio"
-              id={`${name}-${item.id}`}
-              name={name}
-              checked={selected === item.id}
-              onChange={() => handleSelect(item.id)}
-            />
-            <span>{item.name}</span>
-          </motion.label>
-        ))}
-      </motion.div>
-
-      <motion.p
-        className={`${styles.meta} ${styles.clear}`}
-        onClick={handleClear}
+      <motion.button
+        type="button"
+        role="radio"
+        aria-checked={!selected}
+        className={chipClass(!selected)}
+        onClick={() => setFilter(ALL_ID)}
         variants={reduce ? undefined : chipVariants}
       >
-        <span>Clear</span>
-      </motion.p>
+        All
+      </motion.button>
+      {items.map((item) => {
+        const active = selected === item.id;
+        return (
+          <motion.button
+            key={item.id}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            className={chipClass(active)}
+            onClick={() => setFilter(item.id)}
+            variants={reduce ? undefined : chipVariants}
+          >
+            {item.name}
+          </motion.button>
+        );
+      })}
     </motion.div>
   );
 }
 
 function SectionsFilters({
   items,
-  name = "section",
   value,
   onChange,
 }: {
   items: FilterItem[];
-  name?: string;
   value: string;
   onChange: (id: string) => void;
 }) {
@@ -134,32 +119,29 @@ function SectionsFilters({
 
   return (
     <motion.div
-      className={styles.sections}
+      className="flex gap-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      role="radiogroup"
+      aria-label="Sections"
       variants={reduce ? undefined : rowVariants}
       initial={reduce ? false : "hidden"}
       animate="show"
     >
-      <motion.div
-        className={styles.categories}
-        variants={reduce ? undefined : rowVariants}
-      >
-        {items.map((item) => (
-          <motion.label
+      {items.map((item) => {
+        const active = value === item.id;
+        return (
+          <motion.button
             key={item.id}
-            htmlFor={`${name}-${item.id}`}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            className={chipClass(active)}
+            onClick={() => onChange(item.id)}
             variants={reduce ? undefined : chipVariants}
           >
-            <input
-              type="radio"
-              id={`${name}-${item.id}`}
-              name={name}
-              checked={value === item.id}
-              onChange={() => onChange(item.id)}
-            />
-            <span>{item.name}</span>
-          </motion.label>
-        ))}
-      </motion.div>
+            {item.name}
+          </motion.button>
+        );
+      })}
     </motion.div>
   );
 }
@@ -185,19 +167,11 @@ export default function Filters(
     return (
       <SectionsFilters
         items={props.items}
-        name={props.name}
         value={props.value}
         onChange={props.onChange}
       />
     );
   }
 
-  return (
-    <CategoriesFilters
-      items={props.items}
-      param={props.param}
-      label={props.label}
-      name={props.name}
-    />
-  );
+  return <CategoriesFilters items={props.items} param={props.param} />;
 }

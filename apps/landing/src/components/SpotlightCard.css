@@ -1,0 +1,79 @@
+.card-spotlight {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1.5rem;
+  border: 1px solid #222;
+  background-color: #111;
+  padding: 2rem;
+  overflow: hidden;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --spotlight-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Inner wash stays behind copy. Alpha lives in --spotlight-color. */
+.card-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+    42% 58% at var(--mouse-x) var(--mouse-y),
+    var(--spotlight-color) 0%,
+    rgb(255 255 255 / 0.03) 38%,
+    transparent 72%
+  );
+  filter: blur(44px);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+
+/*
+  1px ring that follows the same cursor point.
+  Longhand mask-clip: the shorthand `content-box` form fails in some
+  engines and paints the full radial over the card instead of the edge.
+*/
+.card-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    200px circle at var(--mouse-x) var(--mouse-y),
+    rgb(255 255 255 / 0.82),
+    transparent 42%
+  );
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+  -webkit-mask-origin: content-box, border-box;
+  -webkit-mask-clip: content-box, border-box;
+  -webkit-mask-composite: xor;
+  mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0);
+  mask-origin: content-box, border-box;
+  mask-clip: content-box, border-box;
+  mask-composite: exclude;
+}
+
+.card-spotlight:hover::before,
+.card-spotlight:focus-within::before {
+  opacity: 1;
+}
+
+.card-spotlight:hover::after,
+.card-spotlight:focus-within::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-spotlight::before,
+  .card-spotlight::after {
+    opacity: 0 !important;
+    transition: none;
+  }
+}

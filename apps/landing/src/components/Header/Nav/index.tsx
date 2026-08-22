@@ -5,39 +5,10 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 
 import styles from "./styles.module.scss";
-import {
-  fadeUpVariants,
-  linkVariants,
-  panelVariants,
-} from "../Menu/variants";
-
-const pages = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "About",
-    href: "/about",
-  },
-  {
-    label: "Contact",
-    href: "/contact",
-  },
-];
-
-const socials = [
-  { label: "Instagram", href: "https://www.instagram.com/dtm_ones/" },
-  {
-    label: "Youtube",
-    href: "https://www.youtube.com/channel/UC_x5XG1OV2P6yVqAlKxpw6w",
-  },
-];
-
-const legal = [
-  { label: "Terms of Service", href: "/terms-of-service" },
-  { label: "Privacy Policy", href: "/privacy-policy" },
-];
+import { panelVariants } from "../Menu/variants";
+import { overlayPages } from "../nav-data";
+import Backdrop from "./Backdrop";
+import SplitLink from "./SplitLink";
 
 export default function Nav({ onNavigate }: { onNavigate: () => void }) {
   const pathname = usePathname();
@@ -56,20 +27,19 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
       aria-modal="true"
       aria-label="Site menu"
     >
+      <Backdrop />
       <div className={styles.stage}>
         <nav className={styles.pages} aria-label="Primary">
-          {pages.map((page, index) => {
+          {overlayPages.map((page, index) => {
             const isCurrent =
               page.href === "/"
                 ? pathname === "/"
                 : pathname.startsWith(page.href);
 
             return (
-              <motion.div
+              <div
                 key={page.label}
                 className={`${styles.page} ${isCurrent ? styles.page_current : ""}`}
-                custom={index}
-                variants={linkVariants}
               >
                 <Link
                   href={page.href}
@@ -77,47 +47,12 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
                   onClick={onNavigate}
                   aria-current={isCurrent ? "page" : undefined}
                 >
-                  {page.label}
+                  <SplitLink text={page.label} delay={0.16 + index * 0.1} />
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </nav>
-
-        <motion.footer
-          className={styles.footer}
-          custom={0.58}
-          variants={fadeUpVariants}
-        >
-          <div className={styles.accordions}>
-            {socials.map((social) => (
-              <a
-                key={social.label}
-                href={social.href}
-                className={styles.accordion}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className={styles.accordion_label}>{social.label}</span>
-                <span className={styles.accordion_mark} aria-hidden>
-                  ↗
-                </span>
-              </a>
-            ))}
-          </div>
-          <div className={styles.legal}>
-            {legal.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={styles.legal_link}
-                onClick={onNavigate}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </motion.footer>
       </div>
     </motion.div>
   );

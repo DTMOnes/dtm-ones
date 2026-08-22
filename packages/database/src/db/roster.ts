@@ -12,6 +12,7 @@ export type RosterPlayer = {
   name: string;
   nationality: string;
   lastClub: string;
+  eurobasketLink: string | null;
   heightCm: number | null;
   categoryId: string | null;
   categoryName: string | null;
@@ -42,6 +43,7 @@ const playerColumns = {
   name: roster.name,
   nationality: roster.nationality,
   lastClub: roster.lastClub,
+  eurobasketLink: roster.eurobasketLink,
   heightCm: roster.heightCm,
   categoryId: roster.categoryId,
   categoryName: roster.categoryName,

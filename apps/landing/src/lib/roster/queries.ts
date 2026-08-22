@@ -25,6 +25,7 @@ function toPublicPlayer(player: RosterPlayer): PublicRosterPlayer {
     nationality: player.nationality,
     height_cm: player.heightCm ?? 0,
     last_club: player.lastClub,
+    eurobasket_link: player.eurobasketLink,
     presentation_image_url: player.presentationImageUrl,
     categories:
       player.categoryId && player.categoryName

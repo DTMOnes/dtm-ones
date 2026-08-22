@@ -15,6 +15,7 @@
 
 .stage {
   position: relative;
+  z-index: 1;
   width: min(100%, 1100px);
   max-width: 100%;
   min-height: 100dvh;
@@ -24,7 +25,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(56px, 8vh, 96px);
   text-align: center;
 }
 
@@ -71,103 +71,6 @@
   opacity: 1;
 }
 
-.footer {
-  width: min(100%, 440px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-}
-
-.accordions {
-  width: 100%;
-  height: 52px;
-  display: flex;
-  gap: 1px;
-}
-
-.accordion {
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 18px;
-  background: color-mix(in srgb, var(--color-white) 8%, transparent);
-  color: var(--color-white);
-  text-decoration: none;
-  transition:
-    flex-grow 0.55s cubic-bezier(0.16, 1, 0.3, 1),
-    background 0.35s ease;
-
-  &:hover,
-  &:focus-visible {
-    flex-grow: 2.4;
-    background: var(--color-white);
-    outline: none;
-
-    .accordion_label {
-      color: var(--color-black);
-      opacity: 1;
-    }
-
-    .accordion_mark {
-      color: var(--color-black);
-      transform: translate(0, 0);
-      opacity: 1;
-    }
-  }
-}
-
-.accordion_label {
-  font-family: var(--font-big-shoulders);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-white);
-  opacity: 0.7;
-  white-space: nowrap;
-  transition:
-    color 0.35s ease,
-    opacity 0.35s ease;
-}
-
-.accordion_mark {
-  position: absolute;
-  right: 18px;
-  font-family: var(--font-inter);
-  font-size: 14px;
-  color: var(--color-white);
-  transform: translate(-6px, 6px);
-  opacity: 0;
-  transition:
-    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.25s ease,
-    color 0.35s ease;
-}
-
-.legal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-}
-
-.legal_link {
-  font-family: var(--font-inter);
-  font-size: 12px;
-  color: color-mix(in srgb, var(--color-white) 48%, transparent);
-  transition: color 0.3s ease;
-
-  &:hover,
-  &:focus-visible {
-    color: var(--color-white);
-    outline: none;
-  }
-}
-
 @media (width < 900px) {
   .stage {
     padding-top: 104px;
@@ -182,21 +85,10 @@
   .stage {
     min-height: 100svh;
     padding: 96px 20px 28px;
-    gap: clamp(44px, 6vh, 64px);
   }
 
   .page_link {
     font-size: clamp(3.4rem, 17vw, 5.4rem);
-  }
-
-  .footer {
-    width: 100%;
-    gap: 24px;
-  }
-
-  .accordions {
-    width: 100%;
-    height: 48px;
   }
 }
 
@@ -210,21 +102,10 @@
     min-height: 70px;
     font-size: clamp(3rem, 16vw, 4.25rem);
   }
-
-  .accordion {
-    padding: 0 14px;
-  }
-
-  .accordion_mark {
-    right: 14px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page_link,
-  .accordion,
-  .accordion_label,
-  .accordion_mark {
+  .page_link {
     transition-duration: 0.01ms;
   }
 }

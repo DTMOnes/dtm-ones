@@ -6,6 +6,7 @@ import "./globals.css";
 import NavigationProgress from "@/components/NavigationProgress";
 import { HeaderProvider } from "@/components/Header/HeaderProvider";
 import SiteHeader from "@/components/Header/SiteHeader";
+import Footer from "@/components/Footer";
 
 const bigShoulders = Big_Shoulders({
   weight: ["400", "700", "800", "900"],
@@ -33,13 +34,14 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bigShoulders.variable} ${inter.variable} dark`}
+      className={`${bigShoulders.variable} ${inter.variable} group/chrome dark font-sans`}
     >
-      <body className="antialiased font-inter">
+      <body className="antialiased">
         <NavigationProgress />
         <HeaderProvider>
           <SiteHeader />
-          {children}
+          <div className="page-scroll">{children}</div>
+          <Footer />
         </HeaderProvider>
       </body>
     </html>
