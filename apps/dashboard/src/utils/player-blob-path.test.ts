@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { isAllowedPlayerImage, isPlayerBlobPathname, playerBlobPathname } from "./player-blob-path";
+import { isAllowedPlayerImage, isClientBlobPathname, isPlayerBlobPathname, playerBlobPathname, clientBlobPathname } from "./player-blob-path";
 
 const playerId = "00000000-0000-4000-8000-000000000001";
 const otherId = "00000000-0000-4000-8000-000000000002";
@@ -100,5 +100,33 @@ test("a Blob pathname uses the Player id, slot, and file name", () => {
   assert.equal(
     playerBlobPathname(playerId, "gallery", "C:\\photos\\shot 1.png"),
     `players/${playerId}/gallery/shot-1.png`,
+  );
+});
+
+test("a presentation pathname is bound to that Coach", () => {
+  assert.equal(
+    isClientBlobPathname(
+      "coach",
+      otherId,
+      "presentation",
+      `coaches/${otherId}/presentation/pat.jpg`,
+    ),
+    true,
+  );
+  assert.equal(
+    isClientBlobPathname(
+      "coach",
+      otherId,
+      "presentation",
+      `players/${otherId}/presentation/pat.jpg`,
+    ),
+    false,
+  );
+});
+
+test("a Blob pathname uses the Coach id, slot, and file name", () => {
+  assert.equal(
+    clientBlobPathname("coach", otherId, "gallery", "shot 1.png"),
+    `coaches/${otherId}/gallery/shot-1.png`,
   );
 });

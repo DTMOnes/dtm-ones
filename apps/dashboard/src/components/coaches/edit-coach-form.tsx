@@ -70,7 +70,7 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
           <CardTitle>Profile</CardTitle>
           <CardDescription>
             A public Coach needs name, nationality, last club, and a Eurobasket
-            link. Height, Category, and media are Player facts.
+            link. Height, Category, and videos are Player facts.
           </CardDescription>
         </CardHeader>
         <form

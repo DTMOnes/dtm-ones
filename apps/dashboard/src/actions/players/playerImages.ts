@@ -21,33 +21,35 @@ export const commitPresentationImageAction = staffActionClient
   .metadata({ actionName: "commitPresentationImage" })
   .inputSchema(commitPlayerImageSchema)
   .action(async ({ parsedInput }) => {
-    const player = await commitPresentationImage(
+    const client = await commitPresentationImage(
       db,
-      parsedInput.playerId,
+      parsedInput.clientId,
       { url: parsedInput.url, pathname: parsedInput.pathname },
       deleteBlobs,
     );
 
     revalidatePath("/clients");
-    revalidatePath(`/players/${parsedInput.playerId}`);
+    revalidatePath(`/players/${parsedInput.clientId}`);
+    revalidatePath(`/coaches/${parsedInput.clientId}`);
 
-    return { ok: true as const, player };
+    return { ok: true as const, client };
   });
 
 export const clearPresentationImageAction = staffActionClient
   .metadata({ actionName: "clearPresentationImage" })
   .inputSchema(clearPresentationImageSchema)
   .action(async ({ parsedInput }) => {
-    const player = await clearPresentationImage(
+    const client = await clearPresentationImage(
       db,
-      parsedInput.playerId,
+      parsedInput.clientId,
       deleteBlobs,
     );
 
     revalidatePath("/clients");
-    revalidatePath(`/players/${parsedInput.playerId}`);
+    revalidatePath(`/players/${parsedInput.clientId}`);
+    revalidatePath(`/coaches/${parsedInput.clientId}`);
 
-    return { ok: true as const, player };
+    return { ok: true as const, client };
   });
 
 export const addPlayerGalleryImageAction = staffActionClient
@@ -56,12 +58,13 @@ export const addPlayerGalleryImageAction = staffActionClient
   .action(async ({ parsedInput }) => {
     const image = await addPlayerGalleryImage(
       db,
-      parsedInput.playerId,
+      parsedInput.clientId,
       { url: parsedInput.url, pathname: parsedInput.pathname },
       deleteBlobs,
     );
 
-    revalidatePath(`/players/${parsedInput.playerId}`);
+    revalidatePath(`/players/${parsedInput.clientId}`);
+    revalidatePath(`/coaches/${parsedInput.clientId}`);
 
     return { ok: true as const, image };
   });
@@ -72,12 +75,13 @@ export const removePlayerGalleryImageAction = staffActionClient
   .action(async ({ parsedInput }) => {
     await removePlayerGalleryImage(
       db,
-      parsedInput.playerId,
+      parsedInput.clientId,
       parsedInput.imageId,
       deleteBlobs,
     );
 
-    revalidatePath(`/players/${parsedInput.playerId}`);
+    revalidatePath(`/players/${parsedInput.clientId}`);
+    revalidatePath(`/coaches/${parsedInput.clientId}`);
 
     return { ok: true as const };
   });

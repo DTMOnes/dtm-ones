@@ -51,7 +51,7 @@ export default async function Page({
       />
 
       <PlayerDetailTabs
-        playerId={player.id}
+        basePath={`/players/${player.id}`}
         tab={tab}
         info={
           <DetailLayout

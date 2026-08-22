@@ -13,7 +13,15 @@ import {
   setCoachVisibility,
   updateCoach,
 } from "./coaches";
-import { addPlayerVideo, createPlayer, getPlayer } from "./players";
+import {
+  addPlayerGalleryImage,
+  addPlayerVideo,
+  clearPresentationImage,
+  commitPresentationImage,
+  createPlayer,
+  getPlayer,
+  removePlayerGalleryImage,
+} from "./players";
 
 const root = path.resolve(
   fileURLToPath(new URL(".", import.meta.url)),
@@ -82,6 +90,99 @@ test("a Player and a Coach can exist as two Clients", async () => {
   assert.equal(await getCoach(db, player.id), null);
   assert.equal((await getPlayer(db, player.id))?.name, "Pat Riley");
   assert.equal((await getCoach(db, coach.id))?.name, "Pat Riley");
+});
+
+function trackingDeleteBlobs() {
+  const deleted: string[] = [];
+  return {
+    deleted,
+    deleteBlobs: async (keys: string[]) => {
+      deleted.push(...keys);
+    },
+  };
+}
+
+test("commit presentation image stores the URL on the Coach", async () => {
+  const created = await createCoach(db, coachInput());
+  const blobs = trackingDeleteBlobs();
+  const pathname = `coaches/${created.id}/presentation/pat.jpg`;
+  const url = "https://example.com/pat.jpg";
+
+  await commitPresentationImage(
+    db,
+    created.id,
+    { url, pathname },
+    blobs.deleteBlobs,
+  );
+  const retrieved = await getCoach(db, created.id);
+
+  assert.equal(retrieved?.presentationImageUrl, url);
+  assert.deepEqual(blobs.deleted, []);
+});
+
+test("replacing a Coach presentation image deletes the previous Blob", async () => {
+  const created = await createCoach(db, coachInput());
+  const blobs = trackingDeleteBlobs();
+  const firstPath = `coaches/${created.id}/presentation/old.jpg`;
+  const nextPath = `coaches/${created.id}/presentation/new.jpg`;
+
+  await commitPresentationImage(
+    db,
+    created.id,
+    { url: "https://example.com/old.jpg", pathname: firstPath },
+    blobs.deleteBlobs,
+  );
+  await commitPresentationImage(
+    db,
+    created.id,
+    { url: "https://example.com/new.jpg", pathname: nextPath },
+    blobs.deleteBlobs,
+  );
+
+  const retrieved = await getCoach(db, created.id);
+  assert.equal(retrieved?.presentationImageUrl, "https://example.com/new.jpg");
+  assert.deepEqual(blobs.deleted, [firstPath]);
+});
+
+test("gallery images can be added and removed on a Coach", async () => {
+  const created = await createCoach(db, coachInput());
+  const blobs = trackingDeleteBlobs();
+  const pathname = `coaches/${created.id}/gallery/1.jpg`;
+  const url = "https://example.com/gallery.jpg";
+
+  const image = await addPlayerGalleryImage(
+    db,
+    created.id,
+    { url, pathname },
+    blobs.deleteBlobs,
+  );
+  const afterAdd = await getCoach(db, created.id);
+
+  assert.equal(afterAdd?.gallery.length, 1);
+  assert.equal(afterAdd?.gallery[0]?.url, url);
+  assert.deepEqual(blobs.deleted, []);
+
+  await removePlayerGalleryImage(db, created.id, image.id, blobs.deleteBlobs);
+
+  assert.deepEqual((await getCoach(db, created.id))?.gallery, []);
+  assert.deepEqual(blobs.deleted, [pathname]);
+});
+
+test("clear presentation image removes it from the Coach and deletes the Blob", async () => {
+  const created = await createCoach(db, coachInput());
+  const blobs = trackingDeleteBlobs();
+  const pathname = `coaches/${created.id}/presentation/pat.jpg`;
+
+  await commitPresentationImage(
+    db,
+    created.id,
+    { url: "https://example.com/pat.jpg", pathname },
+    blobs.deleteBlobs,
+  );
+  await clearPresentationImage(db, created.id, blobs.deleteBlobs);
+
+  assert.equal((await getCoach(db, created.id))?.presentationImageUrl, null);
+  assert.deepEqual(blobs.deleted, [pathname]);
 });
 
 test("Player media cannot be stored on a Coach", async () => {

@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { schema, type Database } from "@dtm/database";
 
 import type { Coach, CoachVisibility } from "@/types/coach";
@@ -55,15 +55,36 @@ export async function getCoach(db: Database, id: string): Promise<Coach | null> 
       lastClub: true,
       eurobasketLink: true,
       visibility: true,
+      presentationImageUrl: true,
     },
     where: and(
       eq(schema.clients.id, id),
       eq(schema.clients.kind, "coach"),
       isNull(schema.clients.trashedAt),
     ),
+    with: {
+      galleryImages: {
+        columns: {
+          id: true,
+          url: true,
+        },
+        orderBy: [
+          asc(schema.playerGalleryImages.sortOrder),
+          asc(schema.playerGalleryImages.createdAt),
+        ],
+      },
+    },
   });
 
-  return row ?? null;
+  if (!row) {
+    return null;
+  }
+
+  const { galleryImages, ...coach } = row;
+  return {
+    ...coach,
+    gallery: galleryImages,
+  };
 }
 
 export async function createCoach(

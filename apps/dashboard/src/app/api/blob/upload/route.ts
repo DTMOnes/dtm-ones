@@ -5,10 +5,11 @@ import { env } from "@/config/env";
 import { db } from "@/lib/db";
 import { playerBlobClientPayloadSchema } from "@/lib/validation/players";
 import { getSession } from "@/utils/auth/get-session";
+import { getCoach } from "@/utils/coaches";
 import {
   PLAYER_IMAGE_CONTENT_TYPES,
   PLAYER_IMAGE_MAX_BYTES,
-  isPlayerBlobPathname,
+  isClientBlobPathname,
 } from "@/utils/player-blob-path";
 import { getPlayer } from "@/utils/players";
 
@@ -39,8 +40,9 @@ export async function POST(request: Request): Promise<NextResponse> {
         }
 
         if (
-          !isPlayerBlobPathname(
-            parsed.data.playerId,
+          !isClientBlobPathname(
+            parsed.data.kind,
+            parsed.data.clientId,
             parsed.data.slot,
             pathname,
           )
@@ -48,9 +50,16 @@ export async function POST(request: Request): Promise<NextResponse> {
           throw new Error("Invalid upload path.");
         }
 
-        const player = await getPlayer(db, parsed.data.playerId);
-        if (!player) {
-          throw new Error("Player not found.");
+        const client =
+          parsed.data.kind === "player"
+            ? await getPlayer(db, parsed.data.clientId)
+            : await getCoach(db, parsed.data.clientId);
+        if (!client) {
+          throw new Error(
+            parsed.data.kind === "player"
+              ? "Player not found."
+              : "Coach not found.",
+          );
         }
 
         return {

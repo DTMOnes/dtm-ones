@@ -33,15 +33,18 @@ import type { PlayerGalleryImage } from "@/types/player";
 import {
   PLAYER_IMAGE_CONTENT_TYPES,
   isAllowedPlayerImage,
+  type ClientBlobKind,
 } from "@/utils/player-blob-path";
 
 import { ImagesIcon, InfoIcon, TrashIcon } from "@phosphor-icons/react";
 
 export function PlayerGallery({
-  playerId,
+  clientId,
+  kind,
   images,
 }: {
-  playerId: string;
+  clientId: string;
+  kind: ClientBlobKind;
   images: PlayerGalleryImage[];
 }) {
   const router = useRouter();
@@ -93,9 +96,9 @@ export function PlayerGallery({
         }
 
         try {
-          const blob = await uploadPlayerImage(playerId, "gallery", file);
+          const blob = await uploadPlayerImage(kind, clientId, "gallery", file);
           const result = await addImage({
-            playerId,
+            clientId,
             url: blob.url,
             pathname: blob.pathname,
           });
@@ -137,7 +140,9 @@ export function PlayerGallery({
       <CardHeader>
         <CardTitle>Gallery Pictures</CardTitle>
         <CardDescription>
-          All the pictures in the player&apos;s page gallery.
+          {kind === "player"
+            ? "All the pictures in the Player's page gallery."
+            : "All the pictures in the Coach's page gallery."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -160,7 +165,9 @@ export function PlayerGallery({
               </EmptyMedia>
               <EmptyTitle>No gallery images yet</EmptyTitle>
               <EmptyDescription>
-                Add photos for the Roster. Gallery may stay empty.
+                {kind === "player"
+                  ? "Add photos for the Roster. Gallery may stay empty."
+                  : "Add photos for this Coach. Gallery may stay empty."}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -186,7 +193,7 @@ export function PlayerGallery({
                   disabled={busy}
                   aria-label="Remove gallery image"
                   onClick={() => {
-                    void removeImage({ playerId, imageId: image.id });
+                    void removeImage({ clientId, imageId: image.id });
                   }}
                 >
                   {isRemoving ? <Spinner /> : <TrashIcon className="size-4" />}

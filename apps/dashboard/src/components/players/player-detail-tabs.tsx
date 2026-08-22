@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/tabs";
 
 export function PlayerDetailTabs({
-  playerId,
+  basePath,
   tab,
   info,
   media,
 }: {
-  playerId: string;
+  basePath: string;
   tab: "info" | "media";
   info: React.ReactNode;
   media: React.ReactNode;
@@ -26,10 +26,7 @@ export function PlayerDetailTabs({
     <Tabs
       value={tab}
       onValueChange={(value) => {
-        const href =
-          value === "media"
-            ? `/players/${playerId}?tab=media`
-            : `/players/${playerId}`;
+        const href = value === "media" ? `${basePath}?tab=media` : basePath;
         router.replace(href, { scroll: false });
       }}
       className="w-full gap-6"
