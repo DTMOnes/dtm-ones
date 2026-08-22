@@ -5,19 +5,17 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 
 import styles from "./styles.module.scss";
-import {
-  fadeUpVariants,
-  linkVariants,
-  panelVariants,
-} from "../Menu/variants";
+import { fadeUpVariants, panelVariants } from "../Menu/variants";
 import { overlayPages } from "../nav-data";
+import Backdrop from "./Backdrop";
+import SplitLink from "./SplitLink";
 
 const pages = overlayPages;
 
 const socials = [
   { label: "Instagram", href: "https://www.instagram.com/dtm_ones/" },
   {
-    label: "Youtube",
+    label: "YouTube",
     href: "https://www.youtube.com/channel/UC_x5XG1OV2P6yVqAlKxpw6w",
   },
 ];
@@ -44,6 +42,7 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
       aria-modal="true"
       aria-label="Site menu"
     >
+      <Backdrop />
       <div className={styles.stage}>
         <nav className={styles.pages} aria-label="Primary">
           {pages.map((page, index) => {
@@ -53,11 +52,9 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
                 : pathname.startsWith(page.href);
 
             return (
-              <motion.div
+              <div
                 key={page.label}
                 className={`${styles.page} ${isCurrent ? styles.page_current : ""}`}
-                custom={index}
-                variants={linkVariants}
               >
                 <Link
                   href={page.href}
@@ -65,9 +62,9 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
                   onClick={onNavigate}
                   aria-current={isCurrent ? "page" : undefined}
                 >
-                  {page.label}
+                  <SplitLink text={page.label} delay={0.16 + index * 0.1} />
                 </Link>
-              </motion.div>
+              </div>
             );
           })}
         </nav>
@@ -77,19 +74,16 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
           custom={0.58}
           variants={fadeUpVariants}
         >
-          <div className={styles.accordions}>
+          <div className={styles.socials}>
             {socials.map((social) => (
               <a
                 key={social.label}
                 href={social.href}
-                className={styles.accordion}
+                className={styles.social}
                 target="_blank"
                 rel="noreferrer"
               >
-                <span className={styles.accordion_label}>{social.label}</span>
-                <span className={styles.accordion_mark} aria-hidden>
-                  ↗
-                </span>
+                {social.label}
               </a>
             ))}
           </div>

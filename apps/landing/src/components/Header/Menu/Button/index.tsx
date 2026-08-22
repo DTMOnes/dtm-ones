@@ -1,10 +1,9 @@
 "use client";
 
 import type { Ref } from "react";
-import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
-import styles from "./styles.module.scss";
+const ease = [0.76, 0, 0.24, 1] as const;
 
 export default function Button({
   isActive,
@@ -15,44 +14,40 @@ export default function Button({
   onClick: () => void;
   buttonRef?: Ref<HTMLButtonElement>;
 }) {
+  const reduce = useReducedMotion();
+  const duration = reduce ? 0 : 0.35;
+
   return (
     <motion.button
       ref={buttonRef}
       type="button"
-      className={styles.button}
+      className="relative flex size-11 cursor-pointer items-center justify-center text-white outline-none transition-opacity duration-200 hover:opacity-70 focus-visible:ring-2 focus-visible:ring-white/50"
       onClick={onClick}
       aria-label={isActive ? "Close menu" : "Open menu"}
       aria-expanded={isActive}
       aria-controls="site-menu"
-      whileTap={{ scale: 0.92 }}
+      whileTap={reduce ? undefined : { scale: 0.92 }}
       transition={{ duration: 0.2 }}
     >
-      <motion.div
-        className={styles.slider}
-        animate={{ top: isActive ? "-100%" : "0%" }}
-        transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
-      >
-        <span className={styles.element}>
-          <Image
-            className={styles.icon}
-            src="/assets/icons/list-bold.svg"
-            alt=""
-            width={24}
-            height={24}
-            aria-hidden
-          />
-        </span>
-        <span className={`${styles.element} ${styles.close}`}>
-          <Image
-            className={styles.icon}
-            src="/assets/icons/x-bold.svg"
-            alt=""
-            width={24}
-            height={24}
-            aria-hidden
-          />
-        </span>
-      </motion.div>
+      {/* Two-line morph from React Bits Card Nav */}
+      <span className="flex w-6 flex-col gap-1.5" aria-hidden>
+        <motion.span
+          className="block h-[2.5px] w-full origin-center bg-current"
+          animate={{
+            y: isActive ? 4.25 : 0,
+            rotate: isActive ? 45 : 0,
+          }}
+          transition={{ duration, ease }}
+        />
+        <motion.span
+          className="block h-[2.5px] w-full origin-center bg-current"
+          animate={{
+            y: isActive ? -4.25 : 0,
+            rotate: isActive ? -45 : 0,
+          }}
+          transition={{ duration, ease }}
+        />
+      </span>
     </motion.button>
   );
 }

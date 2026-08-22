@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "motion/react";
 
-import styles from "./styles.module.scss";
 import Button from "./Button";
 import Nav from "../Nav";
 
@@ -85,7 +84,7 @@ export default function Menu() {
   }, [isActive]);
 
   return (
-    <div className={styles.container}>
+    <>
       <Button
         isActive={isActive}
         onClick={() =>
@@ -103,6 +102,6 @@ export default function Menu() {
             document.body,
           )
         : null}
-    </div>
+    </>
   );
 }
