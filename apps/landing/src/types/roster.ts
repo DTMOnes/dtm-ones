@@ -23,6 +23,7 @@ export type PublicRosterPlayer = {
   nationality: string;
   height_cm: number;
   last_club: string;
+  eurobasket_link: string | null;
   presentation_image_url: string | null;
   categories: PublicRosterCategoryRef[];
   gallery_images: PublicRosterGalleryImage[];

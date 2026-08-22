@@ -29,15 +29,20 @@ const itemVariants: Variants = {
 export default function Header({
   search,
   filters,
+  overlay = false,
 }: {
   search?: ReactNode;
   filters?: ReactNode;
+  overlay?: boolean;
 }) {
   const reduce = useReducedMotion();
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-[1000] overflow-visible bg-background px-7 pb-10 group-data-[menu-open]/chrome:z-[1002] group-data-[menu-open]/chrome:bg-transparent"
+      className={cn(
+        "fixed inset-x-0 top-0 z-[1000] overflow-visible px-7 group-data-[menu-open]/chrome:z-[1002] group-data-[menu-open]/chrome:bg-transparent",
+        overlay ? "bg-transparent pb-0" : "bg-background pb-10",
+      )}
       style={{ paddingTop: 20 }}
     >
       <motion.div

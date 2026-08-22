@@ -27,5 +27,11 @@ export default function SiteHeader() {
       </Suspense>
     ) : null;
 
-  return <Header search={search} filters={filters} />;
+  return (
+    <Header
+      search={search}
+      filters={filters}
+      overlay={pathname.startsWith("/players/")}
+    />
+  );
 }

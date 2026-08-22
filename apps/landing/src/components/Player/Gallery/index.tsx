@@ -1,24 +1,11 @@
 "use client";
 
-// Next
-import Image from "next/image";
+import { useMemo } from "react";
 
-// React
-import { useEffect, useRef, useState } from "react";
-
-// Motion
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useTransform,
-} from "motion/react";
-
-// Styles
-import styles from "./styles.module.scss";
-
-// Types
+import MorphSlider from "@/components/MorphSlider";
 import type { PublicRosterGalleryImage } from "@/types/roster";
+
+import styles from "./styles.module.scss";
 
 const PLACEHOLDER_SRC = "/assets/images/player-placeholder.png";
 
@@ -26,109 +13,46 @@ export default function PlayerGallery({
   images,
   fallbackSrc,
   playerName,
+  showControls = true,
 }: {
   images: PublicRosterGalleryImage[];
   fallbackSrc?: string | null;
   playerName: string;
+  showControls?: boolean;
 }) {
-  const reduce = useReducedMotion();
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [scrollable, setScrollable] = useState(false);
+  const items = useMemo(() => {
+    const sources =
+      images.length > 0
+        ? images.map((image) => image.url)
+        : [fallbackSrc?.trim() || PLACEHOLDER_SRC];
 
-  const progress = useMotionValue(0);
-  const thumbRatio = useMotionValue(1);
-  const thumbWidth = useTransform(thumbRatio, (ratio) => `${ratio * 100}%`);
-  const thumbLeft = useTransform(
-    [progress, thumbRatio],
-    ([p, ratio]: number[]) => `${p * (100 - ratio * 100)}%`,
-  );
+    return sources.map((image) => ({ image }));
+  }, [fallbackSrc, images]);
 
-  const sources =
-    images.length > 0
-      ? images.map((image) => ({ id: image.id, url: image.url }))
-      : [
-          {
-            id: "fallback",
-            url: fallbackSrc?.trim() || PLACEHOLDER_SRC,
-          },
-        ];
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const update = () => {
-      const max = track.scrollWidth - track.clientWidth;
-      const ratio =
-        track.scrollWidth > 0 ? track.clientWidth / track.scrollWidth : 1;
-      const nextScrollable = max > 2;
-      setScrollable(nextScrollable);
-      thumbRatio.set(Math.min(1, Math.max(ratio, 0.12)));
-      progress.set(max > 0 ? track.scrollLeft / max : 0);
-    };
-
-    update();
-    track.addEventListener("scroll", update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(track);
-    for (const child of track.children) {
-      if (child instanceof HTMLElement) observer.observe(child);
-    }
-
-    return () => {
-      track.removeEventListener("scroll", update);
-      observer.disconnect();
-    };
-  }, [progress, sources.length, thumbRatio]);
-
-  const seek = (clientX: number, target: HTMLElement) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const rect = target.getBoundingClientRect();
-    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
-    const max = track.scrollWidth - track.clientWidth;
-    track.scrollTo({
-      left: ratio * max,
-      behavior: reduce ? "auto" : "smooth",
-    });
-  };
+  const sliderKey = items.map((item) => item.image).join("|");
 
   return (
     <div className={styles.container}>
-      <div ref={trackRef} className={styles.track}>
-        {sources.map((source, index) => (
-          <figure key={source.id} className={styles.card}>
-            <Image
-              className={styles.image}
-              src={source.url}
-              alt={`${playerName} gallery ${index + 1}`}
-              width={1600}
-              height={2000}
-              sizes="50vw"
-              style={{ height: "100%", width: "auto" }}
-              priority={index === 0}
-              draggable={false}
-            />
-          </figure>
-        ))}
-      </div>
-
-      {scrollable ? (
-        <button
-          type="button"
-          className={styles.progress}
-          aria-label="Gallery scroll position"
-          onClick={(event) => seek(event.clientX, event.currentTarget)}
-        >
-          <motion.span
-            className={styles.progressThumb}
-            style={{
-              width: thumbWidth,
-              left: thumbLeft,
-            }}
-          />
-        </button>
-      ) : null}
+      {/* Morph Slider is WebGL textures. YouTube stays in PlayerHighlights so iframe controls are never cropped. */}
+      <MorphSlider
+        key={sliderKey}
+        items={items}
+        className={styles.slider}
+        radius={0}
+        overlayColor="#0f0f0f"
+        transition="melt"
+        duration={0.9}
+        intensity={0.45}
+        scale={2.2}
+        aberration={0.15}
+        drift={0}
+        autoplay={false}
+        loop={items.length > 1}
+        showCaptions={false}
+        showIndicators={false}
+        showControls={showControls && items.length > 1}
+        aria-label={`${playerName} gallery`}
+      />
     </div>
   );
 }
