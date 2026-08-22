@@ -10,6 +10,7 @@ import {
 } from "@dtm/database";
 
 import { db } from "@/lib/db";
+import { ROSTER_PAGE_SIZE } from "@/lib/roster/constants";
 import type {
   PublicRosterCategory,
   PublicRosterPlayer,
@@ -20,10 +21,11 @@ export type { ListPublicRosterPlayersParams };
 function toPublicPlayer(player: RosterPlayer): PublicRosterPlayer {
   return {
     id: player.id,
+    kind: player.kind,
     slug: player.id,
     full_name: player.name,
     nationality: player.nationality,
-    height_cm: player.heightCm ?? 0,
+    height_cm: player.heightCm,
     last_club: player.lastClub,
     eurobasket_link: player.eurobasketLink,
     presentation_image_url: player.presentationImageUrl,
@@ -69,10 +71,20 @@ export const getPublicRosterPlayer = cache(
 
 export async function listPublicRosterPlayers(
   params: ListPublicRosterPlayersParams = {},
-): Promise<PublicRosterPlayer[]> {
+): Promise<{ clients: PublicRosterPlayer[]; hasMore: boolean }> {
   await connection();
-  const players = await listRosterPlayers(db, params);
-  return players.map(toPublicPlayer);
+  const limit = params.limit ?? ROSTER_PAGE_SIZE;
+  const offset = params.offset ?? 0;
+  const rows = await listRosterPlayers(db, {
+    ...params,
+    limit: limit + 1,
+    offset,
+  });
+
+  return {
+    clients: rows.slice(0, limit).map(toPublicPlayer),
+    hasMore: rows.length > limit,
+  };
 }
 
 export const listPublicRosterCategories = cache(async (): Promise<

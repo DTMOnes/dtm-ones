@@ -264,26 +264,123 @@ test("a Client in the Trash is not on the Roster", async () => {
   assert.deepEqual(names, ["Public Player"]);
 });
 
-test("a public Coach is not listed as a Player", async () => {
+async function insertCoach(values: {
+  name: string;
+  visibility: "public" | "private";
+  trashedAt?: Date;
+}) {
+  const [row] = await db
+    .insert(clients)
+    .values({
+      kind: "coach",
+      name: values.name,
+      nationality: "USA",
+      lastClub: "Miami Heat",
+      visibility: values.visibility,
+      eurobasketLink: "https://basketball.eurobasket.com/coach/Pat-Riley/1",
+      trashedAt: values.trashedAt,
+    })
+    .returning({ id: clients.id, name: clients.name });
+
+  if (!row) {
+    throw new Error("insertCoach returned no row");
+  }
+
+  return row;
+}
+
+test("the Roster lists public Players and Coaches by name", async () => {
   const category = await insertCategory("Guards");
   await insertPlayer({
     name: "Manu Ginobili",
     visibility: "public",
     categoryId: category.id,
   });
-  await db.insert(clients).values({
-    kind: "coach",
-    name: "Pat Riley",
-    nationality: "USA",
-    lastClub: "Miami Heat",
-    visibility: "public",
-    eurobasketLink: "https://basketball.eurobasket.com/coach/Pat-Riley/1",
-  });
+  await insertCoach({ name: "Pat Riley", visibility: "public" });
+  await insertCoach({ name: "Hidden Coach", visibility: "private" });
 
-  const names = (await listPublicRosterPlayers(landingDb)).map(
-    (player) => player.name,
+  const listed = await listPublicRosterPlayers(landingDb);
+  assert.deepEqual(
+    listed.map((row) => row.name),
+    ["Manu Ginobili", "Pat Riley"],
   );
-  assert.deepEqual(names, ["Manu Ginobili"]);
+  assert.equal(listed[1]?.kind, "coach");
+});
+
+test("kind=coach lists only Coaches; a Category filter excludes Coaches", async () => {
+  const guards = await insertCategory("Guards");
+  await insertPlayer({
+    name: "Manu Ginobili",
+    visibility: "public",
+    categoryId: guards.id,
+  });
+  await insertCoach({ name: "Pat Riley", visibility: "public" });
+
+  const coaches = await listPublicRosterPlayers(landingDb, { kind: "coach" });
+  assert.deepEqual(
+    coaches.map((row) => row.name),
+    ["Pat Riley"],
+  );
+
+  const guardsOnly = await listPublicRosterPlayers(landingDb, {
+    categoryIds: [guards.id],
+  });
+  assert.deepEqual(
+    guardsOnly.map((row) => row.name),
+    ["Manu Ginobili"],
+  );
+});
+
+test("Roster search matches a Coach name on the full Roster", async () => {
+  const guards = await insertCategory("Guards");
+  await insertPlayer({
+    name: "Manu Ginobili",
+    visibility: "public",
+    categoryId: guards.id,
+  });
+  await insertCoach({ name: "Pat Riley", visibility: "public" });
+
+  const search = await listPublicRosterPlayers(landingDb, { q: "Riley" });
+  assert.deepEqual(
+    search.map((row) => row.name),
+    ["Pat Riley"],
+  );
+});
+
+test("Roster list honors limit and offset", async () => {
+  const guards = await insertCategory("Guards");
+  await insertPlayer({
+    name: "Manu Ginobili",
+    visibility: "public",
+    categoryId: guards.id,
+  });
+  await insertCoach({ name: "Pat Riley", visibility: "public" });
+
+  const first = await listPublicRosterPlayers(landingDb, { limit: 1, offset: 0 });
+  assert.deepEqual(
+    first.map((row) => row.name),
+    ["Manu Ginobili"],
+  );
+
+  const second = await listPublicRosterPlayers(landingDb, {
+    limit: 1,
+    offset: 1,
+  });
+  assert.deepEqual(
+    second.map((row) => row.name),
+    ["Pat Riley"],
+  );
+});
+
+test("a public Coach is retrievable on the Roster", async () => {
+  const coach = await insertCoach({ name: "Pat Riley", visibility: "public" });
+
+  const retrieved = await getPublicRosterPlayer(landingDb, coach.id);
+  assert.equal(retrieved?.name, "Pat Riley");
+  assert.equal(retrieved?.kind, "coach");
+  assert.equal(retrieved?.heightCm, null);
+  assert.equal(retrieved?.categoryId, null);
+  assert.deepEqual(retrieved?.videos, []);
 });
 
 test("Roster search and Category filter match public Players", async () => {

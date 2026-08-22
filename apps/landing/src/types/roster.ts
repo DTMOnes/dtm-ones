@@ -18,10 +18,11 @@ export type PublicRosterVideo = {
 
 export type PublicRosterPlayer = {
   id: string;
+  kind: "player" | "coach";
   slug: string;
   full_name: string;
   nationality: string;
-  height_cm: number;
+  height_cm: number | null;
   last_club: string;
   eurobasket_link: string | null;
   presentation_image_url: string | null;

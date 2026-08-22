@@ -80,10 +80,11 @@ export default function Cards({
   const reduce = useReducedMotion();
 
   const imageSrc = player.presentation_image_url?.trim() || PLACEHOLDER_SRC;
-  const categoryName = player.categories[0]?.name ?? "";
+  const kindLabel =
+    player.kind === "coach" ? "Coaches" : player.categories[0]?.name ?? "";
 
   const handleNavigate = () => {
-    router.push(`/players/${player.id}`);
+    router.push(`/roster/${player.id}`);
   };
 
   return (
@@ -122,8 +123,8 @@ export default function Cards({
         animate="enter"
       >
         <h2 className={styles.player_name}>{player.full_name}</h2>
-        {categoryName ? (
-          <p className={styles.player_position}>{categoryName}</p>
+        {kindLabel ? (
+          <p className={styles.player_position}>{kindLabel}</p>
         ) : null}
       </motion.div>
     </motion.div>

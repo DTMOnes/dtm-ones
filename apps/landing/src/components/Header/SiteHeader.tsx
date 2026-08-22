@@ -31,7 +31,7 @@ export default function SiteHeader() {
     <Header
       search={search}
       filters={filters}
-      overlay={pathname.startsWith("/players/")}
+      overlay={pathname.startsWith("/roster/")}
     />
   );
 }

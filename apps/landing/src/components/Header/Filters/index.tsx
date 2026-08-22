@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+import { COACHES_FILTER_ID } from "@/lib/roster/constants";
 import { cn } from "@/lib/utils";
 
 export type FilterItem = {
@@ -53,13 +54,20 @@ function CategoriesFilters({
   const searchParams = useSearchParams();
   const { startRosterTransition } = useHeaderOverride();
   const reduce = useReducedMotion();
-  const selected = searchParams.get(param);
+  const selectedCategory = searchParams.get(param);
+  const selectedKind = searchParams.get("kind");
+  const allActive = !selectedCategory && selectedKind !== COACHES_FILTER_ID;
 
   const setFilter = (id: string) => {
     const params = new URLSearchParams(searchParams);
     if (id === ALL_ID) {
       params.delete(param);
+      params.delete("kind");
+    } else if (id === COACHES_FILTER_ID) {
+      params.delete(param);
+      params.set("kind", COACHES_FILTER_ID);
     } else {
+      params.delete("kind");
       params.set(param, id);
     }
     startRosterTransition(() => {
@@ -71,7 +79,7 @@ function CategoriesFilters({
     <motion.div
       className="flex gap-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       role="radiogroup"
-      aria-label="Categories"
+      aria-label="Roster filters"
       variants={reduce ? undefined : rowVariants}
       initial={reduce ? false : "hidden"}
       animate="show"
@@ -79,15 +87,19 @@ function CategoriesFilters({
       <motion.button
         type="button"
         role="radio"
-        aria-checked={!selected}
-        className={chipClass(!selected)}
+        aria-checked={allActive}
+        className={chipClass(allActive)}
         onClick={() => setFilter(ALL_ID)}
         variants={reduce ? undefined : chipVariants}
       >
         All
       </motion.button>
       {items.map((item) => {
-        const active = selected === item.id;
+        const active =
+          item.id === COACHES_FILTER_ID
+            ? selectedKind === COACHES_FILTER_ID
+            : selectedKind !== COACHES_FILTER_ID &&
+              selectedCategory === item.id;
         return (
           <motion.button
             key={item.id}

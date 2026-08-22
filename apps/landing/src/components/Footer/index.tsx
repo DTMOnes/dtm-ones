@@ -28,7 +28,7 @@ export default function Footer() {
   const pathname = usePathname();
 
   // ponytail: player view is a locked 100dvh stage; hide until that layout is reworked.
-  if (pathname.startsWith("/players/")) return null;
+  if (pathname.startsWith("/roster/")) return null;
 
   const year = new Date().getFullYear();
 

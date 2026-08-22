@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-// Queries
 import { getPublicRosterPlayer } from "@/lib/roster/queries";
-
-// Components
 import PlayerView from "@/components/Player/PlayerView";
 
 export async function generateMetadata({
@@ -13,15 +10,15 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const player = await getPublicRosterPlayer(id);
+  const client = await getPublicRosterPlayer(id);
 
-  if (!player) {
-    return { title: "Player | DTM Ones" };
+  if (!client) {
+    return { title: "Roster | DTM Ones" };
   }
 
   return {
-    title: `${player.full_name} | DTM Ones`,
-    description: `Profile for ${player.full_name} at DTM Ones.`,
+    title: `${client.full_name} | DTM Ones`,
+    description: `Profile for ${client.full_name} at DTM Ones.`,
   };
 }
 
@@ -31,11 +28,11 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const player = await getPublicRosterPlayer(id);
+  const client = await getPublicRosterPlayer(id);
 
-  if (!player) {
+  if (!client) {
     notFound();
   }
 
-  return <PlayerView player={player} />;
+  return <PlayerView player={client} />;
 }

@@ -9,6 +9,7 @@ import {
 
 export type RosterPlayer = {
   id: string;
+  kind: "player" | "coach";
   name: string;
   nationality: string;
   lastClub: string;
@@ -29,6 +30,9 @@ export type RosterCategory = {
 export type ListPublicRosterPlayersParams = {
   q?: string;
   categoryIds?: string[];
+  kind?: "player" | "coach";
+  limit?: number;
+  offset?: number;
 };
 
 const UUID_PATTERN =
@@ -38,8 +42,9 @@ function isUuid(value: string): boolean {
   return UUID_PATTERN.test(value);
 }
 
-const playerColumns = {
+const rosterColumns = {
   id: roster.id,
+  kind: roster.kind,
   name: roster.name,
   nationality: roster.nationality,
   lastClub: roster.lastClub,
@@ -54,7 +59,11 @@ export async function listPublicRosterPlayers(
   db: Database,
   params: ListPublicRosterPlayersParams = {},
 ): Promise<RosterPlayer[]> {
-  const filters = [eq(roster.kind, "player")];
+  const filters = [];
+
+  if (params.kind) {
+    filters.push(eq(roster.kind, params.kind));
+  }
 
   const trimmed = params.q?.trim() ?? "";
   if (trimmed.length > 0) {
@@ -66,11 +75,21 @@ export async function listPublicRosterPlayers(
     filters.push(inArray(roster.categoryId, categoryIds));
   }
 
-  const rows = await db
-    .select(playerColumns)
+  let query = db
+    .select(rosterColumns)
     .from(roster)
-    .where(and(...filters))
-    .orderBy(asc(roster.name));
+    .where(filters.length > 0 ? and(...filters) : undefined)
+    .orderBy(asc(roster.name))
+    .$dynamic();
+
+  if (params.limit !== undefined) {
+    query = query.limit(params.limit);
+  }
+  if (params.offset !== undefined) {
+    query = query.offset(params.offset);
+  }
+
+  const rows = await query;
 
   return rows.map((row) => ({
     ...row,
@@ -91,9 +110,9 @@ export async function getPublicRosterPlayer(
   }
 
   const [row] = await db
-    .select(playerColumns)
+    .select(rosterColumns)
     .from(roster)
-    .where(and(eq(roster.id, id), eq(roster.kind, "player")))
+    .where(eq(roster.id, id))
     .limit(1);
 
   if (!row) {

@@ -11,6 +11,34 @@
   align-items: stretch;
 }
 
+.loadMore {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 8px;
+}
+
+.loadMoreButton {
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-dark-gray);
+  @include type.inter(13px);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+}
+
 .empty_shell {
   width: 100%;
   box-sizing: border-box;

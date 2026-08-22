@@ -23,10 +23,14 @@ export const metadata: Metadata = {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; c?: string | string[] }>;
+  searchParams: Promise<{
+    q?: string;
+    c?: string | string[];
+    kind?: string | string[];
+  }>;
 }) {
   const sp = await searchParams;
-  const { q, c } = normalizeSearchParams(sp);
+  const { q, c, kind } = normalizeSearchParams(sp);
 
   const categories = await listPublicRosterCategories();
   const knownByLower = new Map(
@@ -36,15 +40,23 @@ export default async function Page({
     .map((id) => knownByLower.get(id.toLowerCase()))
     .filter((id): id is string => id !== undefined);
 
-  const players = await listPublicRosterPlayers({
+  const { clients, hasMore } = await listPublicRosterPlayers({
     q,
     categoryIds,
+    kind,
   });
 
   return (
     <HomeRoster>
       <Suspense fallback={<GridLoading />}>
-        <Grid players={players} />
+        <Grid
+          key={`${q ?? ""}:${kind ?? ""}:${categoryIds.join(",")}`}
+          clients={clients}
+          hasMore={hasMore}
+          q={q}
+          categoryIds={categoryIds}
+          kind={kind}
+        />
       </Suspense>
     </HomeRoster>
   );

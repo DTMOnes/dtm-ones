@@ -19,12 +19,15 @@ export function PlayerInfoPanel({
   onClose: () => void;
 }) {
   const reduce = useReducedMotion();
-  const categoryName = player.categories[0]?.name ?? "";
+  const categoryName =
+    player.kind === "coach" ? "Coaches" : player.categories[0]?.name ?? "";
   const lastClub = player.last_club.trim();
   const eurobasket = player.eurobasket_link?.trim() ?? "";
 
   const stats = [
-    { label: "Height", value: `${player.height_cm} cm` },
+    player.kind === "player"
+      ? { label: "Height", value: `${player.height_cm ?? 0} cm` }
+      : null,
     { label: "Nationality", value: player.nationality },
     lastClub.length > 0 ? { label: "Last club", value: lastClub } : null,
   ].filter((item): item is { label: string; value: string } => item !== null);

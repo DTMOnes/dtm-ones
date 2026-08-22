@@ -38,6 +38,11 @@
   pointer-events: none;
 }
 
+.modeSwitch {
+  pointer-events: none;
+  align-self: flex-start;
+}
+
 .dock {
   display: flex;
   align-items: flex-end;

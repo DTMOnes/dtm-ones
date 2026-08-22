@@ -6,7 +6,8 @@ import { PublicRosterPlayer } from "@/types/roster";
 
 export default function Info({ player }: { player: PublicRosterPlayer }) {
   const lastClub = player.last_club.trim();
-  const categoryName = player.categories[0]?.name ?? "";
+  const categoryName =
+    player.kind === "coach" ? "Coaches" : player.categories[0]?.name ?? "";
 
   return (
     <div className={styles.player_info}>
@@ -16,10 +17,12 @@ export default function Info({ player }: { player: PublicRosterPlayer }) {
       </div>
 
       <div className={styles.player_stats}>
-        <div className={styles.player_stats_item}>
-          <p>Height</p>
-          <h2>{player.height_cm} cm</h2>
-        </div>
+        {player.kind === "player" ? (
+          <div className={styles.player_stats_item}>
+            <p>Height</p>
+            <h2>{player.height_cm ?? 0} cm</h2>
+          </div>
+        ) : null}
         <div className={styles.player_stats_item}>
           <p>Nationality</p>
           <h2>{player.nationality}</h2>
