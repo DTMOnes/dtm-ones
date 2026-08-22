@@ -44,9 +44,9 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
     >,
     defaultValues: {
       id: coach.id,
-      name: coach.name,
-      nationality: coach.nationality,
-      lastClub: coach.lastClub,
+      name: coach.name ?? "",
+      nationality: coach.nationality ?? "",
+      lastClub: coach.lastClub ?? "",
       eurobasketLink: coach.eurobasketLink ?? "",
     },
   });

@@ -30,7 +30,7 @@ export default async function Page({
       <PageHeader
         backHref="/coaches"
         backLabel="Coaches"
-        title={coach.name}
+        title={coach.name ?? ""}
         description="Coach profile"
         status={isPublic ? "Public" : "Private"}
       />

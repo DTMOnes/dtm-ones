@@ -140,6 +140,16 @@ function isForeignKeyViolation(error: unknown): boolean {
   );
 }
 
+function isNotNullViolation(error: unknown): boolean {
+  const pgError = postgresError(error);
+  if (!pgError) {
+    return false;
+  }
+
+  const code = "code" in pgError ? pgError.code : undefined;
+  return code === "23502";
+}
+
 function slugify(name: string): string {
   const slug = name
     .trim()
@@ -149,7 +159,74 @@ function slugify(name: string): string {
   return slug.length > 0 ? slug : "category";
 }
 
-test("a Coach cannot store Player facts", async () => {
+test("a Client can omit name, nationality, and last club", async () => {
+  const row = await insertClient({ kind: "player" });
+
+  const [stored] = await db
+    .select({
+      name: clients.name,
+      nationality: clients.nationality,
+      lastClub: clients.lastClub,
+      kind: clients.kind,
+    })
+    .from(clients)
+    .where(eq(clients.id, row.id));
+
+  assert.equal(stored?.kind, "player");
+  assert.equal(stored?.name, null);
+  assert.equal(stored?.nationality, null);
+  assert.equal(stored?.lastClub, null);
+});
+
+test("kind is required and Visibility defaults to private", async () => {
+  await assert.rejects(
+    () =>
+      db.execute(
+        sql`insert into clients (kind, visibility) values (null, 'private')`,
+      ),
+    isNotNullViolation,
+  );
+
+  const row = await insertClient({ kind: "coach" });
+  const [stored] = await db
+    .select({ visibility: clients.visibility })
+    .from(clients)
+    .where(eq(clients.id, row.id));
+
+  assert.equal(stored?.visibility, "private");
+});
+
+test("a Coach can store a presentation image and gallery", async () => {
+  const coach = await insertClient({
+    ...coachValues(),
+    presentationImageUrl: "https://example.com/coach.jpg",
+    presentationImageKey: "clients/coach.jpg",
+  });
+
+  const [stored] = await db
+    .select({
+      presentationImageUrl: clients.presentationImageUrl,
+      presentationImageKey: clients.presentationImageKey,
+    })
+    .from(clients)
+    .where(eq(clients.id, coach.id));
+
+  assert.equal(stored?.presentationImageUrl, "https://example.com/coach.jpg");
+  assert.equal(stored?.presentationImageKey, "clients/coach.jpg");
+
+  const [gallery] = await db
+    .insert(playerGalleryImages)
+    .values({
+      clientId: coach.id,
+      clientKind: "coach",
+      url: "https://example.com/gallery.jpg",
+    })
+    .returning({ url: playerGalleryImages.url });
+
+  assert.equal(gallery?.url, "https://example.com/gallery.jpg");
+});
+
+test("a Coach cannot store height, Category, or videos", async () => {
   const category = await insertCategory("Guards");
   const coach = await insertClient(coachValues());
 
@@ -162,34 +239,6 @@ test("a Coach cannot store Player facts", async () => {
     () => insertClient({ ...coachValues(), categoryId: category.id }),
     (error: unknown) =>
       isCheckViolation(error, "clients_coach_has_no_player_facts"),
-  );
-  await assert.rejects(
-    () =>
-      insertClient({
-        ...coachValues(),
-        presentationImageUrl: "https://example.com/coach.jpg",
-      }),
-    (error: unknown) =>
-      isCheckViolation(error, "clients_coach_has_no_player_facts"),
-  );
-  await assert.rejects(
-    () =>
-      db.insert(playerGalleryImages).values({
-        clientId: coach.id,
-        clientKind: "player",
-        url: "https://example.com/gallery.jpg",
-      }),
-    isForeignKeyViolation,
-  );
-  await assert.rejects(
-    () =>
-      db.insert(playerGalleryImages).values({
-        clientId: coach.id,
-        clientKind: "coach",
-        url: "https://example.com/gallery.jpg",
-      }),
-    (error: unknown) =>
-      isCheckViolation(error, "player_gallery_images_kind_player"),
   );
   await assert.rejects(
     () =>
@@ -209,6 +258,48 @@ test("a Coach cannot store Player facts", async () => {
       }),
     (error: unknown) => isCheckViolation(error, "player_videos_kind_player"),
   );
+});
+
+test("a Player can store height, Category, presentation image, gallery, and videos", async () => {
+  const guards = await insertCategory("Guards");
+  const player = await insertClient({
+    ...playerValues(),
+    categoryId: guards.id,
+    presentationImageUrl: "https://example.com/manu.jpg",
+    presentationImageKey: "clients/manu.jpg",
+  });
+
+  const [gallery] = await db
+    .insert(playerGalleryImages)
+    .values({
+      clientId: player.id,
+      clientKind: "player",
+      url: "https://example.com/gallery.jpg",
+    })
+    .returning({ url: playerGalleryImages.url });
+  const [video] = await db
+    .insert(playerVideos)
+    .values({
+      clientId: player.id,
+      clientKind: "player",
+      youtubeUrl: "https://youtube.com/watch?v=dQw4w9WgXcQ",
+    })
+    .returning({ youtubeUrl: playerVideos.youtubeUrl });
+
+  const [stored] = await db
+    .select({
+      heightCm: clients.heightCm,
+      categoryId: clients.categoryId,
+      presentationImageUrl: clients.presentationImageUrl,
+    })
+    .from(clients)
+    .where(eq(clients.id, player.id));
+
+  assert.equal(stored?.heightCm, 198);
+  assert.equal(stored?.categoryId, guards.id);
+  assert.equal(stored?.presentationImageUrl, "https://example.com/manu.jpg");
+  assert.equal(gallery?.url, "https://example.com/gallery.jpg");
+  assert.equal(video?.youtubeUrl, "https://youtube.com/watch?v=dQw4w9WgXcQ");
 });
 
 test("a Player has at most one Category", async () => {

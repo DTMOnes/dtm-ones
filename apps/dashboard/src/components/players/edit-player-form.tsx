@@ -53,9 +53,9 @@ export function EditPlayerForm({
     >,
     defaultValues: {
       id: player.id,
-      name: player.name,
-      nationality: player.nationality,
-      lastClub: player.lastClub,
+      name: player.name ?? "",
+      nationality: player.nationality ?? "",
+      lastClub: player.lastClub ?? "",
       heightCm: player.heightCm == null ? "" : String(player.heightCm),
       categoryId: player.categoryId ?? "",
       eurobasketLink: player.eurobasketLink ?? "",
