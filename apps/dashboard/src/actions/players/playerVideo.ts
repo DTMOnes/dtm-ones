@@ -20,7 +20,7 @@ export const addPlayerVideoAction = staffActionClient
       parsedInput.youtubeUrl,
     );
 
-    revalidatePath(`/players/${parsedInput.playerId}`);
+    revalidatePath(`/clients/${parsedInput.playerId}`);
 
     return { ok: true as const, video };
   });
@@ -31,7 +31,7 @@ export const removePlayerVideoAction = staffActionClient
   .action(async ({ parsedInput }) => {
     await removePlayerVideo(db, parsedInput.playerId, parsedInput.videoId);
 
-    revalidatePath(`/players/${parsedInput.playerId}`);
+    revalidatePath(`/clients/${parsedInput.playerId}`);
 
     return { ok: true as const };
   });

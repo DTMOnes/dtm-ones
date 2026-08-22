@@ -60,7 +60,7 @@ pnpm --filter @dtm/dashboard dev
 ```
 apps/
   landing/             # Public site (/, /contact, Roster)
-  dashboard/           # Staff (/players, /coaches, /contacts, /users)
+  dashboard/           # Staff (/clients, /contacts, /users)
 packages/
   database/            # Drizzle schema and client
   typescript-config/   # Shared TS configs

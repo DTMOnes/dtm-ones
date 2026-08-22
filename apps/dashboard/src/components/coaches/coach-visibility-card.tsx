@@ -75,7 +75,7 @@ export function CoachVisibilityCard({
                 <li key={gap} className="text-sm">
                   {gap === "Presentation image" || gap === "Gallery image" ? (
                     <Link
-                      href={`/coaches/${coach.id}?tab=media`}
+                      href={`/clients/${coach.id}?tab=media`}
                       className="underline underline-offset-2"
                     >
                       {gap}

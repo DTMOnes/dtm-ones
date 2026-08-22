@@ -21,8 +21,6 @@ const routeLabels: Array<{
 }> = [
   { prefix: "/contacts", label: "Inbox" },
   { prefix: "/clients", label: "Clients" },
-  { prefix: "/players", label: "Clients", parentHref: "/clients" },
-  { prefix: "/coaches", label: "Clients", parentHref: "/clients" },
   { prefix: "/categories", label: "Categories" },
   { prefix: "/trash", label: "Trash" },
   { prefix: "/users", label: "Users" },

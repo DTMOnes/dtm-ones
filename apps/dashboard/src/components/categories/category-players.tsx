@@ -62,7 +62,7 @@ export function CategoryPlayers({ players }: CategoryPlayersProps) {
             {players.map((player) => (
               <Item key={player.id} variant="muted" asChild>
                 <Link
-                  href={`/players/${player.id}`}
+                  href={`/clients/${player.id}`}
                   className="flex w-full items-start justify-between gap-4"
                 >
                   <ItemContent>

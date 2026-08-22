@@ -18,7 +18,7 @@ export const setPlayerVisibilityAction = staffActionClient
     );
 
     revalidatePath("/clients");
-    revalidatePath(`/players/${parsedInput.id}`);
+    revalidatePath(`/clients/${parsedInput.id}`);
 
     return { ok: true as const, player };
   });

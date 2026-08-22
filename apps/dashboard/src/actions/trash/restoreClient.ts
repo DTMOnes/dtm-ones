@@ -15,8 +15,7 @@ export const restoreClientAction = staffActionClient
 
     revalidatePath("/clients");
     revalidatePath("/trash");
-    revalidatePath(`/players/${parsedInput.id}`);
-    revalidatePath(`/coaches/${parsedInput.id}`);
+    revalidatePath(`/clients/${parsedInput.id}`);
 
     return { ok: true as const };
   });
