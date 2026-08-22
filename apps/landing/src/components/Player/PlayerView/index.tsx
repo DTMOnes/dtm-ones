@@ -10,6 +10,7 @@ import {
 import PlayerGallery from "@/components/Player/Gallery";
 import PlayerHighlights from "@/components/Player/Highlights";
 import PlayerInfo, { PlayerInfoPanel } from "@/components/Player/Info";
+import PlayerModeSwitch from "@/components/Player/ModeSwitch";
 import type { PublicRosterPlayer } from "@/types/roster";
 
 import styles from "./styles.module.scss";
@@ -80,40 +81,20 @@ export default function PlayerView({ player }: { player: PublicRosterPlayer }) {
       </AnimatePresence>
 
       <div className={styles.chrome}>
-        <motion.nav
-          className={styles.modes}
-          aria-label="Player sections"
+        <motion.div
           initial={reduce ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: easeOut, delay: 0.08 }}
         >
-          {PLAYER_SECTIONS.map((item) => {
-            const active = section === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={
-                  active ? `${styles.mode} ${styles.modeActive}` : styles.mode
-                }
-                aria-current={active ? "true" : undefined}
-                onClick={() => {
-                  setSection(item.id);
-                  setPlaying(false);
-                }}
-              >
-                {item.name}
-                {active ? (
-                  <motion.span
-                    className={styles.modeMark}
-                    layoutId={reduce ? undefined : "player-mode-mark"}
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                  />
-                ) : null}
-              </button>
-            );
-          })}
-        </motion.nav>
+          <PlayerModeSwitch
+            items={PLAYER_SECTIONS}
+            value={section}
+            onChange={(id) => {
+              setSection(id);
+              setPlaying(false);
+            }}
+          />
+        </motion.div>
 
         {showDock ? (
           <motion.div
