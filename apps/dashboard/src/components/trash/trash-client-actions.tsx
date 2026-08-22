@@ -38,7 +38,7 @@ export function TrashClientActions({
     {
       onSuccess: () => {
         toast.success("Client restored.");
-        router.refresh();
+        router.push(`/clients/${clientId}`);
       },
       onError: ({ error }) => {
         if (error.serverError) {

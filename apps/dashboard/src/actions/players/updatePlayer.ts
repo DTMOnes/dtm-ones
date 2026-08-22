@@ -15,7 +15,7 @@ export const updatePlayerAction = staffActionClient
     const player = await updatePlayer(db, id, patch);
 
     revalidatePath("/clients");
-    revalidatePath(`/players/${id}`);
+    revalidatePath(`/clients/${id}`);
 
     return { ok: true as const, player };
   });

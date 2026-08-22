@@ -68,7 +68,7 @@ function RequirementList({
                 check.label === "Video") &&
               !check.met ? (
                 <Link
-                  href={`/players/${playerId}?tab=media`}
+                  href={`/clients/${playerId}?tab=media`}
                   className="underline underline-offset-2"
                 >
                   {check.label}

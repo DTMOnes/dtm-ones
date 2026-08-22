@@ -75,13 +75,7 @@ export default async function Page({
         <ItemGroup>
           {clients.map((client) => (
             <Item key={client.id} variant="muted" asChild>
-              <Link
-                href={
-                  client.kind === "player"
-                    ? `/players/${client.id}`
-                    : `/coaches/${client.id}`
-                }
-              >
+              <Link href={`/clients/${client.id}`}>
                 <ListRowAvatar name={client.name} />
                 <ItemContent>
                   <ItemTitle>

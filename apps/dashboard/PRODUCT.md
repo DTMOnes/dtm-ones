@@ -27,7 +27,7 @@ Staff work for the same FIBA-licensed agency (founded June 2000 by Gustavo Gorin
 
 - Own origin behind Better Auth (local `http://localhost:3001`; production is its own Vercel project).
 - After sign-in, the default destination is the Contacts inbox (`/contacts`).
-- Other Staff routes: `/players`, `/players/[id]`, `/coaches`, `/coaches/[id]`, `/categories`, `/categories/[id]`, `/trash`. Owner-only: `/users`.
+- Other Staff routes: `/clients`, `/clients/[id]`, `/categories`, `/categories/[id]`, `/trash`. Owner-only: `/users`.
 - Player images upload to Vercel Blob from this app only. The landing site never uploads.
 - Categories are Player positions Staff create and rename. A Category cannot be deleted while any Player has it. Coaches do not have a Category.
 - Restoring a Client from Trash keeps its Visibility; public means it returns to the Roster.

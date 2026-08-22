@@ -29,8 +29,7 @@ export const commitPresentationImageAction = staffActionClient
     );
 
     revalidatePath("/clients");
-    revalidatePath(`/players/${parsedInput.clientId}`);
-    revalidatePath(`/coaches/${parsedInput.clientId}`);
+    revalidatePath(`/clients/${parsedInput.clientId}`);
 
     return { ok: true as const, client };
   });
@@ -46,8 +45,7 @@ export const clearPresentationImageAction = staffActionClient
     );
 
     revalidatePath("/clients");
-    revalidatePath(`/players/${parsedInput.clientId}`);
-    revalidatePath(`/coaches/${parsedInput.clientId}`);
+    revalidatePath(`/clients/${parsedInput.clientId}`);
 
     return { ok: true as const, client };
   });
@@ -63,8 +61,7 @@ export const addPlayerGalleryImageAction = staffActionClient
       deleteBlobs,
     );
 
-    revalidatePath(`/players/${parsedInput.clientId}`);
-    revalidatePath(`/coaches/${parsedInput.clientId}`);
+    revalidatePath(`/clients/${parsedInput.clientId}`);
 
     return { ok: true as const, image };
   });
@@ -80,8 +77,7 @@ export const removePlayerGalleryImageAction = staffActionClient
       deleteBlobs,
     );
 
-    revalidatePath(`/players/${parsedInput.clientId}`);
-    revalidatePath(`/coaches/${parsedInput.clientId}`);
+    revalidatePath(`/clients/${parsedInput.clientId}`);
 
     return { ok: true as const };
   });
