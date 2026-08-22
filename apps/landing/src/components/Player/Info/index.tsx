@@ -53,7 +53,7 @@ export function PlayerInfoPanel({
       >
         <SpotlightCard
           className={styles.plate}
-          spotlightColor="rgba(255, 255, 255, 0.1)"
+          spotlightColor="rgba(255, 255, 255, 0.06)"
         >
           <div className={styles.body}>
             {categoryName || eurobasket.length > 0 ? (
