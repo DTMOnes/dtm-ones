@@ -32,6 +32,7 @@ import { Spinner } from "@/components/ui/spinner";
 import {
   PLAYER_IMAGE_CONTENT_TYPES,
   isAllowedPlayerImage,
+  type ClientBlobKind,
 } from "@/utils/player-blob-path";
 
 import {
@@ -43,10 +44,12 @@ import {
 } from "@phosphor-icons/react";
 
 export function PlayerPresentationImage({
-  playerId,
+  clientId,
+  kind,
   url,
 }: {
-  playerId: string;
+  clientId: string;
+  kind: ClientBlobKind;
   url: string | null;
 }) {
   const router = useRouter();
@@ -97,9 +100,9 @@ export function PlayerPresentationImage({
 
     setUploading(true);
     try {
-      const blob = await uploadPlayerImage(playerId, "presentation", file);
+      const blob = await uploadPlayerImage(kind, clientId, "presentation", file);
       await commit({
-        playerId,
+        clientId,
         url: blob.url,
         pathname: blob.pathname,
       });
@@ -133,7 +136,7 @@ export function PlayerPresentationImage({
           variant="outline"
           disabled={busy}
           onClick={() => {
-            void clear({ playerId });
+            void clear({ clientId });
           }}
         >
           {isClearing ? (
@@ -173,8 +176,9 @@ export function PlayerPresentationImage({
       <CardHeader>
         <CardTitle>Presentation image</CardTitle>
         <CardDescription>
-          This will be the first picture they see for the player, the one
-          displayed on the main roster grid.
+          {kind === "player"
+            ? "This will be the first picture they see for the Player, the one displayed on the main roster grid."
+            : "This is the presentation image for this Coach."}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -196,7 +200,9 @@ export function PlayerPresentationImage({
               </EmptyMedia>
               <EmptyTitle>No presentation image yet</EmptyTitle>
               <EmptyDescription>
-                Upload a photo so this Player can be public on the Roster.
+                {kind === "player"
+                  ? "Upload a photo so this Player can be public on the Roster."
+                  : "Upload a photo for this Coach."}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>

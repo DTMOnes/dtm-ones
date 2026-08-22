@@ -71,21 +71,22 @@ export const removePlayerVideoSchema = z.object({
 });
 
 export const playerBlobClientPayloadSchema = z.object({
-  playerId: z.uuid(),
+  clientId: z.uuid(),
+  kind: z.enum(["player", "coach"]),
   slot: z.enum(["presentation", "gallery"]),
 });
 
 export const commitPlayerImageSchema = z.object({
-  playerId: z.uuid(),
+  clientId: z.uuid(),
   url: z.url(),
   pathname: z.string().trim().min(1),
 });
 
 export const clearPresentationImageSchema = z.object({
-  playerId: z.uuid(),
+  clientId: z.uuid(),
 });
 
 export const removePlayerGalleryImageSchema = z.object({
-  playerId: z.uuid(),
+  clientId: z.uuid(),
   imageId: z.uuid(),
 });

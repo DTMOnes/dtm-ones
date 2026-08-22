@@ -2,6 +2,8 @@ export const PLAYER_BLOB_SLOTS = ["presentation", "gallery"] as const;
 
 export type PlayerBlobSlot = (typeof PLAYER_BLOB_SLOTS)[number];
 
+export type ClientBlobKind = "player" | "coach";
+
 export const PLAYER_IMAGE_CONTENT_TYPES = [
   "image/jpeg",
   "image/png",
@@ -20,11 +22,23 @@ export function isAllowedPlayerImage(file: {
   );
 }
 
-export function playerBlobPrefix(
-  playerId: string,
+export function clientBlobPrefix(
+  kind: ClientBlobKind,
+  clientId: string,
   slot: PlayerBlobSlot,
 ): string {
-  return `players/${playerId}/${slot}/`;
+  return `${kind === "player" ? "players" : "coaches"}/${clientId}/${slot}/`;
+}
+
+export function clientBlobPathname(
+  kind: ClientBlobKind,
+  clientId: string,
+  slot: PlayerBlobSlot,
+  fileName: string,
+): string {
+  const base =
+    fileName.split(/[/\\]/).pop()?.replace(/[^\w.\-]+/g, "-") || "image";
+  return `${clientBlobPrefix(kind, clientId, slot)}${base}`;
 }
 
 export function playerBlobPathname(
@@ -32,9 +46,22 @@ export function playerBlobPathname(
   slot: PlayerBlobSlot,
   fileName: string,
 ): string {
-  const base =
-    fileName.split(/[/\\]/).pop()?.replace(/[^\w.\-]+/g, "-") || "image";
-  return `${playerBlobPrefix(playerId, slot)}${base}`;
+  return clientBlobPathname("player", playerId, slot, fileName);
+}
+
+export function isClientBlobPathname(
+  kind: ClientBlobKind,
+  clientId: string,
+  slot: PlayerBlobSlot,
+  pathname: string,
+): boolean {
+  const prefix = clientBlobPrefix(kind, clientId, slot);
+  if (!pathname.startsWith(prefix)) {
+    return false;
+  }
+
+  const rest = pathname.slice(prefix.length);
+  return rest.length > 0 && !rest.includes("..") && !rest.includes("/");
 }
 
 export function isPlayerBlobPathname(
@@ -42,11 +69,5 @@ export function isPlayerBlobPathname(
   slot: PlayerBlobSlot,
   pathname: string,
 ): boolean {
-  const prefix = playerBlobPrefix(playerId, slot);
-  if (!pathname.startsWith(prefix)) {
-    return false;
-  }
-
-  const rest = pathname.slice(prefix.length);
-  return rest.length > 0 && !rest.includes("..") && !rest.includes("/");
+  return isClientBlobPathname("player", playerId, slot, pathname);
 }

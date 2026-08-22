@@ -25,10 +25,15 @@ export function PlayerMedia({ player }: { player: PlayerDetail }) {
   return (
     <div className="flex flex-col gap-6">
       <PlayerPresentationImage
-        playerId={player.id}
+        clientId={player.id}
+        kind="player"
         url={player.presentationImageUrl}
       />
-      <PlayerGallery playerId={player.id} images={player.gallery} />
+      <PlayerGallery
+        clientId={player.id}
+        kind="player"
+        images={player.gallery}
+      />
       <Card>
         <CardHeader>
           <CardTitle>YouTube videos</CardTitle>

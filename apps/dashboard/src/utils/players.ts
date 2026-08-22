@@ -1,9 +1,14 @@
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { schema, type Database } from "@dtm/database";
 
+import type { Coach } from "@/types/coach";
 import type { PlayerDetail, PlayerVisibility } from "@/types/player";
+import { getCoach } from "./coaches";
 import { ConflictError, NotFoundError } from "./errors";
-import { isPlayerBlobPathname } from "./player-blob-path";
+import {
+  isClientBlobPathname,
+  type ClientBlobKind,
+} from "./player-blob-path";
 
 export type DeleteBlobs = (keys: string[]) => Promise<void>;
 
@@ -322,13 +327,28 @@ export async function removePlayerVideo(
   }
 }
 
+function imageBlobKind(
+  clientId: string,
+  slot: "presentation" | "gallery",
+  pathname: string,
+): ClientBlobKind | null {
+  if (isClientBlobPathname("player", clientId, slot, pathname)) {
+    return "player";
+  }
+  if (isClientBlobPathname("coach", clientId, slot, pathname)) {
+    return "coach";
+  }
+  return null;
+}
+
 export async function commitPresentationImage(
   db: Database,
-  playerId: string,
+  clientId: string,
   blob: PlayerImageBlob,
   deleteBlobs: DeleteBlobs,
-): Promise<PlayerDetail> {
-  if (!isPlayerBlobPathname(playerId, "presentation", blob.pathname)) {
+): Promise<PlayerDetail | Coach> {
+  const kind = imageBlobKind(clientId, "presentation", blob.pathname);
+  if (!kind) {
     await deleteBlobs([blob.pathname]);
     throw new ConflictError("Invalid image path.");
   }
@@ -339,15 +359,15 @@ export async function commitPresentationImage(
       presentationImageKey: true,
     },
     where: and(
-      eq(schema.clients.id, playerId),
-      eq(schema.clients.kind, "player"),
+      eq(schema.clients.id, clientId),
+      eq(schema.clients.kind, kind),
       isNull(schema.clients.trashedAt),
     ),
   });
 
   if (!existing) {
     await deleteBlobs([blob.pathname]);
-    throw new NotFoundError("Player");
+    throw new NotFoundError(kind === "player" ? "Player" : "Coach");
   }
 
   try {
@@ -358,7 +378,7 @@ export async function commitPresentationImage(
         presentationImageKey: blob.pathname,
         updatedAt: new Date(),
       })
-      .where(eq(schema.clients.id, playerId));
+      .where(eq(schema.clients.id, clientId));
   } catch (error) {
     await deleteBlobs([blob.pathname]);
     throw error;
@@ -373,22 +393,32 @@ export async function commitPresentationImage(
     }
   }
 
-  const player = await getPlayer(db, playerId);
-  if (!player) {
-    throw new NotFoundError("Player");
+  if (kind === "player") {
+    const player = await getPlayer(db, clientId);
+    if (!player) {
+      throw new NotFoundError("Player");
+    }
+
+    return player;
   }
 
-  return player;
+  const coach = await getCoach(db, clientId);
+  if (!coach) {
+    throw new NotFoundError("Coach");
+  }
+
+  return coach;
 }
 
 export async function clearPresentationImage(
   db: Database,
-  playerId: string,
+  clientId: string,
   deleteBlobs: DeleteBlobs,
-): Promise<PlayerDetail> {
+): Promise<PlayerDetail | Coach> {
   const existing = await db.query.clients.findFirst({
     columns: {
       id: true,
+      kind: true,
       name: true,
       nationality: true,
       lastClub: true,
@@ -399,25 +429,26 @@ export async function clearPresentationImage(
       presentationImageKey: true,
     },
     where: and(
-      eq(schema.clients.id, playerId),
-      eq(schema.clients.kind, "player"),
+      eq(schema.clients.id, clientId),
       isNull(schema.clients.trashedAt),
     ),
   });
 
   if (!existing) {
-    throw new NotFoundError("Player");
+    throw new NotFoundError("Client");
   }
 
-  const next = {
-    ...existing,
-    presentationImageUrl: null,
-  };
+  if (existing.kind === "player") {
+    const next = {
+      ...existing,
+      presentationImageUrl: null,
+    };
 
-  if (existing.visibility === "public" && !isPlayerComplete(next)) {
-    throw new ConflictError(
-      "A Player cannot be public unless the profile is complete.",
-    );
+    if (existing.visibility === "public" && !isPlayerComplete(next)) {
+      throw new ConflictError(
+        "A Player cannot be public unless the profile is complete.",
+      );
+    }
   }
 
   await db
@@ -427,43 +458,56 @@ export async function clearPresentationImage(
       presentationImageKey: null,
       updatedAt: new Date(),
     })
-    .where(eq(schema.clients.id, playerId));
+    .where(eq(schema.clients.id, clientId));
 
   if (existing.presentationImageKey) {
     await deleteBlobs([existing.presentationImageKey]);
   }
 
-  const player = await getPlayer(db, playerId);
-  if (!player) {
-    throw new NotFoundError("Player");
+  if (existing.kind === "player") {
+    const player = await getPlayer(db, clientId);
+    if (!player) {
+      throw new NotFoundError("Player");
+    }
+
+    return player;
   }
 
-  return player;
+  const coach = await getCoach(db, clientId);
+  if (!coach) {
+    throw new NotFoundError("Coach");
+  }
+
+  return coach;
 }
 
 export async function addPlayerGalleryImage(
   db: Database,
-  playerId: string,
+  clientId: string,
   blob: PlayerImageBlob,
   deleteBlobs: DeleteBlobs,
 ): Promise<{ id: string; url: string }> {
-  if (!isPlayerBlobPathname(playerId, "gallery", blob.pathname)) {
+  const kind = imageBlobKind(clientId, "gallery", blob.pathname);
+  if (!kind) {
     await deleteBlobs([blob.pathname]);
     throw new ConflictError("Invalid image path.");
   }
 
-  const existing = await getPlayer(db, playerId);
+  const existing =
+    kind === "player"
+      ? await getPlayer(db, clientId)
+      : await getCoach(db, clientId);
   if (!existing) {
     await deleteBlobs([blob.pathname]);
-    throw new NotFoundError("Player");
+    throw new NotFoundError(kind === "player" ? "Player" : "Coach");
   }
 
   try {
     const [row] = await db
       .insert(schema.playerGalleryImages)
       .values({
-        clientId: playerId,
-        clientKind: "player",
+        clientId,
+        clientKind: kind,
         url: blob.url,
         storageKey: blob.pathname,
         sortOrder: existing.gallery.length,
