@@ -2,6 +2,7 @@
 
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 
 import { EyeSlashIcon, GlobeSimpleIcon } from "@phosphor-icons/react";
@@ -72,7 +73,16 @@ export function CoachVisibilityCard({
             <ul className="flex flex-col gap-2">
               {gaps.map((gap) => (
                 <li key={gap} className="text-sm">
-                  {gap}
+                  {gap === "Presentation image" || gap === "Gallery image" ? (
+                    <Link
+                      href={`/coaches/${coach.id}?tab=media`}
+                      className="underline underline-offset-2"
+                    >
+                      {gap}
+                    </Link>
+                  ) : (
+                    gap
+                  )}
                 </li>
               ))}
             </ul>

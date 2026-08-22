@@ -59,10 +59,33 @@ function eurobasketLink() {
 }
 
 async function completeCoach() {
-  return createCoach(db, {
+  const created = await createCoach(db, {
     ...coachInput(),
     eurobasketLink: eurobasketLink(),
   });
+  await commitPresentationImage(
+    db,
+    created.id,
+    {
+      url: "https://example.com/pat.jpg",
+      pathname: `coaches/${created.id}/presentation/pat.jpg`,
+    },
+    async () => {},
+  );
+  await addPlayerGalleryImage(
+    db,
+    created.id,
+    {
+      url: "https://example.com/gallery.jpg",
+      pathname: `coaches/${created.id}/gallery/1.jpg`,
+    },
+    async () => {},
+  );
+  const coach = await getCoach(db, created.id);
+  if (!coach) {
+    throw new Error("completeCoach could not load coach");
+  }
+  return coach;
 }
 
 test("create Coach makes a private Client retrievable by the returned id", async () => {
@@ -214,6 +237,23 @@ test("a Coach cannot be public unless the profile is complete", async () => {
   assert.equal((await getCoach(db, created.id))?.visibility, "private");
 });
 
+test("a Coach cannot be public without presentation image and gallery", async () => {
+  const created = await createCoach(db, {
+    ...coachInput(),
+    eurobasketLink: eurobasketLink(),
+  });
+
+  await assert.rejects(
+    () => setCoachVisibility(db, created.id, "public"),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Coach cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getCoach(db, created.id))?.visibility, "private");
+});
+
 test("a complete Coach can be public", async () => {
   const created = await completeCoach();
 
@@ -247,6 +287,45 @@ test("editing a public Coach refuses an incomplete profile", async () => {
   );
 
   assert.equal((await getCoach(db, created.id))?.eurobasketLink, eurobasketLink());
+});
+
+test("a public Coach cannot clear the presentation image", async () => {
+  const created = await completeCoach();
+  await setCoachVisibility(db, created.id, "public");
+  const blobs = trackingDeleteBlobs();
+
+  await assert.rejects(
+    () => clearPresentationImage(db, created.id, blobs.deleteBlobs),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Coach cannot be public unless the profile is complete.",
+  );
+
+  assert.equal(
+    (await getCoach(db, created.id))?.presentationImageUrl,
+    "https://example.com/pat.jpg",
+  );
+  assert.deepEqual(blobs.deleted, []);
+});
+
+test("a public Coach cannot lose the last gallery image", async () => {
+  const created = await completeCoach();
+  await setCoachVisibility(db, created.id, "public");
+  const blobs = trackingDeleteBlobs();
+  const imageId = created.gallery[0]?.id;
+  assert.ok(imageId);
+
+  await assert.rejects(
+    () => removePlayerGalleryImage(db, created.id, imageId, blobs.deleteBlobs),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Coach cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getCoach(db, created.id))?.gallery.length, 1);
+  assert.deepEqual(blobs.deleted, []);
 });
 
 test("get Coach returns null for an id that does not exist", async () => {

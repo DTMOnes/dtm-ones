@@ -13,6 +13,9 @@ const complete = {
   heightCm: 198,
   categoryId: "guards",
   presentationImageUrl: "https://example.com/manu.jpg",
+  eurobasketLink: "https://basketball.eurobasket.com/player/Manu-Ginobili/1",
+  gallery: [{ id: "g1" }],
+  videos: [{ id: "v1" }],
 };
 
 test("playerCompletenessChecks marks missing fields as unmet", () => {
@@ -21,11 +24,21 @@ test("playerCompletenessChecks marks missing fields as unmet", () => {
     lastClub: "  ",
     heightCm: null,
     presentationImageUrl: null,
+    eurobasketLink: null,
+    gallery: [],
+    videos: [],
   })
     .filter((check) => !check.met)
     .map((check) => check.label);
 
-  assert.deepEqual(unmet, ["Last club", "Height", "Presentation image"]);
+  assert.deepEqual(unmet, [
+    "Last club",
+    "Height",
+    "Presentation image",
+    "Eurobasket link",
+    "Gallery image",
+    "Video",
+  ]);
 });
 
 test("playerCompletenessGaps is the unmet labels", () => {

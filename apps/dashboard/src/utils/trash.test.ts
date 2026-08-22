@@ -7,9 +7,15 @@ import { eq, sql } from "drizzle-orm";
 import { createDatabase, listPublicRosterPlayers, schema } from "@dtm/database";
 
 import { createCategory } from "./categories";
-import { createCoach, getCoach, setCoachVisibility } from "./coaches";
+import { createCoach, getCoach } from "./coaches";
 import { NotFoundError } from "./errors";
-import { createPlayer, getPlayer, setPlayerVisibility } from "./players";
+import {
+  addPlayerGalleryImage,
+  addPlayerVideo,
+  createPlayer,
+  getPlayer,
+  setPlayerVisibility,
+} from "./players";
 import {
   deleteClientFromTrash,
   restoreClient,
@@ -63,7 +69,22 @@ async function completePublicPlayer() {
     heightCm: 198,
     categoryId: category.id,
     presentationImageUrl: "https://example.com/manu.jpg",
+    eurobasketLink: "https://basketball.eurobasket.com/player/Manu-Ginobili/1",
   });
+  await addPlayerVideo(
+    db,
+    player.id,
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  );
+  await addPlayerGalleryImage(
+    db,
+    player.id,
+    {
+      url: "https://example.com/gallery.jpg",
+      pathname: `players/${player.id}/gallery/1.jpg`,
+    },
+    async () => {},
+  );
   return setPlayerVisibility(db, player.id, "public");
 }
 
@@ -153,8 +174,6 @@ test("trashing a Player does not trash a Coach", async () => {
 
 test("a private Client stays private after restore", async () => {
   const coach = await createCoach(db, coachInput());
-  await setCoachVisibility(db, coach.id, "public");
-  await setCoachVisibility(db, coach.id, "private");
 
   await trashClient(db, coach.id);
   await restoreClient(db, coach.id);

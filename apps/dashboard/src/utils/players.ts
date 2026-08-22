@@ -3,7 +3,7 @@ import { schema, type Database } from "@dtm/database";
 
 import type { Coach } from "@/types/coach";
 import type { PlayerDetail, PlayerVisibility } from "@/types/player";
-import { getCoach } from "./coaches";
+import { getCoach, isCoachComplete } from "./coaches";
 import { ConflictError, NotFoundError } from "./errors";
 import {
   isClientBlobPathname,
@@ -34,14 +34,21 @@ export type PlayerCompletenessCheck = {
   met: boolean;
 };
 
-export function playerCompletenessChecks(player: {
+type PlayerCompletenessInput = {
   name: string | null;
   nationality: string | null;
   lastClub: string | null;
   heightCm: number | null;
   categoryId: string | null;
   presentationImageUrl: string | null;
-}): PlayerCompletenessCheck[] {
+  eurobasketLink: string | null;
+  gallery: { length: number };
+  videos: { length: number };
+};
+
+export function playerCompletenessChecks(
+  player: PlayerCompletenessInput,
+): PlayerCompletenessCheck[] {
   return [
     { label: "Name", met: Boolean(player.name?.trim()) },
     { label: "Nationality", met: Boolean(player.nationality?.trim()) },
@@ -52,30 +59,21 @@ export function playerCompletenessChecks(player: {
       label: "Presentation image",
       met: Boolean(player.presentationImageUrl),
     },
+    { label: "Eurobasket link", met: Boolean(player.eurobasketLink?.trim()) },
+    { label: "Gallery image", met: player.gallery.length > 0 },
+    { label: "Video", met: player.videos.length > 0 },
   ];
 }
 
-export function playerCompletenessGaps(player: {
-  name: string | null;
-  nationality: string | null;
-  lastClub: string | null;
-  heightCm: number | null;
-  categoryId: string | null;
-  presentationImageUrl: string | null;
-}): string[] {
+export function playerCompletenessGaps(
+  player: PlayerCompletenessInput,
+): string[] {
   return playerCompletenessChecks(player)
     .filter((check) => !check.met)
     .map((check) => check.label);
 }
 
-function isPlayerComplete(player: {
-  name: string | null;
-  nationality: string | null;
-  lastClub: string | null;
-  heightCm: number | null;
-  categoryId: string | null;
-  presentationImageUrl: string | null;
-}): boolean {
+function isPlayerComplete(player: PlayerCompletenessInput): boolean {
   return playerCompletenessGaps(player).length === 0;
 }
 
@@ -219,6 +217,8 @@ export async function updatePlayer(
       patch.eurobasketLink === undefined
         ? existing.eurobasketLink
         : patch.eurobasketLink,
+    gallery: existing.gallery,
+    videos: existing.videos,
   };
 
   if (existing.visibility === "public" && !isPlayerComplete(next)) {
@@ -230,7 +230,16 @@ export async function updatePlayer(
   try {
     await db
       .update(schema.clients)
-      .set({ ...next, updatedAt: new Date() })
+      .set({
+        name: next.name,
+        nationality: next.nationality,
+        lastClub: next.lastClub,
+        heightCm: next.heightCm,
+        categoryId: next.categoryId,
+        presentationImageUrl: next.presentationImageUrl,
+        eurobasketLink: next.eurobasketLink,
+        updatedAt: new Date(),
+      })
       .where(eq(schema.clients.id, id));
   } catch (error) {
     if (isForeignKeyViolation(error)) {
@@ -312,6 +321,18 @@ export async function removePlayerVideo(
   playerId: string,
   videoId: string,
 ): Promise<void> {
+  const existing = await getPlayer(db, playerId);
+  const nextVideos = existing?.videos.filter((video) => video.id !== videoId);
+  if (
+    existing?.visibility === "public" &&
+    nextVideos &&
+    !isPlayerComplete({ ...existing, videos: nextVideos })
+  ) {
+    throw new ConflictError(
+      "A Player cannot be public unless the profile is complete.",
+    );
+  }
+
   const [row] = await db
     .delete(schema.playerVideos)
     .where(
@@ -419,13 +440,6 @@ export async function clearPresentationImage(
     columns: {
       id: true,
       kind: true,
-      name: true,
-      nationality: true,
-      lastClub: true,
-      visibility: true,
-      heightCm: true,
-      categoryId: true,
-      presentationImageUrl: true,
       presentationImageKey: true,
     },
     where: and(
@@ -439,14 +453,31 @@ export async function clearPresentationImage(
   }
 
   if (existing.kind === "player") {
-    const next = {
-      ...existing,
-      presentationImageUrl: null,
-    };
+    const player = await getPlayer(db, clientId);
+    if (!player) {
+      throw new NotFoundError("Player");
+    }
 
-    if (existing.visibility === "public" && !isPlayerComplete(next)) {
+    if (
+      player.visibility === "public" &&
+      !isPlayerComplete({ ...player, presentationImageUrl: null })
+    ) {
       throw new ConflictError(
         "A Player cannot be public unless the profile is complete.",
+      );
+    }
+  } else {
+    const coach = await getCoach(db, clientId);
+    if (!coach) {
+      throw new NotFoundError("Coach");
+    }
+
+    if (
+      coach.visibility === "public" &&
+      !isCoachComplete({ ...coach, presentationImageUrl: null })
+    ) {
+      throw new ConflictError(
+        "A Coach cannot be public unless the profile is complete.",
       );
     }
   }
@@ -530,7 +561,7 @@ export async function addPlayerGalleryImage(
 
 export async function removePlayerGalleryImage(
   db: Database,
-  playerId: string,
+  clientId: string,
   imageId: string,
   deleteBlobs: DeleteBlobs,
 ): Promise<void> {
@@ -541,12 +572,38 @@ export async function removePlayerGalleryImage(
     },
     where: and(
       eq(schema.playerGalleryImages.id, imageId),
-      eq(schema.playerGalleryImages.clientId, playerId),
+      eq(schema.playerGalleryImages.clientId, clientId),
     ),
   });
 
   if (!image) {
     throw new NotFoundError("Image");
+  }
+
+  const player = await getPlayer(db, clientId);
+  if (player) {
+    const nextGallery = player.gallery.filter((item) => item.id !== imageId);
+    if (
+      player.visibility === "public" &&
+      !isPlayerComplete({ ...player, gallery: nextGallery })
+    ) {
+      throw new ConflictError(
+        "A Player cannot be public unless the profile is complete.",
+      );
+    }
+  } else {
+    const coach = await getCoach(db, clientId);
+    if (coach) {
+      const nextGallery = coach.gallery.filter((item) => item.id !== imageId);
+      if (
+        coach.visibility === "public" &&
+        !isCoachComplete({ ...coach, gallery: nextGallery })
+      ) {
+        throw new ConflictError(
+          "A Coach cannot be public unless the profile is complete.",
+        );
+      }
+    }
   }
 
   await db
