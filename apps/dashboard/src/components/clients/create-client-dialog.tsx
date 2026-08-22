@@ -12,10 +12,9 @@ import type { z } from "zod";
 
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr";
 
-import { createPlayerAction } from "@/actions/players/createPlayer";
+import { createClientAction } from "@/actions/clients/createClient";
 import OptionsField from "@/components/form/options-field";
 import SubmitButton from "@/components/form/submit-button";
-import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,42 +26,35 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FieldGroup } from "@/components/ui/field";
-import { createPlayerSchema } from "@/lib/validation/players";
+import { createClientSchema } from "@/lib/validation/clients";
 
 type FormValues = {
-  name: string;
-  nationality: string;
-  lastClub: string;
-  heightCm: string;
-  categoryId: string;
+  kind: string;
 };
 
-export function CreatePlayerDialog({
-  categories,
-}: {
-  categories: Array<{ id: string; name: string }>;
-}) {
+const KIND_OPTIONS = [
+  { id: "player", name: "Player" },
+  { id: "coach", name: "Coach" },
+];
+
+export function CreateClientDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  const methods = useForm<FormValues, unknown, z.output<typeof createPlayerSchema>>({
-    resolver: zodResolver(createPlayerSchema) as Resolver<
+  const methods = useForm<FormValues, unknown, z.output<typeof createClientSchema>>({
+    resolver: zodResolver(createClientSchema) as Resolver<
       FormValues,
       unknown,
-      z.output<typeof createPlayerSchema>
+      z.output<typeof createClientSchema>
     >,
     defaultValues: {
-      name: "",
-      nationality: "",
-      lastClub: "",
-      heightCm: "",
-      categoryId: "",
+      kind: "",
     },
   });
 
-  const { executeAsync, isExecuting } = useAction(createPlayerAction, {
+  const { executeAsync, isExecuting } = useAction(createClientAction, {
     onSuccess: () => {
-      toast.success("Player created successfully.");
+      toast.success("Client created.");
       methods.reset();
       setOpen(false);
       router.refresh();
@@ -85,14 +77,14 @@ export function CreatePlayerDialog({
       <DialogTrigger asChild>
         <Button>
           <PlusIcon />
-          New player
+          New Client
         </Button>
       </DialogTrigger>
       <DialogContent showCloseButton={!isExecuting}>
         <DialogHeader>
-          <DialogTitle>New player</DialogTitle>
+          <DialogTitle>New Client</DialogTitle>
           <DialogDescription>
-            A Player starts private. Public requires a complete profile.
+            Choose Player or Coach. The Client starts private.
           </DialogDescription>
         </DialogHeader>
         <FormProvider {...methods}>
@@ -102,35 +94,10 @@ export function CreatePlayerDialog({
             noValidate
           >
             <FieldGroup>
-              <TextField
-                name="name"
-                label="Name"
-                placeholder="Manu Ginobili"
-                disabled={isExecuting}
-              />
-              <TextField
-                name="nationality"
-                label="Nationality"
-                placeholder="Argentina"
-                disabled={isExecuting}
-              />
-              <TextField
-                name="lastClub"
-                label="Last club"
-                placeholder="San Antonio Spurs"
-                disabled={isExecuting}
-              />
-              <TextField
-                name="heightCm"
-                label="Height (cm)"
-                placeholder="198"
-                disabled={isExecuting}
-              />
               <OptionsField
-                name="categoryId"
-                label="Category"
-                options={categories}
-                emptyMessage="No categories created yet"
+                name="kind"
+                label="Kind"
+                options={KIND_OPTIONS}
                 disabled={isExecuting}
               />
             </FieldGroup>
@@ -146,7 +113,7 @@ export function CreatePlayerDialog({
               </Button>
               <div className="flex-1 sm:flex-initial">
                 <SubmitButton
-                  label="Create player"
+                  label="Create Client"
                   isExecuting={isExecuting}
                   icon={<PlusIcon />}
                 />

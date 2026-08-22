@@ -7,12 +7,6 @@ const optionalUrl = z.preprocess(
   z.url().nullable(),
 );
 
-export const createCoachSchema = z.object({
-  name: requiredText,
-  nationality: requiredText,
-  lastClub: requiredText,
-});
-
 export const updateCoachSchema = z.object({
   id: z.uuid(),
   name: requiredText,

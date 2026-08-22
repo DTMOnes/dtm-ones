@@ -13,6 +13,7 @@ import { PlayerDetailTabs } from "@/components/players/player-detail-tabs";
 import { PlayerVisibilityCard } from "@/components/players/player-visibility-card";
 import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { db } from "@/lib/db";
+import { clientDisplayName } from "@/utils/clients";
 import { getPlayer, playerCompletenessChecks } from "@/utils/players";
 
 export default async function Page({
@@ -44,8 +45,8 @@ export default async function Page({
   return (
     <PageShell>
       <PageHeader
-        backHref="/players"
-        title={player.name ?? ""}
+        backHref="/clients"
+        title={clientDisplayName("player", player.name)}
         description="Player profile"
       />
 

@@ -45,14 +45,6 @@ export const youtubeUrlSchema = z
     );
   }, "Enter a YouTube URL.");
 
-export const createPlayerSchema = z.object({
-  name: requiredText,
-  nationality: requiredText,
-  lastClub: requiredText,
-  heightCm: optionalHeightCm,
-  categoryId: optionalCategoryId,
-});
-
 export const updatePlayerSchema = z.object({
   id: z.uuid(),
   name: requiredText,

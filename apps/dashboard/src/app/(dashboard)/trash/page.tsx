@@ -19,6 +19,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { db } from "@/lib/db";
+import { clientDisplayName, kindLabel } from "@/utils/clients";
 import { listFacts, visibilityLabel } from "@/utils/list-row";
 
 export default async function Page() {
@@ -50,14 +51,15 @@ export default async function Page() {
       ) : (
         <ItemGroup>
           {clients.map((client) => {
-            const kindLabel = client.kind === "player" ? "Player" : "Coach";
-            const facts = listFacts(kindLabel, client.nationality);
+            const facts = listFacts(kindLabel(client.kind), client.nationality);
 
             return (
               <Item key={client.id} variant="muted" className="max-sm:flex-wrap">
                 <ListRowAvatar name={client.name} />
                 <ItemContent>
-                  <ItemTitle>{client.name}</ItemTitle>
+                  <ItemTitle>
+                    {clientDisplayName(client.kind, client.name)}
+                  </ItemTitle>
                   {facts ? <ItemDescription>{facts}</ItemDescription> : null}
                 </ItemContent>
                 <ItemActions className="max-sm:w-full max-sm:justify-end">
@@ -66,7 +68,7 @@ export default async function Page() {
                   </ListRowMeta>
                   <TrashClientActions
                     clientId={client.id}
-                    clientName={client.name}
+                    clientName={clientDisplayName(client.kind, client.name)}
                   />
                 </ItemActions>
               </Item>

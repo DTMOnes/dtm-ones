@@ -17,7 +17,7 @@ export const setCoachVisibilityAction = staffActionClient
       parsedInput.visibility,
     );
 
-    revalidatePath("/coaches");
+    revalidatePath("/clients");
     revalidatePath(`/coaches/${parsedInput.id}`);
 
     return { ok: true as const, coach };

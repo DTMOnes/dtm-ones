@@ -13,8 +13,7 @@ export const restoreClientAction = staffActionClient
   .action(async ({ parsedInput }) => {
     await restoreClient(db, parsedInput.id);
 
-    revalidatePath("/players");
-    revalidatePath("/coaches");
+    revalidatePath("/clients");
     revalidatePath("/trash");
     revalidatePath(`/players/${parsedInput.id}`);
     revalidatePath(`/coaches/${parsedInput.id}`);
