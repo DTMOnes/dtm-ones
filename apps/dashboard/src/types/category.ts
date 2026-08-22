@@ -10,6 +10,6 @@ export type CategoryWithCount = Category & {
 
 export type CategoryPlayerSummary = {
   id: string;
-  name: string;
-  lastClub: string;
+  name: string | null;
+  lastClub: string | null;
 };

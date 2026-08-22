@@ -146,7 +146,7 @@ export function ListEmpty({
   );
 }
 
-export function ListRowAvatar({ name }: { name: string }) {
+export function ListRowAvatar({ name }: { name: string | null }) {
   return (
     <ItemMedia variant="image">
       <span className="text-muted-foreground text-xs font-medium">

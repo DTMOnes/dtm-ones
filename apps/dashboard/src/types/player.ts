@@ -12,9 +12,9 @@ export type PlayerGalleryImage = {
 
 export type Player = {
   id: string;
-  name: string;
-  nationality: string;
-  lastClub: string;
+  name: string | null;
+  nationality: string | null;
+  lastClub: string | null;
   eurobasketLink: string | null;
   visibility: PlayerVisibility;
   heightCm: number | null;

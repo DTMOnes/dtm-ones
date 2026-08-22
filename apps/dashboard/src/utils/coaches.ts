@@ -14,20 +14,20 @@ export type CoachWrite = {
 export type CoachPatch = Partial<CoachWrite>;
 
 export function coachCompletenessGaps(coach: {
-  name: string;
-  nationality: string;
-  lastClub: string;
+  name: string | null;
+  nationality: string | null;
+  lastClub: string | null;
   eurobasketLink: string | null;
 }): string[] {
   const gaps: string[] = [];
 
-  if (!coach.name.trim()) {
+  if (!coach.name?.trim()) {
     gaps.push("Name");
   }
-  if (!coach.nationality.trim()) {
+  if (!coach.nationality?.trim()) {
     gaps.push("Nationality");
   }
-  if (!coach.lastClub.trim()) {
+  if (!coach.lastClub?.trim()) {
     gaps.push("Last club");
   }
   if (!coach.eurobasketLink) {
@@ -38,9 +38,9 @@ export function coachCompletenessGaps(coach: {
 }
 
 function isCoachComplete(coach: {
-  name: string;
-  nationality: string;
-  lastClub: string;
+  name: string | null;
+  nationality: string | null;
+  lastClub: string | null;
   eurobasketLink: string | null;
 }): boolean {
   return coachCompletenessGaps(coach).length === 0;

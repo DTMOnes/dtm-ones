@@ -53,9 +53,9 @@ export const clients = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     kind: clientKind("kind").notNull(),
-    name: text("name").notNull(),
-    nationality: text("nationality").notNull(),
-    lastClub: text("last_club").notNull(),
+    name: text("name"),
+    nationality: text("nationality"),
+    lastClub: text("last_club"),
     eurobasketLink: text("eurobasket_link"),
     visibility: clientVisibility("visibility").notNull().default("private"),
     trashedAt: timestamp("trashed_at", { withTimezone: true }),
@@ -79,8 +79,6 @@ export const clients = pgTable(
       sql`${table.kind} <> 'coach' OR (
         ${table.heightCm} IS NULL
         AND ${table.categoryId} IS NULL
-        AND ${table.presentationImageUrl} IS NULL
-        AND ${table.presentationImageKey} IS NULL
       )`,
     ),
   ],
@@ -100,10 +98,6 @@ export const playerGalleryImages = pgTable(
       .defaultNow(),
   },
   (table) => [
-    check(
-      "player_gallery_images_kind_player",
-      sql`${table.clientKind} = 'player'`,
-    ),
     foreignKey({
       columns: [table.clientId, table.clientKind],
       foreignColumns: [clients.id, clients.kind],

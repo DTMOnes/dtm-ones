@@ -45,7 +45,7 @@ export default async function Page({
     <PageShell>
       <PageHeader
         backHref="/players"
-        title={player.name}
+        title={player.name ?? ""}
         description="Player profile"
       />
 

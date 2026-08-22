@@ -28,7 +28,7 @@ export function TrashClientActions({
   clientName,
 }: {
   clientId: string;
-  clientName: string;
+  clientName: string | null;
 }) {
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);

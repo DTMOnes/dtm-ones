@@ -30,17 +30,17 @@ export type PlayerCompletenessCheck = {
 };
 
 export function playerCompletenessChecks(player: {
-  name: string;
-  nationality: string;
-  lastClub: string;
+  name: string | null;
+  nationality: string | null;
+  lastClub: string | null;
   heightCm: number | null;
   categoryId: string | null;
   presentationImageUrl: string | null;
 }): PlayerCompletenessCheck[] {
   return [
-    { label: "Name", met: Boolean(player.name.trim()) },
-    { label: "Nationality", met: Boolean(player.nationality.trim()) },
-    { label: "Last club", met: Boolean(player.lastClub.trim()) },
+    { label: "Name", met: Boolean(player.name?.trim()) },
+    { label: "Nationality", met: Boolean(player.nationality?.trim()) },
+    { label: "Last club", met: Boolean(player.lastClub?.trim()) },
     { label: "Height", met: player.heightCm != null },
     { label: "Category", met: Boolean(player.categoryId) },
     {
@@ -51,9 +51,9 @@ export function playerCompletenessChecks(player: {
 }
 
 export function playerCompletenessGaps(player: {
-  name: string;
-  nationality: string;
-  lastClub: string;
+  name: string | null;
+  nationality: string | null;
+  lastClub: string | null;
   heightCm: number | null;
   categoryId: string | null;
   presentationImageUrl: string | null;
@@ -64,9 +64,9 @@ export function playerCompletenessGaps(player: {
 }
 
 function isPlayerComplete(player: {
-  name: string;
-  nationality: string;
-  lastClub: string;
+  name: string | null;
+  nationality: string | null;
+  lastClub: string | null;
   heightCm: number | null;
   categoryId: string | null;
   presentationImageUrl: string | null;

@@ -72,7 +72,14 @@ export async function listPublicRosterPlayers(
     .where(and(...filters))
     .orderBy(asc(roster.name));
 
-  return rows.map((row) => ({ ...row, gallery: [], videos: [] }));
+  return rows.map((row) => ({
+    ...row,
+    name: row.name ?? "",
+    nationality: row.nationality ?? "",
+    lastClub: row.lastClub ?? "",
+    gallery: [],
+    videos: [],
+  }));
 }
 
 export async function getPublicRosterPlayer(
@@ -113,7 +120,14 @@ export async function getPublicRosterPlayer(
     .where(eq(rosterVideos.clientId, id))
     .orderBy(asc(rosterVideos.sortOrder));
 
-  return { ...row, gallery, videos };
+  return {
+    ...row,
+    name: row.name ?? "",
+    nationality: row.nationality ?? "",
+    lastClub: row.lastClub ?? "",
+    gallery,
+    videos,
+  };
 }
 
 export async function listPublicRosterCategories(
