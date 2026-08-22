@@ -6,6 +6,7 @@ import "./globals.css";
 import NavigationProgress from "@/components/NavigationProgress";
 import { HeaderProvider } from "@/components/Header/HeaderProvider";
 import SiteHeader from "@/components/Header/SiteHeader";
+import Footer from "@/components/Footer";
 
 const bigShoulders = Big_Shoulders({
   weight: ["400", "700", "800", "900"],
@@ -40,6 +41,7 @@ export default async function RootLayout({
         <HeaderProvider>
           <SiteHeader />
           <div className="page-scroll">{children}</div>
+          <Footer />
         </HeaderProvider>
       </body>
     </html>
