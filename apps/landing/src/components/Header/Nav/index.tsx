@@ -10,21 +10,9 @@ import {
   linkVariants,
   panelVariants,
 } from "../Menu/variants";
+import { overlayPages } from "../nav-data";
 
-const pages = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "About",
-    href: "/about",
-  },
-  {
-    label: "Contact",
-    href: "/contact",
-  },
-];
+const pages = overlayPages;
 
 const socials = [
   { label: "Instagram", href: "https://www.instagram.com/dtm_ones/" },

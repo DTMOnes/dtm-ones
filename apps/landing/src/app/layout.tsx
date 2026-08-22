@@ -33,13 +33,13 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bigShoulders.variable} ${inter.variable} dark font-sans`}
+      className={`${bigShoulders.variable} ${inter.variable} group/chrome dark font-sans`}
     >
       <body className="antialiased">
         <NavigationProgress />
         <HeaderProvider>
           <SiteHeader />
-          {children}
+          <div className="page-scroll">{children}</div>
         </HeaderProvider>
       </body>
     </html>

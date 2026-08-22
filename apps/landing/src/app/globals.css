@@ -115,8 +115,31 @@
 
 html,
 body {
-  overflow-x: hidden;
   scrollbar-width: none;
+}
+
+.page-scroll {
+  overflow-x: hidden;
+}
+
+.search-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  width: 100%;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 999px;
+  background: #1d1d1d;
+  outline: none;
+  box-shadow: 0 0 16px 1px rgb(255 255 255 / 0.25);
+}
+
+.search-pill:focus-within {
+  border-color: rgb(255 255 255 / 0.16);
+  box-shadow: 0 0 20px 1px rgb(255 255 255 / 0.25);
 }
 
 html::-webkit-scrollbar,
@@ -129,3 +152,4 @@ a {
   color: inherit;
   cursor: pointer;
 }
+

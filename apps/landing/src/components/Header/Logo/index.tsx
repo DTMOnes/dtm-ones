@@ -1,21 +1,16 @@
-// Next
 import Link from "next/link";
 import Image from "next/image";
 
-// Styles
-import styles from "./styles.module.scss";
-
 export default function Logo() {
   return (
-    <Link href="/" className={styles.container}>
+    <Link href="/" className="flex size-11 items-center justify-center">
       <Image
-        className={styles.image}
+        className="block"
         src="/assets/dtm-ones-logo.svg"
-        alt="Logo"
+        alt="DTM Ones"
         width={30}
         height={25}
       />
-      <span className={styles.text}>DTM ONES</span>
     </Link>
   );
 }

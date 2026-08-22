@@ -3,10 +3,8 @@
 import type { ReactNode } from "react";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
-// Styles
-import styles from "./styles.module.scss";
+import { cn } from "@/lib/utils";
 
-// Components
 import Logo from "./Logo";
 import Menu from "./Menu";
 
@@ -29,54 +27,56 @@ const itemVariants: Variants = {
 };
 
 export default function Header({
-  brand,
   search,
   filters,
-  stackCenterOnMobile = false,
 }: {
-  brand?: ReactNode;
   search?: ReactNode;
   filters?: ReactNode;
-  /** Move the center slot under the top row on small screens (player sections). */
-  stackCenterOnMobile?: boolean;
 }) {
   const reduce = useReducedMotion();
 
   return (
-    <motion.header
-      className={`${styles.header}${stackCenterOnMobile ? ` ${styles.stack_center}` : ""}`}
-      variants={reduce ? undefined : chromeVariants}
-      initial={reduce ? false : "hidden"}
-      animate="show"
+    <header
+      className="fixed inset-x-0 top-0 z-[1000] overflow-visible bg-background px-7 pb-10 group-data-[menu-open]/chrome:z-[1002] group-data-[menu-open]/chrome:bg-transparent"
+      style={{ paddingTop: 20 }}
     >
-      <div className={styles.top_container}>
+      <motion.div
+        variants={reduce ? undefined : chromeVariants}
+        initial={reduce ? false : "hidden"}
+        animate="show"
+      >
         <motion.div
-          className={styles.start}
+          className="flex items-center gap-4 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(0,440px)_1fr]"
           variants={reduce ? undefined : itemVariants}
         >
-          {brand ?? <Logo />}
+          <div className="flex min-w-0 items-center">
+            <Logo />
+          </div>
+
+          <div
+            className={cn(
+              "min-w-0 group-data-[menu-open]/chrome:pointer-events-none group-data-[menu-open]/chrome:invisible",
+              search ? "max-lg:flex-1" : "max-lg:hidden",
+            )}
+          >
+            {search}
+          </div>
+
+          <div className="flex items-center justify-end max-lg:ml-auto">
+            <Menu />
+          </div>
         </motion.div>
-        <motion.div
-          className={styles.center}
-          variants={reduce ? undefined : itemVariants}
-        >
-          {search}
-        </motion.div>
-        <motion.div
-          className={styles.end}
-          variants={reduce ? undefined : itemVariants}
-        >
-          <Menu />
-        </motion.div>
-      </div>
-      {filters ? (
-        <motion.div
-          className={styles.filters}
-          variants={reduce ? undefined : itemVariants}
-        >
-          {filters}
-        </motion.div>
-      ) : null}
-    </motion.header>
+
+        {filters ? (
+          <motion.div
+            className="group-data-[menu-open]/chrome:pointer-events-none group-data-[menu-open]/chrome:invisible"
+            style={{ marginTop: 40 }}
+            variants={reduce ? undefined : itemVariants}
+          >
+            {filters}
+          </motion.div>
+        ) : null}
+      </motion.div>
+    </header>
   );
 }

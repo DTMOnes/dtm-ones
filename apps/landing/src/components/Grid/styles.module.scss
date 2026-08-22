@@ -3,7 +3,7 @@
 .container {
   width: 100%;
   box-sizing: border-box;
-  padding: 180px 28px 40px;
+  padding: 264px 28px 40px;
   display: grid;
   /* Prefer ~320px cards; grow equally so each full row spans the viewport. */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
@@ -15,7 +15,7 @@
   width: 100%;
   box-sizing: border-box;
   min-height: 100dvh;
-  padding: 180px 28px 40px;
+  padding: 264px 28px 40px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -60,7 +60,7 @@
 @media (width < 700px) {
   .container,
   .empty_shell {
-    padding: 160px 16px 32px;
+    padding: 264px 16px 32px;
   }
 
   .container {
