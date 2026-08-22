@@ -16,6 +16,7 @@ import {
   createPlayer,
   getPlayer,
   removePlayerGalleryImage,
+  removePlayerVideo,
   setPlayerVisibility,
   updatePlayer,
 } from "./players";
@@ -53,12 +54,32 @@ function playerInput() {
 
 async function completePlayer() {
   const category = await createCategory(db, "Guards");
-  return createPlayer(db, {
+  const created = await createPlayer(db, {
     ...playerInput(),
     heightCm: 198,
     categoryId: category.id,
     presentationImageUrl: "https://example.com/manu.jpg",
+    eurobasketLink: "https://basketball.eurobasket.com/player/Manu-Ginobili/1",
   });
+  await addPlayerVideo(
+    db,
+    created.id,
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  );
+  await addPlayerGalleryImage(
+    db,
+    created.id,
+    {
+      url: "https://example.com/gallery.jpg",
+      pathname: `players/${created.id}/gallery/1.jpg`,
+    },
+    async () => {},
+  );
+  const player = await getPlayer(db, created.id);
+  if (!player) {
+    throw new Error("completePlayer could not load player");
+  }
+  return player;
 }
 
 test("create Player makes a private Client retrievable by the returned id", async () => {
@@ -93,6 +114,26 @@ test("a Player has at most one Category", async () => {
 
 test("a Player cannot be public unless the profile is complete", async () => {
   const created = await createPlayer(db, playerInput());
+
+  await assert.rejects(
+    () => setPlayerVisibility(db, created.id, "public"),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Player cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getPlayer(db, created.id))?.visibility, "private");
+});
+
+test("a Player cannot be public without Eurobasket link, gallery, or videos", async () => {
+  const category = await createCategory(db, "Guards");
+  const created = await createPlayer(db, {
+    ...playerInput(),
+    heightCm: 198,
+    categoryId: category.id,
+    presentationImageUrl: "https://example.com/manu.jpg",
+  });
 
   await assert.rejects(
     () => setPlayerVisibility(db, created.id, "public"),
@@ -297,6 +338,42 @@ test("a public Player cannot clear the presentation image", async () => {
     "https://example.com/manu.jpg",
   );
   assert.deepEqual(blobs.deleted, []);
+});
+
+test("a public Player cannot lose the last gallery image", async () => {
+  const created = await completePlayer();
+  await setPlayerVisibility(db, created.id, "public");
+  const blobs = trackingDeleteBlobs();
+  const imageId = created.gallery[0]?.id;
+  assert.ok(imageId);
+
+  await assert.rejects(
+    () => removePlayerGalleryImage(db, created.id, imageId, blobs.deleteBlobs),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Player cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getPlayer(db, created.id))?.gallery.length, 1);
+  assert.deepEqual(blobs.deleted, []);
+});
+
+test("a public Player cannot lose the last video", async () => {
+  const created = await completePlayer();
+  await setPlayerVisibility(db, created.id, "public");
+  const videoId = created.videos[0]?.id;
+  assert.ok(videoId);
+
+  await assert.rejects(
+    () => removePlayerVideo(db, created.id, videoId),
+    (error: unknown) =>
+      error instanceof ConflictError &&
+      error.message ===
+        "A Player cannot be public unless the profile is complete.",
+  );
+
+  assert.equal((await getPlayer(db, created.id))?.videos.length, 1);
 });
 
 test("gallery images can be added and are retrievable", async () => {

@@ -63,7 +63,10 @@ function RequirementList({
               <CircleIcon aria-hidden className="mt-0.5 size-4 shrink-0" />
             )}
             <span className={muted ? "text-muted-foreground" : "font-medium"}>
-              {check.label === "Presentation image" && !check.met ? (
+              {(check.label === "Presentation image" ||
+                check.label === "Gallery image" ||
+                check.label === "Video") &&
+              !check.met ? (
                 <Link
                   href={`/players/${playerId}?tab=media`}
                   className="underline underline-offset-2"

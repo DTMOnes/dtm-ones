@@ -13,12 +13,18 @@ export type CoachWrite = {
 
 export type CoachPatch = Partial<CoachWrite>;
 
-export function coachCompletenessGaps(coach: {
+type CoachCompletenessInput = {
   name: string | null;
   nationality: string | null;
   lastClub: string | null;
   eurobasketLink: string | null;
-}): string[] {
+  presentationImageUrl: string | null;
+  gallery: { length: number };
+};
+
+export function coachCompletenessGaps(
+  coach: CoachCompletenessInput,
+): string[] {
   const gaps: string[] = [];
 
   if (!coach.name?.trim()) {
@@ -30,19 +36,20 @@ export function coachCompletenessGaps(coach: {
   if (!coach.lastClub?.trim()) {
     gaps.push("Last club");
   }
-  if (!coach.eurobasketLink) {
+  if (!coach.eurobasketLink?.trim()) {
     gaps.push("Eurobasket link");
+  }
+  if (!coach.presentationImageUrl) {
+    gaps.push("Presentation image");
+  }
+  if (coach.gallery.length === 0) {
+    gaps.push("Gallery image");
   }
 
   return gaps;
 }
 
-function isCoachComplete(coach: {
-  name: string | null;
-  nationality: string | null;
-  lastClub: string | null;
-  eurobasketLink: string | null;
-}): boolean {
+export function isCoachComplete(coach: CoachCompletenessInput): boolean {
   return coachCompletenessGaps(coach).length === 0;
 }
 
@@ -133,6 +140,8 @@ export async function updateCoach(
       patch.eurobasketLink === undefined
         ? existing.eurobasketLink
         : patch.eurobasketLink,
+    presentationImageUrl: existing.presentationImageUrl,
+    gallery: existing.gallery,
   };
 
   if (existing.visibility === "public" && !isCoachComplete(next)) {
@@ -143,7 +152,13 @@ export async function updateCoach(
 
   await db
     .update(schema.clients)
-    .set({ ...next, updatedAt: new Date() })
+    .set({
+      name: next.name,
+      nationality: next.nationality,
+      lastClub: next.lastClub,
+      eurobasketLink: next.eurobasketLink,
+      updatedAt: new Date(),
+    })
     .where(eq(schema.clients.id, id));
 
   const coach = await getCoach(db, id);
