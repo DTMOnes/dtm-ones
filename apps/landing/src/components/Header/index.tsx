@@ -39,12 +39,9 @@ export default function Header({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-[1000] overflow-visible px-7 group-data-[menu-open]/chrome:z-[1002] group-data-[menu-open]/chrome:bg-transparent",
-        overlay
-          ? "pointer-events-none bg-transparent pb-0"
-          : "bg-background pb-6",
+        "fixed inset-x-0 top-0 z-[1000] box-border min-h-[var(--header-height)] overflow-visible px-7 pt-[var(--header-padding-top)] pb-[var(--header-padding-bottom)] group-data-[menu-open]/chrome:z-[1002] group-data-[menu-open]/chrome:bg-transparent",
+        overlay ? "pointer-events-none bg-transparent" : "border-b border-[var(--glass-border)] bg-background",
       )}
-      style={{ paddingTop: 20 }}
     >
       <motion.div
         className={overlay ? "pointer-events-none" : undefined}
@@ -56,7 +53,7 @@ export default function Header({
           className={cn(
             // Phone: gap-2 keeps search icon ↔ hamburger tight (#49).
             // Desktop: wider column gap in the 3-col grid.
-            "flex items-center gap-2 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(0,440px)_1fr] lg:gap-4",
+            "flex min-h-[var(--glass-header-control-size)] items-center gap-2 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(280px,440px)_1fr] lg:gap-4",
             overlay && "pointer-events-none",
           )}
           variants={reduce ? undefined : itemVariants}
@@ -73,10 +70,15 @@ export default function Header({
           <div
             className={cn(
               "min-w-0 group-data-[menu-open]/chrome:pointer-events-none group-data-[menu-open]/chrome:invisible",
-              search ? "max-lg:flex-1" : "max-lg:hidden",
+              search ? "max-lg:flex-1" : "max-lg:hidden lg:block",
             )}
           >
-            {search}
+            {search ?? (
+              <div
+                className="hidden h-[var(--glass-header-control-size)] w-full lg:block"
+                aria-hidden
+              />
+            )}
           </div>
 
           <div

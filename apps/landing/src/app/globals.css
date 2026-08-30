@@ -88,6 +88,16 @@
   --glass-drop: 0 10px 28px rgb(0 0 0 / 0.28);
   --glass-control-size: 40px;
   --glass-header-control-size: 44px;
+  --header-padding-top: 20px;
+  --header-padding-bottom: 24px;
+  --header-height: calc(
+    var(--header-padding-top) + var(--glass-header-control-size) +
+      var(--header-padding-bottom)
+  );
+  --roster-scroll-padding-top: calc(var(--header-height) + 32px);
+  --header-search-panel-top: calc(
+    var(--header-padding-top) + var(--glass-header-control-size) + 12px
+  );
   --glass-soft-radius: 12px;
   --glass-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --glass-plate-radius: 16px;

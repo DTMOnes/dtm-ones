@@ -116,7 +116,7 @@ export default function SearchCluster() {
               "absolute top-full z-[1001] mt-3 flex flex-col gap-3",
               // Desktop: cluster width. Phone: break out to header content width.
               "right-0 left-0 lg:left-0 lg:right-0",
-              "max-lg:fixed max-lg:inset-x-7 max-lg:top-[76px] max-lg:right-7 max-lg:left-7",
+              "max-lg:fixed max-lg:inset-x-7 max-lg:top-[var(--header-search-panel-top)] max-lg:right-7 max-lg:left-7",
             )}
             initial={reduce ? false : { opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
