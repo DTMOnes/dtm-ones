@@ -9,12 +9,12 @@ import styles from "./styles.module.scss";
 const socials = [
   {
     label: "Instagram",
-    href: "https://www.instagram.com/dtm_ones/",
+    href: "https://www.instagram.com/dtm.ones/",
     Icon: InstagramLogo,
   },
   {
     label: "YouTube",
-    href: "https://www.youtube.com/channel/UC_x5XG1OV2P6yVqAlKxpw6w",
+    href: "https://www.youtube.com/@dtmones6926",
     Icon: YoutubeLogo,
   },
 ] as const;
