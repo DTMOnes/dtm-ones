@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "motion/react";
+
+import { useHeaderOverride } from "@/components/Header/HeaderProvider";
 
 import Button from "./Button";
 import Nav from "../Nav";
@@ -12,14 +14,18 @@ const subscribeToClient = () => () => {};
 
 export default function Menu() {
   const pathname = usePathname();
-  const [openPathname, setOpenPathname] = useState<string | null>(null);
+  const { chromeOverlay, toggleMenu, closeChromeOverlay } = useHeaderOverride();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const mounted = useSyncExternalStore(
     subscribeToClient,
     () => true,
     () => false,
   );
-  const isActive = openPathname === pathname;
+  const isActive = chromeOverlay === "menu";
+
+  useEffect(() => {
+    closeChromeOverlay();
+  }, [pathname, closeChromeOverlay]);
 
   useEffect(() => {
     if (isActive) {
@@ -42,7 +48,7 @@ export default function Menu() {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setOpenPathname(null);
+        closeChromeOverlay();
         return;
       }
 
@@ -81,22 +87,20 @@ export default function Menu() {
       window.removeEventListener("keydown", onKeyDown);
       menuButton?.focus();
     };
-  }, [isActive]);
+  }, [isActive, closeChromeOverlay]);
 
   return (
     <>
       <Button
         isActive={isActive}
-        onClick={() =>
-          setOpenPathname((open) => (open === pathname ? null : pathname))
-        }
+        onClick={toggleMenu}
         buttonRef={buttonRef}
       />
       {mounted
         ? createPortal(
             <AnimatePresence mode="wait">
               {isActive ? (
-                <Nav onNavigate={() => setOpenPathname(null)} />
+                <Nav onNavigate={closeChromeOverlay} />
               ) : null}
             </AnimatePresence>,
             document.body,

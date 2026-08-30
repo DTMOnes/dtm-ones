@@ -730,7 +730,7 @@ export default function MorphSlider({
         <div className="absolute top-1/2 left-0 right-0 z-[3] flex justify-between px-4 -translate-y-1/2 pointer-events-none">
           <button
             type="button"
-            className="pointer-events-auto inline-flex items-center justify-center w-10 h-10 rounded-full text-white border border-white/20 bg-[rgba(12,12,14,0.4)] backdrop-blur-md cursor-pointer transition-transform duration-200 hover:scale-105 hover:bg-[rgba(24,24,28,0.6)] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80"
+            className="glass-control glass-control--icon pointer-events-auto"
             aria-label="Previous slide"
             onClick={handlePrev}
           >
@@ -738,7 +738,7 @@ export default function MorphSlider({
           </button>
           <button
             type="button"
-            className="pointer-events-auto inline-flex items-center justify-center w-10 h-10 rounded-full text-white border border-white/20 bg-[rgba(12,12,14,0.4)] backdrop-blur-md cursor-pointer transition-transform duration-200 hover:scale-105 hover:bg-[rgba(24,24,28,0.6)] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/80"
+            className="glass-control glass-control--icon pointer-events-auto"
             aria-label="Next slide"
             onClick={handleNext}
           >
