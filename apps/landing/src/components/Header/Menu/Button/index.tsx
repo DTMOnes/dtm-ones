@@ -22,6 +22,7 @@ export default function Button({
   return (
     <GlassControl
       ref={buttonRef}
+      variant="soft"
       aria-label={isActive ? "Close menu" : "Open menu"}
       aria-expanded={isActive}
       aria-controls="site-menu"
