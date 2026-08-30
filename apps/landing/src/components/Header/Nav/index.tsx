@@ -6,9 +6,8 @@ import { motion, useReducedMotion } from "motion/react";
 
 import styles from "./styles.module.scss";
 import { panelVariants } from "../Menu/variants";
-import { overlayPages } from "../nav-data";
+import { isNavCurrent, overlayPages } from "../nav-data";
 import Backdrop from "./Backdrop";
-import SplitLink from "./SplitLink";
 
 export default function Nav({ onNavigate }: { onNavigate: () => void }) {
   const pathname = usePathname();
@@ -30,11 +29,8 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
       <Backdrop />
       <div className={styles.stage}>
         <nav className={styles.pages} aria-label="Primary">
-          {overlayPages.map((page, index) => {
-            const isCurrent =
-              page.href === "/"
-                ? pathname === "/"
-                : pathname.startsWith(page.href);
+          {overlayPages.map((page) => {
+            const isCurrent = isNavCurrent(pathname, page.href);
 
             return (
               <div
@@ -47,7 +43,7 @@ export default function Nav({ onNavigate }: { onNavigate: () => void }) {
                   onClick={onNavigate}
                   aria-current={isCurrent ? "page" : undefined}
                 >
-                  <SplitLink text={page.label} delay={0.16 + index * 0.1} />
+                  {page.label}
                 </Link>
               </div>
             );

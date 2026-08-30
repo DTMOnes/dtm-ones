@@ -5,6 +5,7 @@ import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
+import InlineNav from "./InlineNav";
 import Logo from "./Logo";
 import Menu from "./Menu";
 
@@ -53,7 +54,9 @@ export default function Header({
       >
         <motion.div
           className={cn(
-            "flex items-center gap-4 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(0,440px)_1fr]",
+            // Phone: gap-2 keeps search icon ↔ hamburger tight (#49).
+            // Desktop: wider column gap in the 3-col grid.
+            "flex items-center gap-2 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(0,440px)_1fr] lg:gap-4",
             overlay && "pointer-events-none",
           )}
           variants={reduce ? undefined : itemVariants}
@@ -78,10 +81,11 @@ export default function Header({
 
           <div
             className={cn(
-              "flex items-center justify-end max-lg:ml-auto",
+              "flex items-center justify-end gap-2 max-lg:ml-auto",
               overlay && "pointer-events-auto",
             )}
           >
+            <InlineNav className="hidden nav:flex" />
             <Menu />
           </div>
         </motion.div>
