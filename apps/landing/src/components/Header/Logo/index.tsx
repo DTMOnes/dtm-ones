@@ -11,7 +11,7 @@ export default function Logo() {
   return (
     <Link
       href="/"
-      className="relative block h-11 overflow-hidden"
+      className="relative block h-10 overflow-hidden"
       style={{ aspectRatio: `${LOGO_W} / ${LOGO_H}` }}
       aria-label="DTM Ones"
     >
