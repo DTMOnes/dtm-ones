@@ -16,7 +16,6 @@ import {
 } from "@/lib/roster/queries";
 
 export const metadata: Metadata = {
-  title: "DTM Ones | The name talent trusts",
   description: "Basketball talent agency built on trust.",
 };
 
