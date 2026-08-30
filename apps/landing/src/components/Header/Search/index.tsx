@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MagnifyingGlass, X } from "@phosphor-icons/react";
 import { useReducedMotion } from "motion/react";
@@ -10,7 +10,7 @@ import { useHeaderOverride } from "@/components/Header/HeaderProvider";
 import ShinyText from "@/components/ShinyText";
 import { cn } from "@/lib/utils";
 
-export default function Search() {
+export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -19,6 +19,14 @@ export default function Search() {
   const reduce = useReducedMotion() ?? false;
   const [value, setValue] = useState(searchParams.get("q") ?? "");
   const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    const frame = window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [autoFocus]);
 
   const showHint = !focused && value.length === 0;
 

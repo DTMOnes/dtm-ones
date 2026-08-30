@@ -45,9 +45,13 @@ function chipClass(active: boolean) {
 function CategoriesFilters({
   items,
   param = "c",
+  layout = "scroll",
+  onSelect,
 }: {
   items: FilterItem[];
   param?: string;
+  layout?: "scroll" | "wrap";
+  onSelect?: () => void;
 }) {
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -73,11 +77,16 @@ function CategoriesFilters({
     startRosterTransition(() => {
       replace(`${pathname}?${params.toString()}`);
     });
+    onSelect?.();
   };
 
   return (
     <motion.div
-      className="flex gap-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className={
+        layout === "wrap"
+          ? "flex flex-wrap gap-1"
+          : "flex gap-1 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      }
       role="radiogroup"
       aria-label="Roster filters"
       variants={reduce ? undefined : rowVariants}
@@ -166,6 +175,8 @@ export default function Filters(
         param?: string;
         label?: string;
         name?: string;
+        layout?: "scroll" | "wrap";
+        onSelect?: () => void;
       }
     | {
         items: FilterItem[];
@@ -185,5 +196,12 @@ export default function Filters(
     );
   }
 
-  return <CategoriesFilters items={props.items} param={props.param} />;
+  return (
+    <CategoriesFilters
+      items={props.items}
+      param={props.param}
+      layout={props.layout}
+      onSelect={props.onSelect}
+    />
+  );
 }

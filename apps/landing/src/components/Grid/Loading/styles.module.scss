@@ -1,7 +1,7 @@
 .loading {
   width: 100%;
   box-sizing: border-box;
-  padding: 220px 28px 40px;
+  padding: 120px 28px 40px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 20px;
@@ -84,7 +84,7 @@
 
 @media (width < 700px) {
   .loading {
-    padding: 220px 16px 32px;
+    padding: 120px 16px 32px;
     gap: 16px;
   }
 }
