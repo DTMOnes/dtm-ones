@@ -8,7 +8,13 @@ import { useDebouncedCallback } from "use-debounce";
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
 import { cn } from "@/lib/utils";
 
-export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
+export default function Search({
+  autoFocus = false,
+  variant = "pill",
+}: {
+  autoFocus?: boolean;
+  variant?: "pill" | "panel";
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { replace } = useRouter();
   const pathname = usePathname();
@@ -38,6 +44,30 @@ export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
       replace(`${pathname}?${params.toString()}`);
     });
   }, 300);
+
+  const clearSearch = () => {
+    setValue("");
+    handleSearch("");
+    inputRef.current?.focus();
+  };
+
+  if (variant === "panel") {
+    return (
+      <input
+        ref={inputRef}
+        className="w-full appearance-none bg-transparent py-1 text-[15px] text-white outline-none placeholder:text-white/32 [&::-webkit-search-cancel-button]:hidden"
+        type="search"
+        aria-label="Search by name"
+        placeholder="Search by name"
+        value={value}
+        onChange={(event) => {
+          const next = event.target.value;
+          setValue(next);
+          handleSearch(next);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="w-full">
@@ -77,11 +107,7 @@ export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
           )}
           aria-label="Clear search"
           tabIndex={value.length === 0 ? -1 : 0}
-          onClick={() => {
-            setValue("");
-            handleSearch("");
-            inputRef.current?.focus();
-          }}
+          onClick={clearSearch}
         >
           <X className="size-5" weight="bold" aria-hidden />
         </button>

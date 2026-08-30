@@ -67,7 +67,6 @@ export default function SearchCluster() {
     hasFilters && categoryFilters ? (
       <Filters
         items={categoryFilters}
-        layout="wrap"
         onSelect={closeChromeOverlay}
       />
     ) : null;
@@ -112,7 +111,7 @@ export default function SearchCluster() {
             role="region"
             aria-label="Search and filters"
             className={cn(
-              "glass-plate absolute top-full z-[1001] mt-3 p-3",
+              "absolute top-full z-[1001] mt-3 flex flex-col gap-3",
               // Desktop: cluster width. Phone: break out to header content width.
               "right-0 left-0 lg:left-0 lg:right-0",
               "max-lg:fixed max-lg:inset-x-7 max-lg:top-[76px] max-lg:right-7 max-lg:left-7",
@@ -122,12 +121,12 @@ export default function SearchCluster() {
             exit={reduce ? undefined : { opacity: 0, y: -6 }}
             transition={{ duration: 0.28, ease: easeOut }}
           >
-            <div className="flex flex-col gap-3">
-              <div className="lg:hidden">
-                <Search autoFocus={open} />
-              </div>
-              {filtersPanel}
+            <div className="glass-plate p-4 lg:hidden">
+              <Search variant="panel" autoFocus={open} />
             </div>
+            {filtersPanel ? (
+              <div className="glass-plate p-5">{filtersPanel}</div>
+            ) : null}
           </motion.div>
         ) : null}
       </AnimatePresence>
