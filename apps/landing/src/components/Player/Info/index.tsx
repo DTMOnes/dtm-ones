@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight, Info, X } from "@phosphor-icons/react";
 
+import GlassControl from "@/components/GlassControl";
 import SpotlightCard from "@/components/SpotlightCard";
 import type { PublicRosterPlayer } from "@/types/roster";
 
@@ -100,8 +101,6 @@ export default function PlayerInfo({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const reduce = useReducedMotion();
-
   useEffect(() => {
     if (!open) return;
 
@@ -114,16 +113,15 @@ export default function PlayerInfo({
   }, [onOpenChange, open]);
 
   return (
-    <motion.button
-      type="button"
+    <GlassControl
+      variant="pill"
       className={styles.trigger}
       aria-expanded={open}
       aria-controls="player-info-card"
       onClick={() => onOpenChange(!open)}
-      whileTap={reduce ? undefined : { scale: 0.96 }}
     >
       {open ? <X size={18} weight="bold" /> : <Info size={18} weight="bold" />}
       <span>{open ? "Close" : "Info"}</span>
-    </motion.button>
+    </GlassControl>
   );
 }

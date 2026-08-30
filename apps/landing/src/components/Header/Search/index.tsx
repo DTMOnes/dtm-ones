@@ -3,11 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { MagnifyingGlass, X } from "@phosphor-icons/react";
-import { useReducedMotion } from "motion/react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
-import ShinyText from "@/components/ShinyText";
 import { cn } from "@/lib/utils";
 
 export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
@@ -16,7 +14,6 @@ export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { startRosterTransition } = useHeaderOverride();
-  const reduce = useReducedMotion() ?? false;
   const [value, setValue] = useState(searchParams.get("q") ?? "");
   const [focused, setFocused] = useState(false);
 
@@ -27,8 +24,6 @@ export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
     });
     return () => window.cancelAnimationFrame(frame);
   }, [autoFocus]);
-
-  const showHint = !focused && value.length === 0;
 
   const handleSearch = useDebouncedCallback((next: string) => {
     const params = new URLSearchParams(searchParams);
@@ -56,35 +51,21 @@ export default function Search({ autoFocus = false }: { autoFocus?: boolean }) {
           aria-hidden
         />
 
-        <span className="relative min-w-0 flex-1">
-          {showHint ? (
-            <span className="pointer-events-none absolute inset-0 flex items-center">
-              <ShinyText
-                text="Search by name"
-                speed={2.2}
-                delay={0.35}
-                color="#a3a3a3"
-                shineColor="#ffffff"
-                disabled={reduce}
-                className="text-[15px]"
-              />
-            </span>
-          ) : null}
-          <input
-            ref={inputRef}
-            className="relative z-10 w-full appearance-none bg-transparent text-[15px] text-white outline-none [&::-webkit-search-cancel-button]:hidden"
-            type="search"
-            aria-label="Search by name"
-            value={value}
-            onChange={(event) => {
-              const next = event.target.value;
-              setValue(next);
-              handleSearch(next);
-            }}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-          />
-        </span>
+        <input
+          ref={inputRef}
+          className="min-w-0 flex-1 appearance-none bg-transparent text-[15px] text-white outline-none placeholder:text-neutral-500 [&::-webkit-search-cancel-button]:hidden"
+          type="search"
+          aria-label="Search by name"
+          placeholder="Search by name"
+          value={value}
+          onChange={(event) => {
+            const next = event.target.value;
+            setValue(next);
+            handleSearch(next);
+          }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
 
         <button
           type="button"

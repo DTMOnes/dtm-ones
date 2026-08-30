@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { FunnelSimple, MagnifyingGlass } from "@phosphor-icons/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -8,6 +8,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Filters from "@/components/Header/Filters";
 import Search from "@/components/Header/Search";
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+import GlassControl from "@/components/GlassControl";
 import { cn } from "@/lib/utils";
 import {
   isDesktopFilterActive,
@@ -15,48 +16,6 @@ import {
 } from "@/utils/search-chrome-active";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
-
-function ControlButton({
-  label,
-  expanded,
-  active,
-  controls,
-  onClick,
-  children,
-}: {
-  label: string;
-  expanded: boolean;
-  active: boolean;
-  controls: string;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        "relative flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full border text-white outline-none transition-colors duration-200",
-        "border-white/10 bg-[#1d1d1d] hover:border-white/20",
-        "focus-visible:ring-2 focus-visible:ring-white/50",
-        "active:scale-[0.98]",
-        active && "border-white/35",
-        expanded && "border-white/25",
-      )}
-      aria-label={label}
-      aria-expanded={expanded}
-      aria-controls={controls}
-      onClick={onClick}
-    >
-      {children}
-      {active ? (
-        <span
-          className="absolute top-2 right-2 size-1.5 rounded-full bg-white"
-          aria-hidden
-        />
-      ) : null}
-    </button>
-  );
-}
 
 export default function SearchCluster() {
   const panelId = useId();
@@ -121,29 +80,29 @@ export default function SearchCluster() {
           <Search />
         </div>
         {hasFilters ? (
-          <ControlButton
-            label={open ? "Close filters" : "Open filters"}
-            expanded={open}
+          <GlassControl
+            aria-label={open ? "Close filters" : "Open filters"}
+            aria-expanded={open}
+            aria-controls={panelId}
             active={desktopFilterActive}
-            controls={panelId}
             onClick={toggleSearchPanel}
           >
             <FunnelSimple className="size-5" weight="bold" aria-hidden />
-          </ControlButton>
+          </GlassControl>
         ) : null}
       </div>
 
       {/* Mobile: one control for the whole search block */}
       <div className="flex justify-end lg:hidden">
-        <ControlButton
-          label={open ? "Close search" : "Open search"}
-          expanded={open}
+        <GlassControl
+          aria-label={open ? "Close search" : "Open search"}
+          aria-expanded={open}
+          aria-controls={panelId}
           active={mobileControlActive}
-          controls={panelId}
           onClick={toggleSearchPanel}
         >
           <MagnifyingGlass className="size-5" weight="bold" aria-hidden />
-        </ControlButton>
+        </GlassControl>
       </div>
 
       <AnimatePresence>
@@ -153,9 +112,9 @@ export default function SearchCluster() {
             role="region"
             aria-label="Search and filters"
             className={cn(
-              "absolute top-full z-[1001] mt-3 border border-white/10 bg-[#1d1d1d] p-3 shadow-[0_18px_48px_rgb(0_0_0_/_0.45)]",
+              "glass-plate absolute top-full z-[1001] mt-3 p-3",
               // Desktop: cluster width. Phone: break out to header content width.
-              "right-0 left-0 rounded-2xl lg:left-0 lg:right-0",
+              "right-0 left-0 lg:left-0 lg:right-0",
               "max-lg:fixed max-lg:inset-x-7 max-lg:top-[76px] max-lg:right-7 max-lg:left-7",
             )}
             initial={reduce ? false : { opacity: 0, y: -6 }}

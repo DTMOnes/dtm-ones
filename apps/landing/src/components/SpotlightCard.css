@@ -1,10 +1,10 @@
 .card-spotlight {
   position: relative;
   isolation: isolate;
-  border-radius: 1.5rem;
-  border: 1px solid #222;
-  background-color: #111;
-  padding: 2rem;
+  border-radius: inherit;
+  border: 0;
+  /* No background here — consumer owns glass fill + backdrop-filter. */
+  padding: 0;
   overflow: hidden;
   --mouse-x: 50%;
   --mouse-y: 50%;
