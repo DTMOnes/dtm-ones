@@ -39,7 +39,7 @@ function optionClass(active: boolean) {
 }
 
 const sectionMetaClass =
-  "text-[11px] font-medium tracking-[0.14em] text-white uppercase opacity-[0.35]";
+  "text-[length:var(--meta-size)] font-normal tracking-[var(--meta-tracking)] text-white uppercase opacity-[0.35]";
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return <p className={sectionMetaClass}>{children}</p>;

@@ -59,7 +59,7 @@
   }
 
   .player_position {
-    @include type.inter(12px);
+    @include type.inter(var(--meta-size));
     text-transform: uppercase;
     opacity: 0.5;
   }

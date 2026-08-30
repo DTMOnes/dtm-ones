@@ -80,6 +80,7 @@ export default function SearchCluster() {
         </div>
         {hasFilters ? (
           <GlassControl
+            variant="soft"
             aria-label={open ? "Close filters" : "Open filters"}
             aria-expanded={open}
             aria-controls={panelId}
@@ -94,6 +95,7 @@ export default function SearchCluster() {
       {/* Mobile: one control for the whole search block */}
       <div className="flex justify-end lg:hidden">
         <GlassControl
+          variant="soft"
           aria-label={open ? "Close search" : "Open search"}
           aria-expanded={open}
           aria-controls={panelId}
