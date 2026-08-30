@@ -11,7 +11,8 @@ export default function Logo() {
   return (
     <Link
       href="/"
-      className="relative block h-10 overflow-hidden"
+      // 40px beside inline nav (`nav` / 1250+); 32px in tighter header bands.
+      className="relative block h-8 overflow-hidden nav:h-10"
       style={{ aspectRatio: `${LOGO_W} / ${LOGO_H}` }}
       aria-label="DTM Ones"
     >

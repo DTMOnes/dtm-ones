@@ -56,7 +56,9 @@ Tokens live in `src/app/globals.css` (`--glass-*`). Prefer tokens or `GlassContr
 | Highlights **prev/next** | Icon | |
 | Header **mobile search** opener | Icon | Active URL badge = white dot |
 | Header **desktop filter** opener | Icon | Active when `c` / `kind` set |
-| Header **hamburger** | Icon | Line morph kept inside glass circle |
+| Header **hamburger** | Icon | Below `nav` (1250) only; line morph inside glass circle (#49) |
+| Header **inline nav** | Text | `nav+` Home · About · Contact; opacity current/hover (#49) |
+| Full-screen **site menu** | Panel | Below `nav`; glass-backed full-bleed; opacity links, no SplitLink (#49) |
 | Search/filter **overlay panel** | Plate | Companion window, not a card |
 
 ## Where it does **not** apply
@@ -67,7 +69,8 @@ Tokens live in `src/app/globals.css` (`--glass-*`). Prefer tokens or `GlassContr
 | Filter **chips** | Choice controls inside the plate (#54) |
 | Highlights **Play** (large white circle) | Primary media CTA; keep solid high-contrast |
 | Contact submit, Load more, Clear filters, footer social | Page CTAs / quiet links; out of this pass |
-| Full-screen **site menu** panel | Button is glass; full-bleed black nav stays until #49 says otherwise |
+| Desktop **inline nav** links | Typographic opacity current/hover — not glass pills (#49) |
+| Full-screen **site menu** links | Same opacity language as inline; panel is glass-backed full-bleed (#49) |
 
 ## Patterns to retire
 
@@ -85,5 +88,5 @@ Tokens live in `src/app/globals.css` (`--glass-*`). Prefer tokens or `GlassContr
 - Search cluster visual: #52 (desktop glass siblings locked; shiny removed)
 - Unify interactive controls: #53 (this brief)
 - Filter overlay / chips fit: #54
-- Header nav: #49
+- Header nav: #49 (inline at `lg+`; hamburger + restyled overlay below; drop SplitLink)
 - Parent map: #46

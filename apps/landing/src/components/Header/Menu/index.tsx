@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence } from "motion/react";
 
 import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+import { NAV_BREAKPOINT_PX } from "@/components/Header/nav-data";
 
 import Button from "./Button";
 import Nav from "../Nav";
@@ -26,6 +27,17 @@ export default function Menu() {
   useEffect(() => {
     closeChromeOverlay();
   }, [pathname, closeChromeOverlay]);
+
+  // Inline nav at `nav` (1250px) — close the overlay when that band is reached.
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${NAV_BREAKPOINT_PX}px)`);
+    const onChange = () => {
+      if (mq.matches) closeChromeOverlay();
+    };
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [closeChromeOverlay]);
 
   useEffect(() => {
     if (isActive) {
@@ -91,11 +103,13 @@ export default function Menu() {
 
   return (
     <>
-      <Button
-        isActive={isActive}
-        onClick={toggleMenu}
-        buttonRef={buttonRef}
-      />
+      <div className="nav:hidden">
+        <Button
+          isActive={isActive}
+          onClick={toggleMenu}
+          buttonRef={buttonRef}
+        />
+      </div>
       {mounted
         ? createPortal(
             <AnimatePresence mode="wait">
