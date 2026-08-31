@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import InlineNav from "./InlineNav";
 import Logo from "./Logo";
 import Menu from "./Menu";
+import SocialLinks from "./SocialLinks";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
@@ -60,11 +61,16 @@ export default function Header({
         >
           <div
             className={cn(
-              "flex min-w-0 items-center",
+              "flex min-w-0 items-center gap-3",
               overlay && "pointer-events-auto",
             )}
           >
             <Logo />
+            <span
+              className="h-4 w-px shrink-0 bg-[rgb(255_255_255/0.22)]"
+              aria-hidden
+            />
+            <SocialLinks />
           </div>
 
           <div

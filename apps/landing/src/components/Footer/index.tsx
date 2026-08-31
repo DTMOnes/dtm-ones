@@ -2,22 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { InstagramLogo, YoutubeLogo } from "@phosphor-icons/react";
 
 import styles from "./styles.module.scss";
-
-const socials = [
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/dtm.ones/",
-    Icon: InstagramLogo,
-  },
-  {
-    label: "YouTube",
-    href: "https://www.youtube.com/@dtmones6926",
-    Icon: YoutubeLogo,
-  },
-] as const;
 
 const legalPages = [
   { label: "Terms and Conditions", href: "/terms-of-service" },
@@ -51,21 +37,6 @@ export default function Footer() {
             </Link>
           );
         })}
-      </nav>
-
-      <nav className={styles.socials} aria-label="Social">
-        {socials.map(({ label, href, Icon }) => (
-          <a
-            key={label}
-            href={href}
-            className={styles.social}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={label}
-          >
-            <Icon size={20} weight="regular" aria-hidden />
-          </a>
-        ))}
       </nav>
     </footer>
   );
