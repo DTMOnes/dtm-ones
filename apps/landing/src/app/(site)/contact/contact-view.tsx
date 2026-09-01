@@ -53,7 +53,7 @@ export default function ContactView() {
         </motion.h1>
 
         <motion.div
-          className={styles.formStage}
+          className={`${styles.formStage} glass-plate`}
           variants={reduce ? undefined : itemVariants}
         >
           <ContactForm />

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, useReducedMotion } from "motion/react";
 import { useAction } from "next-safe-action/hooks";
 
 import { createContactRequestAction } from "@/actions/contact-requests";
@@ -14,13 +15,25 @@ import {
 
 import styles from "./styles.module.scss";
 
+const easeOut = [0.16, 1, 0.3, 1] as const;
+
+const REASON_OPTIONS = [
+  { value: "seeking_representation", label: "Seeking representation" },
+  { value: "looking_for_a_player", label: "Looking for a player" },
+] as const;
+
 export default function ContactForm() {
+  const reduce = useReducedMotion() ?? false;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const reasonRefs = useRef<Array<HTMLLabelElement | null>>([]);
+  const [thumb, setThumb] = useState({ x: 0, width: 0 });
+
   const {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<CreateContactRequest>({
     resolver: zodResolver(createContactRequestSchema),
@@ -30,6 +43,30 @@ export default function ContactForm() {
       message: "",
     },
   });
+
+  const reason = watch("reason");
+
+  useLayoutEffect(() => {
+    const sync = () => {
+      const index = REASON_OPTIONS.findIndex((option) => option.value === reason);
+      if (index < 0) {
+        setThumb({ x: 0, width: 0 });
+        return;
+      }
+
+      const el = reasonRefs.current[index];
+      if (!el) return;
+      setThumb({ x: el.offsetLeft, width: el.offsetWidth });
+    };
+
+    sync();
+    const fonts = document.fonts?.ready.then(sync).catch(() => undefined);
+    window.addEventListener("resize", sync);
+    return () => {
+      window.removeEventListener("resize", sync);
+      void fonts;
+    };
+  }, [reason]);
 
   const { executeAsync, isExecuting } = useAction(createContactRequestAction, {
     onSuccess: ({ data }) => {
@@ -54,28 +91,38 @@ export default function ContactForm() {
       noValidate
     >
       <fieldset className={styles.fieldset}>
-        <legend className={styles.visuallyHidden}>Inquiry type</legend>
-        <div className={styles.options}>
-          <label className={styles.option} htmlFor="contact-reason-seeking">
-            <input
-              id="contact-reason-seeking"
-              type="radio"
-              value="seeking_representation"
-              disabled={isExecuting}
-              {...register("reason")}
-            />
-            <span>Seeking representation</span>
-          </label>
-          <label className={styles.option} htmlFor="contact-reason-looking">
-            <input
-              id="contact-reason-looking"
-              type="radio"
-              value="looking_for_a_player"
-              disabled={isExecuting}
-              {...register("reason")}
-            />
-            <span>Looking for a player</span>
-          </label>
+        <legend className={styles.reasonLegend}>Inquiry type</legend>
+        <div className={styles.reasonTrack} role="presentation">
+          <motion.span
+            className={styles.reasonIndicator}
+            aria-hidden
+            initial={false}
+            animate={{ x: thumb.x, width: thumb.width }}
+            transition={
+              reduce || thumb.width === 0
+                ? { duration: 0 }
+                : { type: "tween", duration: 0.28, ease: easeOut }
+            }
+          />
+          {REASON_OPTIONS.map((option, index) => (
+            <label
+              key={option.value}
+              ref={(el) => {
+                reasonRefs.current[index] = el;
+              }}
+              className={styles.reasonOption}
+              htmlFor={`contact-reason-${option.value}`}
+            >
+              <input
+                id={`contact-reason-${option.value}`}
+                type="radio"
+                value={option.value}
+                disabled={isExecuting}
+                {...register("reason")}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
         </div>
         {errors.reason?.message ? (
           <p className={styles.error} role="alert">
@@ -87,15 +134,17 @@ export default function ContactForm() {
       <div className={styles.row}>
         <label className={styles.field}>
           <span className={styles.label}>Email</span>
-          <input
-            type="email"
-            placeholder="you@email.com"
-            autoComplete="email"
-            aria-invalid={!!errors.email}
-            disabled={isExecuting}
-            {...register("email")}
-            className={styles.input}
-          />
+          <div className={styles.inputShell}>
+            <input
+              type="email"
+              placeholder="you@email.com"
+              autoComplete="email"
+              aria-invalid={!!errors.email}
+              disabled={isExecuting}
+              {...register("email")}
+              className={styles.input}
+            />
+          </div>
           {errors.email?.message ? (
             <p className={styles.error} role="alert">
               {errors.email.message}
@@ -105,15 +154,17 @@ export default function ContactForm() {
 
         <label className={styles.field}>
           <span className={styles.label}>Phone</span>
-          <input
-            type="tel"
-            placeholder="+1 555 000 0000"
-            autoComplete="tel"
-            aria-invalid={!!errors.phone}
-            disabled={isExecuting}
-            {...register("phone")}
-            className={styles.input}
-          />
+          <div className={styles.inputShell}>
+            <input
+              type="tel"
+              placeholder="+1 555 000 0000"
+              autoComplete="tel"
+              aria-invalid={!!errors.phone}
+              disabled={isExecuting}
+              {...register("phone")}
+              className={styles.input}
+            />
+          </div>
           {errors.phone?.message ? (
             <p className={styles.error} role="alert">
               {errors.phone.message}
@@ -124,14 +175,16 @@ export default function ContactForm() {
 
       <label className={styles.field}>
         <span className={styles.label}>Message</span>
-        <textarea
-          placeholder="Tell us what you need"
-          rows={5}
-          aria-invalid={!!errors.message}
-          disabled={isExecuting}
-          {...register("message")}
-          className={styles.textarea}
-        />
+        <div className={styles.textareaShell}>
+          <textarea
+            placeholder="Tell us what you need"
+            rows={5}
+            aria-invalid={!!errors.message}
+            disabled={isExecuting}
+            {...register("message")}
+            className={styles.textarea}
+          />
+        </div>
         {errors.message?.message ? (
           <p className={styles.error} role="alert">
             {errors.message.message}
