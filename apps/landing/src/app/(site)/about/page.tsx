@@ -5,7 +5,7 @@ import AboutView from "./about-view";
 export const metadata: Metadata = {
   title: "About | DTM Ones",
   description:
-    "Learn how DTM Ones supports basketball players and coaches worldwide.",
+    "Worldwide basketball agency focused on player development and growth, with over 26 years of experience guiding players through their professional careers.",
 };
 
 export default function Page() {
