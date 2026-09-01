@@ -54,7 +54,7 @@ export default function Header({
           className={cn(
             // Phone: gap-2 keeps search icon ↔ hamburger tight (#49).
             // Desktop: wider column gap in the 3-col grid.
-            "flex min-h-[var(--glass-header-control-size)] items-center gap-2 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(280px,440px)_1fr] lg:gap-4",
+            "flex min-h-[var(--glass-header-control-size)] items-center gap-2 overflow-visible lg:grid lg:grid-cols-[1fr_minmax(280px,440px)_1fr] lg:gap-6",
             overlay && "pointer-events-none",
           )}
           variants={reduce ? undefined : itemVariants}
@@ -89,7 +89,7 @@ export default function Header({
 
           <div
             className={cn(
-              "flex items-center justify-end gap-2 max-lg:ml-auto",
+              "flex items-center justify-end gap-3 max-lg:ml-auto",
               overlay && "pointer-events-auto",
             )}
           >

@@ -66,7 +66,7 @@ Do not mix solid `#1d1d1d` + aureola search with glass controls.
 | Header **hamburger** | Soft | Below `nav` (1250) only; line morph (#49) |
 | Header **brand mark** | Ball below `nav`; wordmark at `nav`+ | Ball = `dtm-ones-logo.svg` (compact); wordmark = `logo-dtm-ones.png`. Same `nav` breakpoint as logo height swap / inline nav (#63) |
 | Header **socials** | Meta icons | Beside brand mark, short rule separator, no glass shell. Always visible. URLs in `config/socials.ts`. Not in menu/footer (#63) |
-| Header **inline nav** | Meta | Opacity current/hover (#49) |
+| Header **inline nav** | Glass nav plate | Control fill + soft radius 12; Meta links inside; opacity current/hover (#63) |
 | Full-screen **site menu** | Panel | Below `nav`; glass-backed full-bleed; opacity links, no SplitLink (#49) |
 | Search/filter **overlay panel** | Plate | Companion window; section labels = Meta |
 | Roster card **Category** | Meta | Reference for Meta |
@@ -79,7 +79,6 @@ Do not mix solid `#1d1d1d` + aureola search with glass controls.
 | Filter **chips** | Choice controls inside the plate (#54); keep pill |
 | Highlights **Play** (large white circle) | Primary media CTA; keep solid high-contrast circle |
 | Contact submit, Load more, Clear filters | Page CTAs — radius 12 for solid CTAs; not glass fill |
-| Desktop **inline nav** links | Typographic Meta — not glass pills (#49) |
 | Full-screen **site menu** links | Same opacity language as inline; Big Shoulders display (#49) |
 
 ## Patterns to retire
@@ -103,5 +102,5 @@ Do not mix solid `#1d1d1d` + aureola search with glass controls.
 - Unify interactive controls: #53 (this brief)
 - Filter overlay / chips fit: #54
 - Header nav: #49 (inline at `lg+`; hamburger + restyled overlay below; drop SplitLink)
-- Header glass nav + socials face-up: #63 (ball mark below `nav`; socials soft in header; plate + spacing still open)
+- Header glass nav + socials face-up: #63 (ball mark below `nav`; socials beside brand; glass nav plate at `nav`+)
 - Parent map: #46

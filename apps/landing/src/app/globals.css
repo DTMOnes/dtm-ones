@@ -88,8 +88,8 @@
   --glass-drop: 0 10px 28px rgb(0 0 0 / 0.28);
   --glass-control-size: 40px;
   --glass-header-control-size: 44px;
-  --header-padding-top: 20px;
-  --header-padding-bottom: 24px;
+  --header-padding-top: 24px;
+  --header-padding-bottom: 28px;
   --header-height: calc(
     var(--header-padding-top) + var(--glass-header-control-size) +
       var(--header-padding-bottom)
@@ -282,11 +282,28 @@ body {
 @media (prefers-reduced-transparency: reduce) {
   .glass-control,
   .glass-plate,
+  .glass-nav-plate,
   .search-pill {
     background: var(--glass-fill-solid);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
+}
+
+/* Header inline nav: control fill + soft radius (sibling to search field / hamburger). */
+.glass-nav-plate {
+  box-sizing: border-box;
+  align-items: center;
+  gap: 2.5rem;
+  height: var(--glass-header-control-size);
+  padding: 0 24px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-soft-radius);
+  background: var(--glass-gradient), var(--glass-fill);
+  isolation: isolate;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-inset), var(--glass-drop);
 }
 
 /* Search field: same glass fill as controls; soft radius matches header icons. */
