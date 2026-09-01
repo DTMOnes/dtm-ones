@@ -44,41 +44,71 @@
   overscroll-behavior: contain;
   position: relative;
   z-index: 1;
-  padding-top: 120px;
-  padding-bottom: 32px;
+  padding-top: clamp(140px, 14vh, 168px);
+  padding-bottom: clamp(72px, 10vh, 112px);
   padding-left: clamp(24px, 5vw, 80px);
   padding-right: clamp(24px, 4vw, 80px);
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 20px;
   background: var(--color-black);
   container-type: inline-size;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-white) 22%, transparent)
+    transparent;
 
-  h1,
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-white) 22%, transparent);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-white) 36%, transparent);
+  }
+}
+
+.contentInner {
+  margin-block: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+
   p {
     margin: 0;
     font-family: var(--font-inter);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     text-align: left;
     color: color-mix(in srgb, var(--color-white) 70%, transparent);
   }
 
+  .brand {
+    position: relative;
+    height: 2.5rem;
+    aspect-ratio: 1082 / 259;
+    overflow: hidden;
+  }
+
   .paragraph {
     width: min(100%, 800px);
     padding: 40px 0;
-    font-family: var(--font-big-shoulders);
-    font-size: clamp(28px, 4.5cqi, 40px);
-    font-weight: 900;
-    line-height: 1.2;
-    text-transform: uppercase;
-    color: var(--color-white);
+    font-size: clamp(16px, 2cqi, 18px);
+    line-height: 1.65;
   }
 
   .highlight {
-    color: color-mix(in srgb, var(--color-white) 70%, transparent);
+    color: var(--color-white);
   }
 }
 
@@ -106,8 +136,7 @@
 
 @media (width < 640px) {
   .content {
-    padding-top: 116px;
-    padding-bottom: 24px;
-    justify-content: flex-start;
+    padding-top: 128px;
+    padding-bottom: 56px;
   }
 }

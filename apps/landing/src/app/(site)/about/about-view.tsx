@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import styles from "./styles.module.scss";
+
+const WORDMARK_SRC = "/assets/images/logo-dtm-ones.png";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
@@ -102,15 +105,26 @@ export default function AboutView() {
         <div className={styles.media} />
       </div>
 
-      <motion.div
-        className={styles.content}
-        variants={reduce ? undefined : stageVariants}
-        initial={reduce ? false : "hidden"}
-        animate="show"
-      >
-        <motion.h1 variants={reduce ? undefined : itemVariants}>
-          DTM ONES
-        </motion.h1>
+      <div className={styles.content}>
+        <motion.div
+          className={styles.contentInner}
+          variants={reduce ? undefined : stageVariants}
+          initial={reduce ? false : "hidden"}
+          animate="show"
+        >
+        <motion.div
+          className={styles.brand}
+          variants={reduce ? undefined : itemVariants}
+        >
+          <Image
+            className="object-contain"
+            src={WORDMARK_SRC}
+            alt="DTM Ones"
+            fill
+            sizes="200px"
+            priority
+          />
+        </motion.div>
 
         <motion.p
           className={styles.paragraph}
@@ -152,6 +166,7 @@ export default function AboutView() {
           ))}
         </motion.div>
       </motion.div>
+      </div>
     </main>
   );
 }
