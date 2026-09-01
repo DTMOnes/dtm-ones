@@ -94,6 +94,7 @@
     var(--header-padding-top) + var(--glass-header-control-size) +
       var(--header-padding-bottom)
   );
+  --landing-footer-height: 65px;
   --roster-scroll-padding-top: calc(var(--header-height) + 32px);
   --header-search-panel-top: calc(
     var(--header-padding-top) + var(--glass-header-control-size) + 12px
@@ -173,6 +174,36 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+}
+
+/* About: header (fixed overlay) + scrollable stage + footer = one viewport. */
+html:has([data-about-stage]),
+body:has([data-about-stage]) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+body:has([data-about-stage]) .page-scroll {
+  flex: 0 0 calc(100dvh - var(--landing-footer-height));
+  height: calc(100dvh - var(--landing-footer-height));
+  max-height: calc(100dvh - var(--landing-footer-height));
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body:has([data-about-stage]) .page-scroll > [data-about-stage] {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (width < 700px) {
+  :root {
+    --landing-footer-height: 100px;
+  }
 }
 
 /* Shared landing chrome controls — Player Info pill is the fill reference. */

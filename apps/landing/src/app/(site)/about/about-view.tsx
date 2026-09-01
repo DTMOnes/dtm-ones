@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import styles from "./styles.module.scss";
@@ -65,9 +66,41 @@ const metaLines = [
 export default function AboutView() {
   const reduce = useReducedMotion() ?? false;
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const footer = document.querySelector("footer");
+
+    const syncStage = () => {
+      const footerHeight = footer?.getBoundingClientRect().height ?? 65;
+      root.style.setProperty("--landing-footer-height", `${footerHeight}px`);
+    };
+
+    syncStage();
+    root.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100dvh";
+    document.body.style.maxHeight = "100dvh";
+
+    const observer = footer ? new ResizeObserver(syncStage) : null;
+    observer?.observe(footer!);
+    window.addEventListener("resize", syncStage);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", syncStage);
+      root.style.removeProperty("--landing-footer-height");
+      root.style.overflow = "";
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+      document.body.style.maxHeight = "";
+    };
+  }, []);
+
   return (
-    <main className={styles.container}>
-      <div className={styles.media} aria-hidden />
+    <main className={styles.container} data-about-stage>
+      <div className={styles.mediaRail} aria-hidden>
+        <div className={styles.media} />
+      </div>
 
       <motion.div
         className={styles.content}

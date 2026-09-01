@@ -1,14 +1,32 @@
 .container {
-  flex: 1 0 auto;
   width: 100%;
   max-width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
   position: relative;
   display: grid;
   grid-template-columns: 35% minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.mediaRail {
+  grid-column: 1;
+  min-height: 0;
 }
 
 .media {
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+
+  @media (width >= 1200px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 35%;
+    height: calc(100dvh - var(--landing-footer-height));
+  }
+
   background: url("/assets/images/dunk.jpg");
   background-size: cover;
   background-position: center;
@@ -18,7 +36,14 @@
 }
 
 .content {
+  grid-column: 2;
   width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  position: relative;
+  z-index: 1;
   padding-top: 120px;
   padding-bottom: 32px;
   padding-left: clamp(24px, 5vw, 80px);
@@ -26,7 +51,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 20px;
   background: var(--color-black);
   container-type: inline-size;
@@ -70,8 +95,12 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .media {
+  .mediaRail {
     display: none;
+  }
+
+  .content {
+    grid-column: 1;
   }
 }
 
