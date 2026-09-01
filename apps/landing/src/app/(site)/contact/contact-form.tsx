@@ -38,6 +38,7 @@ export default function ContactForm() {
   } = useForm<CreateContactRequest>({
     resolver: zodResolver(createContactRequestSchema),
     defaultValues: {
+      reason: "seeking_representation",
       email: "",
       phone: "",
       message: "",

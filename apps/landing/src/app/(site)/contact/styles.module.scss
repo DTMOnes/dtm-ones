@@ -47,8 +47,6 @@
 .formStage {
   width: min(100%, 560px);
   margin-left: clamp(48px, calc(48px + (100vw - 1200px) * 0.08), 160px);
-  padding: clamp(24px, 4cqi, 32px);
-  box-sizing: border-box;
 }
 
 .form {
@@ -68,7 +66,7 @@
 }
 
 .reasonLegend {
-  margin: 0;
+  margin: 0 0 6px;
   font-family: var(--font-inter);
   font-size: var(--meta-size);
   font-weight: var(--meta-weight);
@@ -86,7 +84,7 @@
   width: 100%;
   height: var(--glass-control-size);
   padding: 3px;
-  border-radius: 999px;
+  border-radius: var(--glass-soft-radius);
   border: 1px solid var(--glass-border);
   background: var(--glass-gradient), var(--glass-fill);
   backdrop-filter: var(--glass-blur);
@@ -100,7 +98,7 @@
   bottom: 3px;
   left: 0;
   z-index: 0;
-  border-radius: 999px;
+  border-radius: calc(var(--glass-soft-radius) - 3px);
   border: 1px solid var(--glass-border-strong);
   background: rgb(255 255 255 / 0.14);
   pointer-events: none;
@@ -146,7 +144,7 @@
   &:has(input:focus-visible) {
     outline: 2px solid rgb(255 255 255 / 0.8);
     outline-offset: 2px;
-    border-radius: 999px;
+    border-radius: var(--glass-soft-radius);
   }
 
   &:has(input:disabled) {
@@ -257,37 +255,36 @@
 
 .button {
   width: 100%;
-  padding: 16px 28px;
-  font-family: var(--font-big-shoulders);
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  height: var(--glass-header-control-size);
+  padding: 0 20px;
+  font-family: var(--font-inter);
+  font-size: var(--meta-size);
+  font-weight: var(--meta-weight);
+  letter-spacing: var(--meta-tracking);
   text-transform: uppercase;
-  color: var(--color-black);
-  background: var(--color-white);
-  border: 1px solid var(--color-white);
+  color: var(--color-white);
+  border: 1px solid var(--glass-border);
   border-radius: var(--glass-soft-radius);
+  background: var(--glass-gradient), var(--glass-fill);
+  isolation: isolate;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-inset), var(--glass-drop);
   cursor: pointer;
-  transition:
-    background 0.25s var(--glass-ease),
-    color 0.25s var(--glass-ease),
-    border-color 0.25s var(--glass-ease);
+  transition: transform 0.2s var(--glass-ease);
 
   &:hover:not(:disabled) {
-    background: transparent;
-    color: var(--color-white);
+    background: var(--glass-gradient-hover), var(--glass-fill-hover);
   }
 
   &:disabled {
-    color: color-mix(in srgb, var(--color-black) 45%, transparent);
-    background: color-mix(in srgb, var(--color-white) 35%, transparent);
-    border-color: transparent;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 
   &:focus-visible {
-    outline: 1px solid color-mix(in srgb, var(--color-white) 35%, transparent);
-    outline-offset: 3px;
+    outline: 2px solid rgb(255 255 255 / 0.8);
+    outline-offset: 2px;
   }
 
   &:active:not(:disabled) {
@@ -323,7 +320,8 @@
 @media (prefers-reduced-transparency: reduce) {
   .reasonTrack,
   .inputShell,
-  .textareaShell {
+  .textareaShell,
+  .button {
     background: var(--glass-fill-solid);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -371,10 +369,6 @@
     padding-right: 16px;
     justify-content: flex-start;
     gap: 36px;
-  }
-
-  .formStage {
-    padding: 20px 16px;
   }
 
   .row {
