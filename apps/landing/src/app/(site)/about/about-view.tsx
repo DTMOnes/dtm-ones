@@ -83,13 +83,25 @@ export default function AboutView() {
           className={styles.paragraph}
           variants={reduce ? undefined : itemVariants}
         >
-          Since 2000, DTM Ones has worked without interruption to build
-          something rare in this industry — an agency where loyalty and hard
-          work aren&apos;t talking points, but the way we operate every single
-          day.{" "}
+          We are a worldwide basketball agency, focused on player development
+          and growth. Over 26 years of experience speak for themselves,
+          supporting and guiding players throughout their careers and driving
+          ourselves with values of hard work, commitment and loyalty.
+          <br />
+          <br />
+          Working closely with basketball players to manage professional
+          opportunities across multiple countries around the world, providing
+          strategic guidance and ongoing support across each stage of their
+          journey as basketball professionals.
+          <br />
+          <br />
+          DTM Ones takes pride with the treatment provided to their clients,
+          always aiming towards building strong and confident relationships
+          based on trust, discipline and professionalism.
+          <br />
+          <br />
           <span className={styles.highlight}>
-            Twenty-five years later, that&apos;s still the reputation we
-            protect.
+            Let&apos;s draw the line of your dreams!
           </span>
         </motion.p>
 
