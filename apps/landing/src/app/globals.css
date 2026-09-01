@@ -94,7 +94,7 @@
     var(--header-padding-top) + var(--glass-header-control-size) +
       var(--header-padding-bottom)
   );
-  --landing-footer-height: 65px;
+  --landing-footer-height: 82px;
   --roster-scroll-padding-top: calc(var(--header-height) + 32px);
   --header-search-panel-top: calc(
     var(--header-padding-top) + var(--glass-header-control-size) + 12px
@@ -202,7 +202,7 @@ body:has([data-about-stage]) .page-scroll > [data-about-stage] {
 
 @media (width < 700px) {
   :root {
-    --landing-footer-height: 100px;
+    --landing-footer-height: 112px;
   }
 }
 
