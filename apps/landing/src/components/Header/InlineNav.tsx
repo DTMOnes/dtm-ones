@@ -12,7 +12,7 @@ export default function InlineNav({ className }: { className?: string }) {
 
   return (
     <nav
-      className={cn("flex items-center gap-8", className)}
+      className={cn("glass-nav-plate", className)}
       aria-label="Primary"
     >
       {overlayPages.map((page) => {
