@@ -74,7 +74,7 @@ export default function AboutView() {
     const footer = document.querySelector("footer");
 
     const syncStage = () => {
-      const footerHeight = footer?.getBoundingClientRect().height ?? 65;
+      const footerHeight = footer?.getBoundingClientRect().height ?? 82;
       root.style.setProperty("--landing-footer-height", `${footerHeight}px`);
     };
 
