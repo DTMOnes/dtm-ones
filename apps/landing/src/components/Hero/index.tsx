@@ -24,7 +24,8 @@ const SHOTS = [
   { src: "/assets/hero/hero-2.jpg", position: "55% 45%" },
   // Wide shot of one player: framed and zoomed per screen width in styles (.shotMineros).
   { src: "/assets/hero/hero-mineros.webp", className: styles.shotMineros },
-  { src: "/assets/hero/hero-manama.jpg", position: "55% 30%" },
+  // Portrait shot: framed knees-up per screen width in styles (.shotMarinos).
+  { src: "/assets/hero/hero-marinos.jpg", className: styles.shotMarinos },
 ];
 
 export default function Hero() {
