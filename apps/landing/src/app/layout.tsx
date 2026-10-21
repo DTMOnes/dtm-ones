@@ -19,10 +19,32 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
+const siteDescription =
+  "Basketball talent agency built on 25 years of trust. Connecting players and coaches with opportunities worldwide.";
+
+// Link previews (og-image.png) when a page is shared on social apps or chats.
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000",
+  ),
   title: "DTMones",
-  description:
-    "Basketball talent agency built on 25 years of trust. Connecting players and coaches with opportunities worldwide.",
+  description: siteDescription,
+  openGraph: {
+    title: "DTMones",
+    description: siteDescription,
+    siteName: "DTMones",
+    type: "website",
+    locale: "en_US",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "DTMones" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DTMones",
+    description: siteDescription,
+    images: ["/og-image.png"],
+  },
 };
 
 export default async function RootLayout({

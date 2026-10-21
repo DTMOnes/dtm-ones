@@ -54,7 +54,8 @@ FIBA-licensed agency founded in June 2000 by Gustavo Gorini, FIBA & JBA Agent (l
 - About copy with founder and FIBA facts (confirmed).
 - Logo SVGs above (confirmed identity).
 - Photography under `public/assets/images/` is not confirmed as live Client assets. Do not fabricate people, quotes, press, or case studies.
-- Instagram `@dtm_ones` and the YouTube URL in the site menu are unverified. The current YouTube channel ID matches a well-known placeholder.
+- Instagram: `https://www.instagram.com/dtm.ones/` (confirmed).
+- YouTube: `https://www.youtube.com/@dtmones6926` (confirmed).
 
 ## Product Principles
 
