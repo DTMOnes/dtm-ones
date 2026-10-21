@@ -1,132 +1,94 @@
-"use client";
-
-// Next
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-// Motion
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { ArrowRightIcon } from "@/components/icons";
+import type { PublicRosterPlayer } from "@/types/roster";
+import {
+  formatHeight,
+  formatStat,
+  positionLabel,
+  splitName,
+} from "@/utils/player-display";
 
-// Styles
 import styles from "./styles.module.scss";
 
-// Types
-import { PublicRosterPlayer } from "@/types/roster";
+export default function Cards({ player }: { player: PublicRosterPlayer }) {
+  const href = `/roster/${player.id}`;
+  const { first, last } = splitName(player.full_name);
+  const position = positionLabel(player);
+  const stats = player.season_stats;
 
-const PLACEHOLDER_SRC = "/assets/images/player-placeholder.png";
-
-const easeOut = [0.16, 1, 0.3, 1] as const;
-
-const cardVariants: Variants = {
-  initial: {
-    opacity: 1,
-    y: 20,
-    scale: 0.98,
-  },
-  enter: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.55,
-      delay: Math.min(index, 11) * 0.04,
-      ease: easeOut,
-    },
-  }),
-  exit: {
-    opacity: 0,
-    y: 16,
-    scale: 0.98,
-    transition: {
-      duration: 0.28,
-      ease: [0.76, 0, 0.24, 1],
-    },
-  },
-};
-
-const mediaVariants: Variants = {
-  initial: { scale: 1.06 },
-  enter: (index: number) => ({
-    scale: 1,
-    transition: {
-      duration: 0.85,
-      delay: Math.min(index, 11) * 0.04,
-      ease: easeOut,
-    },
-  }),
-};
-
-const infoVariants: Variants = {
-  initial: { opacity: 1, y: 10 },
-  enter: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.45,
-      delay: 0.06 + Math.min(index, 11) * 0.04,
-      ease: easeOut,
-    },
-  }),
-};
-
-export default function Cards({
-  player,
-  index,
-}: {
-  player: PublicRosterPlayer;
-  index: number;
-}) {
-  const router = useRouter();
-  const reduce = useReducedMotion();
-
-  const imageSrc = player.presentation_image_url?.trim() || PLACEHOLDER_SRC;
-  const kindLabel =
-    player.kind === "coach" ? "Coaches" : player.categories[0]?.name ?? "";
-
-  const handleNavigate = () => {
-    router.push(`/roster/${player.id}`);
-  };
+  const facts = [
+    { label: "Team", value: player.last_club },
+    { label: "League", value: player.league },
+    { label: "Country", value: player.nationality },
+    { label: "Height", value: formatHeight(player.height_cm) },
+  ].filter((fact) => Boolean(fact.value));
 
   return (
-    <motion.div
-      className={styles.card}
-      onClick={handleNavigate}
-      custom={index}
-      variants={reduce ? undefined : cardVariants}
-      initial={reduce ? false : "initial"}
-      animate="enter"
-      exit="exit"
-    >
-      <div className={styles.media}>
-        <motion.div
-          className={styles.media_inner}
-          custom={index}
-          variants={reduce ? undefined : mediaVariants}
-          initial={reduce ? false : "initial"}
-          animate="enter"
-        >
-          <Image
-            className={styles.image}
-            src={imageSrc}
-            alt={player.full_name}
-            width={1025}
-            height={1280}
-            draggable={false}
-          />
-        </motion.div>
+    <article className={styles.card}>
+      <div className={styles.top}>
+        <div className={styles.photoCol}>
+          <div className={styles.photo}>
+            {player.presentation_image_url ? (
+              <Image
+                src={player.presentation_image_url}
+                alt={player.full_name}
+                fill
+                sizes="132px"
+              />
+            ) : null}
+          </div>
+          {position ? <div className={styles.position}>{position}</div> : null}
+        </div>
+        <div className={styles.info}>
+          <Link href={href} className={styles.name} tabIndex={-1} aria-hidden>
+            <span className={styles.first}>{first}</span>
+            <span className={styles.last}>{last}</span>
+          </Link>
+          <dl className={styles.facts}>
+            {facts.map((fact) => (
+              <div key={fact.label} className={styles.fact}>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
-      <motion.div
-        className={styles.player_info}
-        custom={index}
-        variants={reduce ? undefined : infoVariants}
-        initial={reduce ? false : "initial"}
-        animate="enter"
+
+      {/* Without stats the dark box stays, empty, so every card keeps the same layout. */}
+      <div
+        className={
+          stats ? styles.stats : `${styles.stats} ${styles.statsEmpty}`
+        }
+        aria-hidden={stats ? undefined : true}
       >
-        <h2 className={styles.player_name}>{player.full_name}</h2>
-        {kindLabel ? (
-          <p className={styles.player_position}>{kindLabel}</p>
-        ) : null}
-      </motion.div>
-    </motion.div>
+        <p className={styles.statsTitle}>{stats?.season ?? ""} stats</p>
+        <dl className={styles.statsRow}>
+          <div>
+            <dt>Pts</dt>
+            <dd>{formatStat(stats?.ppg)}</dd>
+          </div>
+          <div>
+            <dt>Reb</dt>
+            <dd>{formatStat(stats?.rpg)}</dd>
+          </div>
+          <div>
+            <dt>Ast</dt>
+            <dd>{formatStat(stats?.apg)}</dd>
+          </div>
+          <div>
+            <dt>FG%</dt>
+            <dd>{formatStat(stats?.fg_pct, true)}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <Link href={href} className={styles.foot}>
+        View profile<span className="sr-only">: {player.full_name}</span>
+        <ArrowRightIcon />
+      </Link>
+    </article>
   );
 }

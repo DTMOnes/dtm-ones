@@ -1,22 +1,12 @@
 "use client";
 
-import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 
 import Header from "@/components/Header";
-import SearchCluster from "@/components/Header/SearchCluster";
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  const isHome = pathname === "/";
 
-  const search = isHome ? (
-    <Suspense fallback={null}>
-      <SearchCluster />
-    </Suspense>
-  ) : null;
-
-  return (
-    <Header search={search} overlay={pathname.startsWith("/roster/")} />
-  );
+  // Home draws the header over the hero; every other page stacks it above the content.
+  return <Header overlay={pathname === "/"} />;
 }

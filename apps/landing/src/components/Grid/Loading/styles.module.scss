@@ -1,20 +1,16 @@
 .loading {
-  width: 100%;
-  box-sizing: border-box;
-  padding: var(--roster-scroll-padding-top) 28px 40px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: 20px;
-  align-items: stretch;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
 }
 
 .skeleton {
   position: relative;
-  width: 100%;
-  min-width: 0;
-  aspect-ratio: 360 / 420;
+  height: 340px;
   overflow: hidden;
-  background: var(--color-dark-gray);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--blue-500);
+  background: var(--navy-900);
   opacity: 0;
   animation: skeleton-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -22,53 +18,46 @@
 .shimmer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    110deg,
-    transparent 25%,
-    rgb(255 255 255 / 6%) 45%,
-    transparent 65%
-  );
+  background: linear-gradient(110deg, transparent 25%, rgb(255 255 255 / 6%) 45%, transparent 65%);
   background-size: 220% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .meta {
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 16px;
+  top: 24px;
+  left: 152px;
+  right: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  z-index: 1;
+  gap: 10px;
 }
 
 .lineName,
 .lineRole {
   display: block;
-  border-radius: 2px;
   background: rgb(255 255 255 / 10%);
 }
 
 .lineName {
   width: 68%;
-  height: 18px;
+  height: 32px;
 }
 
 .lineRole {
-  width: 34%;
+  width: 40%;
   height: 10px;
 }
 
 @keyframes skeleton-in {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.97);
+    transform: translateY(20px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 }
 
@@ -82,10 +71,20 @@
   }
 }
 
-@media (width < 700px) {
+@media (width < 1100px) {
   .loading {
-    padding: var(--roster-scroll-padding-top) 16px 32px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 720px) {
+  .loading {
+    grid-template-columns: 1fr;
     gap: 16px;
+  }
+
+  .meta {
+    left: 136px;
   }
 }
 

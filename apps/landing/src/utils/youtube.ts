@@ -1,6 +1,3 @@
-import { PublicRosterPlayer } from "@/types/roster";
-import { GalleryItem } from "@/types/gallery";
-
 export function parseYouTubeVideoId(url: string): string | null {
   try {
     const parsed = new URL(url);
@@ -31,7 +28,6 @@ export function getYouTubeEmbedUrl(
     mute: mute ? "1" : "0",
     playsinline: "1",
     rel: "0",
-    modestbranding: "1",
   });
 
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params}`;
@@ -39,23 +35,4 @@ export function getYouTubeEmbedUrl(
 
 export function getYouTubeThumbnailUrl(videoId: string): string {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-}
-
-export function buildGalleryItems(player: PublicRosterPlayer): GalleryItem[] {
-  const images: GalleryItem[] = player.gallery_images.map((image) => ({
-    kind: "image",
-    id: image.id,
-    url: image.url,
-  }));
-
-  const videos: GalleryItem[] = [];
-
-  for (const video of player.videos) {
-    const videoId = parseYouTubeVideoId(video.youtube_url);
-    if (!videoId) continue;
-
-    videos.push({ kind: "video", id: video.id, videoId });
-  }
-
-  return [...images, ...videos];
 }

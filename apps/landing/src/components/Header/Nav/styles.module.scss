@@ -1,123 +1,94 @@
+@use "styles/typography" as type;
+
 .nav {
   position: fixed;
   inset: 0;
   z-index: 1001;
-  overflow: hidden;
-  /* Full-bleed plate: glass backdrop dim + near-solid fill (matches chrome dialect). */
-  background:
-    radial-gradient(
-      circle at 78% 18%,
-      color-mix(in srgb, var(--color-white) 8%, transparent),
-      transparent 42%
-    ),
-    linear-gradient(
-      180deg,
-      rgb(18 18 18 / 0.92) 0%,
-      rgb(10 10 10 / 0.96) 100%
-    ),
-    var(--glass-backdrop);
-  isolation: isolate;
-  backdrop-filter: var(--glass-plate-blur);
-  -webkit-backdrop-filter: var(--glass-plate-blur);
-}
-
-.stage {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 1100px);
-  max-width: 100%;
-  min-height: 100dvh;
-  margin: 0 auto;
-  padding: 116px 28px 36px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  background:
+    radial-gradient(ellipse 90% 45% at 50% 100%, rgb(3 105 176 / 0.35), transparent 70%),
+    rgb(5 11 28 / 0.97);
+}
+
+.bar {
+  display: flex;
+  flex: none;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 96px;
+  padding: 0 64px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+
+  a {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  img {
+    display: block;
+    height: 22px;
+    width: auto;
+  }
 }
 
 .pages {
-  width: 100%;
-  max-width: 56rem;
   display: flex;
+  flex: 1;
   flex-direction: column;
-  align-items: center;
-  gap: clamp(8px, 1.4vh, 16px);
-}
-
-.page {
-  display: flex;
   justify-content: center;
-  width: 100%;
+  gap: 4px;
+  padding: 48px 64px;
 }
 
-.page_link {
-  display: inline-block;
-  font-family: var(--font-big-shoulders);
-  font-weight: 900;
-  font-size: clamp(4rem, 10vw, 7.75rem);
-  line-height: 0.86;
-  letter-spacing: -0.035em;
-  text-transform: uppercase;
-  color: var(--color-white);
-  opacity: 0.32;
-  /* #49: opacity hover only — no translate / letter-spacing motion */
-  transition: opacity 0.3s var(--glass-ease);
+.link {
+  @include type.display(clamp(48px, 7vw, 96px));
+  width: fit-content;
+  line-height: 1.08;
+  transition: color 0.2s;
 
   &:hover,
-  &:focus-visible {
-    opacity: 1;
-    outline: none;
+  &:focus-visible,
+  &[aria-current="page"] {
+    color: var(--red-500);
   }
 }
 
-.page_current .page_link {
-  opacity: 1;
+.socials {
+  display: flex;
+  gap: 12px;
+  padding: 0 64px 48px;
 }
 
-@media (width < 900px) {
-  .stage {
-    padding-top: 104px;
+@media (width < 720px) {
+  .bar {
+    height: 72px;
+    padding: 0 20px;
+
+    img {
+      height: 20px;
+    }
   }
 
-  .page_link {
-    font-size: clamp(4rem, 12vw, 7rem);
-  }
-}
-
-@media (width < 700px) {
-  .stage {
-    min-height: 100svh;
-    padding: 96px 20px 28px;
+  .pages {
+    justify-content: flex-start;
+    gap: 0;
+    padding: 20px;
   }
 
-  .page_link {
-    font-size: clamp(3.4rem, 17vw, 5.4rem);
-  }
-}
-
-@media (width < 420px) {
-  .stage {
-    padding-right: 16px;
-    padding-left: 16px;
+  .link {
+    display: block;
+    width: 100%;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 56px;
+    line-height: 1;
   }
 
-  .page_link {
-    min-height: 70px;
-    font-size: clamp(3rem, 16vw, 4.25rem);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .page_link {
-    transition-duration: 0.01ms;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .nav {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: var(--glass-fill-solid);
+  .socials {
+    padding: 0 20px 28px;
   }
 }

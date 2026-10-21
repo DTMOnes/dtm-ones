@@ -9,6 +9,9 @@ export type CoachWrite = {
   nationality: string;
   lastClub: string;
   eurobasketLink?: string | null;
+  league?: string | null;
+  bio?: string | null;
+  instagramHashtag?: string | null;
 };
 
 export type CoachPatch = Partial<CoachWrite>;
@@ -63,6 +66,9 @@ export async function getCoach(db: Database, id: string): Promise<Coach | null> 
       eurobasketLink: true,
       visibility: true,
       presentationImageUrl: true,
+      league: true,
+      bio: true,
+      instagramHashtag: true,
     },
     where: and(
       eq(schema.clients.id, id),
@@ -107,6 +113,9 @@ export async function createCoach(
       lastClub: input.lastClub,
       visibility: "private",
       eurobasketLink: input.eurobasketLink ?? null,
+      league: input.league ?? null,
+      bio: input.bio ?? null,
+      instagramHashtag: input.instagramHashtag ?? null,
     })
     .returning({ id: schema.clients.id });
 
@@ -157,6 +166,12 @@ export async function updateCoach(
       nationality: next.nationality,
       lastClub: next.lastClub,
       eurobasketLink: next.eurobasketLink,
+      league: patch.league === undefined ? existing.league : patch.league,
+      bio: patch.bio === undefined ? existing.bio : patch.bio,
+      instagramHashtag:
+        patch.instagramHashtag === undefined
+          ? existing.instagramHashtag
+          : patch.instagramHashtag,
       updatedAt: new Date(),
     })
     .where(eq(schema.clients.id, id));

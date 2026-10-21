@@ -1,0 +1,34 @@
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: var(--color-white);
+  font: 700 11px/1 var(--font-body);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--sky-300);
+  }
+}
+
+@media (width < 720px) {
+  .menuButton {
+    min-width: 44px;
+    justify-content: center;
+  }
+
+  .menuLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}

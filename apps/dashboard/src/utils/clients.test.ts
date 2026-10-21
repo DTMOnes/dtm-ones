@@ -15,6 +15,7 @@ import {
 } from "./clients";
 import { createPlayer, getPlayer, updatePlayer } from "./players";
 import { trashClient } from "./trash";
+import { testDatabaseUrl } from "@dtm/database/testing";
 
 const root = path.resolve(
   fileURLToPath(new URL(".", import.meta.url)),
@@ -22,10 +23,7 @@ const root = path.resolve(
 );
 process.loadEnvFile(path.join(root, ".env"));
 
-const connectionString = process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DATABASE_URL or TEST_DATABASE_URL is required");
-}
+const connectionString = testDatabaseUrl();
 
 const db = createDatabase(connectionString);
 

@@ -5,12 +5,15 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./career": "./src/career.ts",
+    "./testing": "./src/testing.ts",
     "./env": "./src/config/env.ts"
   },
   "scripts": {
     "db:push": "drizzle-kit push --config ./src/config/drizzle-kit.ts",
     "db:grant-landing": "tsx src/scripts/grant-landing-role.ts",
-    "test": "node --import tsx --test --test-concurrency=1 src/db/schema.test.ts src/db/landing-roster.test.ts",
+    "db:migrate": "tsx src/scripts/migrate.ts",
+    "test": "node --import tsx --test --test-concurrency=1 src/career.test.ts src/testing.test.ts src/db/schema.test.ts src/db/landing-roster.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import styles from "./styles.module.scss";
-
-const WORDMARK_SRC = "/assets/images/logo-dtm-ones.png";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
@@ -69,88 +65,49 @@ const metaLines = [
 export default function AboutView() {
   const reduce = useReducedMotion() ?? false;
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const footer = document.querySelector("footer");
-
-    const syncStage = () => {
-      const footerHeight = footer?.getBoundingClientRect().height ?? 82;
-      root.style.setProperty("--landing-footer-height", `${footerHeight}px`);
-    };
-
-    syncStage();
-    root.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-    document.body.style.height = "100dvh";
-    document.body.style.maxHeight = "100dvh";
-
-    const observer = footer ? new ResizeObserver(syncStage) : null;
-    observer?.observe(footer!);
-    window.addEventListener("resize", syncStage);
-
-    return () => {
-      observer?.disconnect();
-      window.removeEventListener("resize", syncStage);
-      root.style.removeProperty("--landing-footer-height");
-      root.style.overflow = "";
-      document.body.style.overflow = "";
-      document.body.style.height = "";
-      document.body.style.maxHeight = "";
-    };
-  }, []);
-
   return (
-    <main className={styles.container} data-about-stage>
-      <div className={styles.mediaRail} aria-hidden>
-        <div className={styles.media} />
-      </div>
+    <main className={styles.container}>
+      <div className={styles.media} aria-hidden />
 
-      <div className={styles.content}>
-        <motion.div
-          className={styles.contentInner}
-          variants={reduce ? undefined : stageVariants}
-          initial={reduce ? false : "hidden"}
-          animate="show"
-        >
-        <motion.div
-          className={styles.brand}
-          variants={reduce ? undefined : itemVariants}
-        >
-          <Image
-            className="object-contain"
-            src={WORDMARK_SRC}
-            alt="DTM Ones"
-            fill
-            sizes="200px"
-            priority
-          />
-        </motion.div>
-
-        <motion.p
-          className={styles.paragraph}
-          variants={reduce ? undefined : itemVariants}
-        >
-          We are a worldwide basketball agency, focused on player development
-          and growth. Over 26 years of experience speak for themselves,
-          supporting and guiding players throughout their careers and driving
-          ourselves with values of hard work, commitment and loyalty.
-          <br />
-          <br />
-          Working closely with basketball players to manage professional
-          opportunities across multiple countries around the world, providing
-          strategic guidance and ongoing support across each stage of their
-          journey as basketball professionals.
-          <br />
-          <br />
-          DTM Ones takes pride with the treatment provided to their clients,
-          always aiming towards building strong and confident relationships
-          based on trust, discipline and professionalism.
-          <br />
-          <br />
-          <span className={styles.highlight}>
-            Let&apos;s draw the line of your dreams!
-          </span>
+      <motion.div
+        className={styles.content}
+        variants={reduce ? undefined : stageVariants}
+        initial={reduce ? false : "hidden"}
+        animate="show"
+      >
+        <motion.p className="kicker" variants={reduce ? undefined : itemVariants}>
+          About
         </motion.p>
+        <motion.h1
+          className={styles.title}
+          variants={reduce ? undefined : itemVariants}
+        >
+          DTMones
+        </motion.h1>
+
+        <motion.div
+          className={styles.copy}
+          variants={reduce ? undefined : itemVariants}
+        >
+          <p className={styles.paragraph}>
+            We are a worldwide basketball agency, focused on player development
+            and growth. Over 26 years of experience speak for themselves,
+            supporting and guiding players throughout their careers and driving
+            ourselves with values of hard work, commitment and loyalty.
+          </p>
+          <p>
+            Working closely with basketball players to manage professional
+            opportunities across multiple countries around the world, providing
+            strategic guidance and ongoing support across each stage of their
+            journey as basketball professionals.
+          </p>
+          <p>
+            DTMones takes pride with the treatment provided to their clients,
+            always aiming towards building strong and confident relationships
+            based on trust, discipline and professionalism.
+          </p>
+          <p className={styles.highlight}>Let&apos;s draw the line of your dreams!</p>
+        </motion.div>
 
         <motion.div
           className={styles.meta}
@@ -166,7 +123,6 @@ export default function AboutView() {
           ))}
         </motion.div>
       </motion.div>
-      </div>
     </main>
   );
 }

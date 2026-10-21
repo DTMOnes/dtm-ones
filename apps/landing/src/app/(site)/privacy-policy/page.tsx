@@ -4,16 +4,16 @@ import Link from "next/link";
 import LegalDoc from "@/components/Legal";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DTM Ones",
+  title: "Privacy Policy | DTMones",
   description:
-    "How DTM Ones handles information on the public website. This site does not use cookies.",
+    "How DTMones handles information on the public website. This site does not use cookies.",
 };
 
 export default function Page() {
   return (
     <LegalDoc title="Privacy Policy">
       <p>
-        This policy describes how the DTM Ones public website handles
+        This policy describes how the DTMones public website handles
         information. This site does not use cookies and does not show a cookie
         banner.
       </p>

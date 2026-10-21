@@ -1,8 +1,8 @@
 .main {
   width: 100%;
   min-height: 100dvh;
-  padding: 120px 28px 80px;
-  background: var(--color-black);
+  padding: 72px var(--gutter) 96px;
+  background: var(--navy-950);
 }
 
 .article {
@@ -14,32 +14,33 @@
 
 .article h1 {
   margin: 0;
-  font-family: var(--font-big-shoulders);
-  font-weight: 900;
-  font-size: clamp(40px, 7vw, 64px);
-  line-height: 0.96;
-  letter-spacing: -0.03em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(48px, 7vw, 80px);
+  line-height: 0.95;
   text-transform: uppercase;
   color: var(--color-white);
 }
 
 .article h2 {
   margin: 12px 0 0;
-  font-family: var(--font-inter);
-  font-size: 15px;
-  font-weight: 600;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 800;
   line-height: 1.4;
-  color: var(--color-white);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sky-300);
 }
 
 .article p,
 .article li {
   margin: 0;
-  font-family: var(--font-inter);
+  font-family: var(--font-body);
   font-size: 15px;
   font-weight: 400;
   line-height: 1.55;
-  color: color-mix(in srgb, var(--color-white) 70%, transparent);
+  color: var(--ink-2);
 }
 
 .article ul {
@@ -64,7 +65,7 @@
 
 @media (width < 700px) {
   .main {
-    padding: 116px 16px 64px;
+    padding: 44px var(--gutter) 64px;
   }
 
   .article h1 {

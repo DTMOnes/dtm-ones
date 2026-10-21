@@ -9,10 +9,12 @@ import {
 
 export function PlayerVideoListItem({
   url,
+  title,
   videoId,
   playerId,
 }: {
   url: string;
+  title: string | null;
   videoId: string;
   playerId: string;
 }) {
@@ -29,7 +31,7 @@ export function PlayerVideoListItem({
             {url}
           </a>
         </ItemTitle>
-        <ItemDescription>YouTube video</ItemDescription>
+        <ItemDescription>{title ?? "YouTube video"}</ItemDescription>
       </ItemContent>
       <ItemActions>
         <DeletePlayerVideo videoId={videoId} playerId={playerId} />

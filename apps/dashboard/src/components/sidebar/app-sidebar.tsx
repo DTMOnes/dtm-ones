@@ -65,14 +65,14 @@ export function AppSidebar({
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-2">
+        <div className="flex items-center px-2 py-3">
           <Image
-            src="/assets/dtm-ones-logo.svg"
-            alt="DTM ONES"
-            width={25}
-            height={21}
+            src="/assets/dtm-ones-wordmark.png"
+            alt="DTMones"
+            width={123}
+            height={20}
+            priority
           />
-          <span className="text-base font-semibold tracking-tight">DTM ONES</span>
         </div>
       </SidebarHeader>
       <SidebarContent>

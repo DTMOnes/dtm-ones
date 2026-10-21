@@ -1,8 +1,8 @@
-@mixin big-shoulders($size: null) {
-  font-family: var(--font-big-shoulders);
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.02em;
+/* Anton: surnames and headings. Montserrat: everything else. */
+@mixin display($size: null) {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
   text-transform: uppercase;
   color: var(--color-white);
 
@@ -11,13 +11,22 @@
   }
 }
 
-@mixin inter($size: null) {
-  font-family: var(--font-inter);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+@mixin body($size: null) {
+  font-family: var(--font-body);
+  font-weight: 500;
   color: var(--color-white);
 
   @if $size {
     font-size: $size;
   }
+}
+
+/* Small uppercase label with wide tracking (kickers, tags, buttons). */
+@mixin label($size: 12px, $tracking: 0.16em) {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: $size;
+  line-height: 1;
+  letter-spacing: $tracking;
+  text-transform: uppercase;
 }

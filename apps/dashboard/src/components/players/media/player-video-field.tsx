@@ -22,13 +22,13 @@ export function PlayerVideoField({ playerId }: { playerId: string }) {
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(addPlayerVideoSchema),
-    defaultValues: { playerId, youtubeUrl: "" },
+    defaultValues: { playerId, youtubeUrl: "", title: "" },
   });
 
   const { executeAsync, isExecuting } = useAction(addPlayerVideoAction, {
     onSuccess: () => {
       toast.success("Video added successfully.");
-      methods.reset({ playerId, youtubeUrl: "" });
+      methods.reset({ playerId, youtubeUrl: "", title: "" });
       router.refresh();
     },
     onError: ({ error }) => {
@@ -52,6 +52,14 @@ export function PlayerVideoField({ playerId }: { playerId: string }) {
                 name="youtubeUrl"
                 label="YouTube URL"
                 placeholder="https://www.youtube.com/watch?v=..."
+                disabled={isExecuting}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <TextField
+                name="title"
+                label="Title (optional)"
+                placeholder="Season highlights 2025-26"
                 disabled={isExecuting}
               />
             </div>

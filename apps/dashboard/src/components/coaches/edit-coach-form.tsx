@@ -10,6 +10,7 @@ import type { z } from "zod";
 import { ArrowCounterClockwiseIcon, FloppyDiskIcon } from "@phosphor-icons/react";
 
 import { updateCoachAction } from "@/actions/coaches/updateCoach";
+import TextareaField from "@/components/form/textarea-field";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,9 @@ type FormValues = {
   nationality: string;
   lastClub: string;
   eurobasketLink: string;
+  league: string;
+  bio: string;
+  instagramHashtag: string;
 };
 
 export function EditCoachForm({ coach }: { coach: Coach }) {
@@ -48,6 +52,9 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
       nationality: coach.nationality ?? "",
       lastClub: coach.lastClub ?? "",
       eurobasketLink: coach.eurobasketLink ?? "",
+      league: coach.league ?? "",
+      bio: coach.bio ?? "",
+      instagramHashtag: coach.instagramHashtag ?? "",
     },
   });
 
@@ -103,6 +110,24 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
                 name="eurobasketLink"
                 label="Eurobasket link"
                 placeholder="https://basketball.eurobasket.com/..."
+                disabled={isExecuting}
+              />
+              <TextField
+                name="league"
+                label="Current league"
+                placeholder="NBA · USA"
+                disabled={isExecuting}
+              />
+              <TextareaField
+                name="bio"
+                label="About"
+                placeholder="Coaching path and approach."
+                disabled={isExecuting}
+              />
+              <TextField
+                name="instagramHashtag"
+                label="Instagram hashtag (for NEWS)"
+                placeholder="CoachName"
                 disabled={isExecuting}
               />
             </FieldGroup>

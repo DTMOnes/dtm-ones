@@ -1,0 +1,140 @@
+@use "styles/typography" as type;
+
+/* The one inverse (white) card on the page, like the design's password gate. */
+.gate {
+  display: flex;
+  min-height: 780px;
+  align-items: center;
+  justify-content: center;
+  padding: 96px var(--gutter);
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 45%, rgb(3 105 176 / 0.4), transparent 70%),
+    var(--navy-950);
+}
+
+.card {
+  width: 100%;
+  max-width: 540px;
+  padding: 48px 44px 36px;
+  border-top: 6px solid var(--red-500);
+  background: var(--color-white);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
+  color: var(--navy-900);
+}
+
+.kicker {
+  font-size: 12px;
+  color: var(--blue-500);
+}
+
+.title {
+  @include type.display(60px);
+  margin: 18px 0 0;
+  color: var(--navy-900);
+
+  span {
+    display: block;
+  }
+}
+
+.accent {
+  color: var(--blue-500);
+}
+
+.copy {
+  @include type.body(16px);
+  margin: 18px 0 0;
+  line-height: 1.6;
+  color: var(--ink-dark);
+}
+
+.field {
+  display: block;
+  margin-top: 28px;
+}
+
+.label {
+  @include type.label(11px, 0.2em);
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink-dark);
+}
+
+.inputWrap {
+  position: relative;
+  display: block;
+
+  svg {
+    position: absolute;
+    top: 19px;
+    left: 16px;
+    color: var(--blue-500);
+    pointer-events: none;
+  }
+}
+
+.input {
+  display: block;
+  width: 100%;
+  height: 56px;
+  padding: 0 16px 0 46px;
+  border: 1.5px solid #c9d6e8;
+  background: #f3f8fd;
+  color: var(--navy-900);
+  font: 600 16px var(--font-body);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:focus {
+    border-color: var(--sky-300);
+    box-shadow: 0 0 0 3px rgb(140 196 242 / 0.45);
+  }
+
+  &[aria-invalid="true"] {
+    border-color: var(--red-500);
+  }
+}
+
+.error {
+  margin: 10px 0 0;
+  font: 700 13px/1.4 var(--font-body);
+  color: #b3081a;
+}
+
+.submit {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 22px;
+}
+
+.back {
+  @include type.label(12px, 0.14em);
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-weight: 700;
+  color: var(--blue-500);
+
+  &:hover {
+    color: var(--navy-900);
+  }
+}
+
+@media (width < 720px) {
+  .gate {
+    min-height: 0;
+    padding: 56px var(--gutter) 72px;
+  }
+
+  .card {
+    padding: 36px 24px 26px;
+  }
+
+  .title {
+    font-size: 46px;
+  }
+}

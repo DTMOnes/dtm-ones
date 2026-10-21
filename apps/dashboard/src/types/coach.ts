@@ -13,5 +13,8 @@ export type Coach = {
   eurobasketLink: string | null;
   visibility: CoachVisibility;
   presentationImageUrl: string | null;
+  league: string | null;
+  bio: string | null;
+  instagramHashtag: string | null;
   gallery: CoachGalleryImage[];
 };

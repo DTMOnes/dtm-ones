@@ -61,7 +61,7 @@ export async function grantLandingPrivileges(
   );
   await ownerDb.execute(
     sql.raw(
-      `GRANT SELECT ON roster, roster_gallery_images, roster_videos TO ${role}`,
+      `GRANT SELECT ON roster, roster_gallery_images, roster_videos, roster_career_entries, roster_awards TO ${role}`,
     ),
   );
   await ownerDb.execute(sql.raw(`GRANT INSERT ON contact_requests TO ${role}`));

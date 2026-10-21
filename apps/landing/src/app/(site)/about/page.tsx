@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import AboutView from "./about-view";
 
 export const metadata: Metadata = {
-  title: "About | DTM Ones",
+  title: "About | DTMones",
   description:
-    "Worldwide basketball agency focused on player development and growth, with over 26 years of experience guiding players through their professional careers.",
+    "Learn how DTMones supports basketball players and coaches worldwide.",
 };
 
 export default function Page() {

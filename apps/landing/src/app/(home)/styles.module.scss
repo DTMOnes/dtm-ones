@@ -1,0 +1,264 @@
+@use "styles/typography" as type;
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.display {
+  @include type.display(80px);
+  margin: 12px 0 0;
+}
+
+/* ROSTER: five equal tiles, no player above another. */
+.roster {
+  padding: 88px var(--gutter) 40px;
+  scroll-margin-top: 24px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--navy-900);
+
+  img {
+    object-fit: cover;
+    object-position: 50% 30%;
+    filter: saturate(0.75) contrast(1.05);
+    transition:
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+      filter 0.5s;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(180deg, rgb(5 11 28 / 0) 50%, rgb(5 11 28 / 0.7) 100%),
+      rgb(10 65 112 / 0.22);
+    transition: opacity 0.5s;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    width: 28%;
+    height: 4px;
+    background: var(--blue-500);
+    transition:
+      width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+      background 0.3s;
+  }
+
+  &:hover,
+  &:focus-visible {
+    img {
+      transform: scale(1.07);
+      filter: saturate(1.05) contrast(1.05);
+    }
+
+    &::before {
+      opacity: 0.3;
+    }
+
+    &::after {
+      width: 100%;
+      background: var(--red-500);
+    }
+  }
+}
+
+/* SIGNED: Instagram posters as they are. */
+.signed {
+  padding: 72px var(--gutter) 88px;
+  background: linear-gradient(180deg, var(--navy-950), var(--navy-900));
+
+  .head {
+    margin-bottom: 32px;
+  }
+}
+
+.signedTitle {
+  margin: 12px 0 0;
+  font: 900 clamp(56px, 7.8vw, 112px) / 0.9 var(--font-body);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-shadow: 0 8px 28px rgb(0 0 0 / 0.45);
+}
+
+.posters {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.poster {
+  display: block;
+  transition: transform 0.25s;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border: 1px solid var(--line);
+  }
+
+  &:hover {
+    transform: translateY(-6px);
+  }
+}
+
+/* CTA: the one place white is a background. */
+.cta {
+  border-top: 6px solid var(--red-500);
+  background: var(--color-white);
+  color: var(--navy-900);
+}
+
+.ctaInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+  padding: 80px var(--gutter);
+}
+
+.ctaKicker {
+  color: var(--blue-500);
+}
+
+.ctaTitle {
+  @include type.display(clamp(56px, 7.2vw, 104px));
+  margin: 20px 0 0;
+  color: var(--navy-900);
+
+  span {
+    display: block;
+  }
+}
+
+.ctaAccent {
+  color: var(--blue-500);
+}
+
+.ctaCopy {
+  @include type.body(18px);
+  max-width: 460px;
+  margin: 24px 0 0;
+  line-height: 1.6;
+  color: var(--ink-dark);
+}
+
+.ctaActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.ctaLogo {
+  justify-self: center;
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+}
+
+@media (width < 1100px) {
+  .tiles,
+  .posters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ctaInner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Phones: tiles and posters become swipeable strips. */
+@media (width < 720px) {
+  .roster {
+    padding-top: 56px;
+  }
+
+  .display {
+    font-size: 60px;
+  }
+
+  .tiles,
+  .posters {
+    display: flex;
+    gap: 12px;
+    margin-right: calc(var(--gutter) * -1);
+    margin-left: calc(var(--gutter) * -1);
+    padding: 0 var(--gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--gutter);
+    scrollbar-width: none;
+
+    > li {
+      flex: none;
+      width: 200px;
+      scroll-snap-align: start;
+    }
+  }
+
+  .head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .signed {
+    padding: 48px var(--gutter) 56px;
+  }
+
+  .signedTitle {
+    font-size: 60px;
+  }
+
+  .ctaInner {
+    gap: 40px;
+    padding: 56px var(--gutter);
+  }
+
+  .ctaTitle {
+    font-size: 56px;
+  }
+
+  .ctaCopy {
+    font-size: 16px;
+  }
+
+  .ctaActions {
+    flex-direction: column;
+  }
+
+  .ctaLogo {
+    max-width: 280px;
+  }
+}

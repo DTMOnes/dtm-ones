@@ -63,6 +63,7 @@ export function PlayerMedia({ player }: { player: PlayerDetail }) {
                 <li key={video.id}>
                   <PlayerVideoListItem
                     url={video.youtubeUrl}
+                    title={video.title}
                     videoId={video.id}
                     playerId={player.id}
                   />

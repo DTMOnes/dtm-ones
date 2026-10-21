@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { AnimatePresence } from "motion/react";
-
-import { useHeaderOverride } from "@/components/Header/HeaderProvider";
-import { NAV_BREAKPOINT_PX } from "@/components/Header/nav-data";
 
 import Button from "./Button";
 import Nav from "../Nav";
@@ -15,29 +12,14 @@ const subscribeToClient = () => () => {};
 
 export default function Menu() {
   const pathname = usePathname();
-  const { chromeOverlay, toggleMenu, closeChromeOverlay } = useHeaderOverride();
+  const [openPathname, setOpenPathname] = useState<string | null>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const mounted = useSyncExternalStore(
     subscribeToClient,
     () => true,
     () => false,
   );
-  const isActive = chromeOverlay === "menu";
-
-  useEffect(() => {
-    closeChromeOverlay();
-  }, [pathname, closeChromeOverlay]);
-
-  // Inline nav at `nav` (1250px) — close the overlay when that band is reached.
-  useEffect(() => {
-    const mq = window.matchMedia(`(min-width: ${NAV_BREAKPOINT_PX}px)`);
-    const onChange = () => {
-      if (mq.matches) closeChromeOverlay();
-    };
-    onChange();
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [closeChromeOverlay]);
+  const isActive = openPathname === pathname;
 
   useEffect(() => {
     if (isActive) {
@@ -60,18 +42,17 @@ export default function Menu() {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        closeChromeOverlay();
+        setOpenPathname(null);
         return;
       }
 
       if (event.key !== "Tab") return;
 
-      const menuLinks = Array.from(
-        document.querySelectorAll<HTMLElement>("#site-menu a[href]"),
+      const focusableElements = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "#site-menu a[href], #site-menu button",
+        ),
       );
-      const focusableElements = menuButton
-        ? [...menuLinks, menuButton]
-        : menuLinks;
 
       if (focusableElements.length === 0) return;
 
@@ -99,22 +80,22 @@ export default function Menu() {
       window.removeEventListener("keydown", onKeyDown);
       menuButton?.focus();
     };
-  }, [isActive, closeChromeOverlay]);
+  }, [isActive]);
 
   return (
     <>
-      <div className="nav:hidden">
-        <Button
-          isActive={isActive}
-          onClick={toggleMenu}
-          buttonRef={buttonRef}
-        />
-      </div>
+      <Button
+        isActive={isActive}
+        onClick={() =>
+          setOpenPathname((open) => (open === pathname ? null : pathname))
+        }
+        buttonRef={buttonRef}
+      />
       {mounted
         ? createPortal(
             <AnimatePresence mode="wait">
               {isActive ? (
-                <Nav onNavigate={closeChromeOverlay} />
+                <Nav onNavigate={() => setOpenPathname(null)} />
               ) : null}
             </AnimatePresence>,
             document.body,

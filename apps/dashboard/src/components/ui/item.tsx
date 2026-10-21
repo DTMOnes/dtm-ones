@@ -40,7 +40,7 @@ const itemVariants = cva(
       variant: {
         default: "border-transparent hover:bg-muted/50",
         outline: "border-border hover:bg-muted/40",
-        muted: "border-transparent bg-muted/45 hover:bg-muted",
+        muted: "border-border bg-card hover:border-primary/40 hover:bg-accent",
       },
       size: {
         default: "gap-3 px-3.5 py-3",

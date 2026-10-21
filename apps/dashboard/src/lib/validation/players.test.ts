@@ -66,3 +66,76 @@ test("add Player video requires a Player id and a YouTube URL", () => {
   });
   assert.equal(parsed.success, true);
 });
+
+test("update Player reads strengths per line and drops empty season stats", () => {
+  const parsed = updatePlayerSchema.safeParse({
+    id: "00000000-0000-4000-8000-000000000001",
+    name: "Manu Ginobili",
+    nationality: "Argentina",
+    lastClub: "San Antonio Spurs",
+    heightCm: "198",
+    categoryId: "",
+    eurobasketLink: "",
+    birthDate: "",
+    league: " ",
+    bio: "",
+    strengths: "Scorer\n\n Playmaker ",
+    seasonStats: { season: "", ppg: "", rpg: "" },
+  });
+
+  assert.equal(parsed.success, true);
+  if (parsed.success) {
+    assert.deepEqual(parsed.data.strengths, ["Scorer", "Playmaker"]);
+    assert.equal(parsed.data.seasonStats, null);
+    assert.equal(parsed.data.league, null);
+    assert.equal(parsed.data.birthDate, null);
+  }
+});
+
+test("update Player season stats need a season", () => {
+  const base = {
+    id: "00000000-0000-4000-8000-000000000001",
+    name: "Manu Ginobili",
+    nationality: "Argentina",
+    lastClub: "San Antonio Spurs",
+    strengths: "",
+  };
+
+  assert.equal(
+    updatePlayerSchema.safeParse({ ...base, seasonStats: { ppg: "12.5" } })
+      .success,
+    false,
+  );
+
+  const parsed = updatePlayerSchema.safeParse({
+    ...base,
+    seasonStats: { season: "2025-26", ppg: "12.5", fgPct: "48.2" },
+  });
+  assert.equal(parsed.success, true);
+  if (parsed.success) {
+    assert.equal(parsed.data.seasonStats?.season, "2025-26");
+    assert.equal(parsed.data.seasonStats?.ppg, 12.5);
+    assert.equal(parsed.data.seasonStats?.rpg, null);
+  }
+});
+
+test("Instagram hashtag drops the # and rejects spaces", () => {
+  const base = {
+    id: "00000000-0000-4000-8000-000000000001",
+    name: "Romeao Ferguson",
+    nationality: "USA",
+    lastClub: "Mineros",
+  };
+
+  const parsed = updatePlayerSchema.safeParse({ ...base, instagramHashtag: " #RomeaoFerguson " });
+  assert.equal(parsed.success, true);
+  if (parsed.success) assert.equal(parsed.data.instagramHashtag, "RomeaoFerguson");
+
+  const empty = updatePlayerSchema.safeParse({ ...base, instagramHashtag: "" });
+  assert.equal(empty.success && empty.data.instagramHashtag, null);
+
+  assert.equal(
+    updatePlayerSchema.safeParse({ ...base, instagramHashtag: "Romeao Ferguson" }).success,
+    false,
+  );
+});

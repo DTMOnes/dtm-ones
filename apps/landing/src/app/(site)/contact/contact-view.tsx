@@ -1,64 +1,41 @@
-"use client";
+import Image from "next/image";
 
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { StarIcon } from "@/components/icons";
 
 import ContactForm from "./contact-form";
 import styles from "./styles.module.scss";
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
-
-const stageVariants: Variants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.07,
-      delayChildren: 0,
-    },
-  },
-};
-
-const itemVariants: Variants = {
-  hidden: {
-    opacity: 1,
-    y: 18,
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.45,
-      ease: easeOut,
-    },
-  },
-};
-
 export default function ContactView() {
-  const reduce = useReducedMotion() ?? false;
-
   return (
     <main className={styles.container}>
-      <div className={styles.media} aria-hidden />
+      <div className={styles.media}>
+        <Image
+          className={styles.photo}
+          src="/assets/images/contact-dunk.jpg"
+          alt="A player dunking during a game"
+          fill
+          sizes="(width < 1000px) 100vw, 42vw"
+          priority
+        />
+        <div className={styles.tint} aria-hidden />
+        <div className={styles.shade} aria-hidden />
+        <div className={styles.caption}>
+          <StarIcon size={34} />
+          <p>
+            The line of <br />
+            your dreams
+          </p>
+        </div>
+      </div>
 
-      <motion.div
-        className={styles.content}
-        variants={reduce ? undefined : stageVariants}
-        initial={reduce ? false : "hidden"}
-        animate="show"
-      >
-        <motion.h1
-          className={styles.title}
-          variants={reduce ? undefined : itemVariants}
-        >
-          Contact us
-        </motion.h1>
-
-        <motion.div
-          className={styles.formStage}
-          variants={reduce ? undefined : itemVariants}
-        >
+      <div className={styles.content}>
+        <div className={styles.inner}>
+          <p className="kicker">Get in touch</p>
+          <h1 className={styles.title}>Contact us</h1>
+          <p className={styles.lede}>Players, coaches and clubs — write to us.</p>
           <ContactForm />
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </main>
   );
 }

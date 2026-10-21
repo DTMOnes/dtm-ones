@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Anton, Montserrat } from "next/font/google";
 import "./globals.css";
 
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "DTM ONES Dashboard",
-  description: "DTM ONES Dashboard",
+  title: "DTMones Dashboard",
+  description: "DTMones Dashboard",
 };
 
 export default function RootLayout({
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", "font-sans", geist.variable)}>
+    <html lang="en" className={cn("font-sans", anton.variable, montserrat.variable)}>
       <body className="antialiased">
         {children}
         <Toaster />

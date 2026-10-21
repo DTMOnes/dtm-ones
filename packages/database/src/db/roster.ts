@@ -1,10 +1,13 @@
-import { and, asc, eq, ilike, inArray, isNotNull } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNotNull } from "drizzle-orm";
 
 import type { Database } from "./client";
 import {
   roster,
+  rosterAwards,
+  rosterCareerEntries,
   rosterGalleryImages,
   rosterVideos,
+  type SeasonStats,
 } from "./schema";
 
 export type RosterPlayer = {
@@ -18,8 +21,34 @@ export type RosterPlayer = {
   categoryId: string | null;
   categoryName: string | null;
   presentationImageUrl: string | null;
+  birthDate: string | null;
+  league: string | null;
+  bio: string | null;
+  strengths: string[];
+  seasonStats: SeasonStats | null;
+  instagramHashtag: string | null;
   gallery: { id: string; url: string; sortOrder: number }[];
-  videos: { id: string; youtubeUrl: string; sortOrder: number }[];
+  videos: {
+    id: string;
+    youtubeUrl: string;
+    title: string | null;
+    sortOrder: number;
+  }[];
+  career: {
+    id: string;
+    season: string;
+    club: string;
+    league: string | null;
+    country: string | null;
+    isCurrent: boolean;
+  }[];
+  awards: {
+    id: string;
+    title: string;
+    detail: string | null;
+    year: string | null;
+    kind: "team" | "individual";
+  }[];
 };
 
 export type RosterCategory = {
@@ -53,6 +82,12 @@ const rosterColumns = {
   categoryId: roster.categoryId,
   categoryName: roster.categoryName,
   presentationImageUrl: roster.presentationImageUrl,
+  birthDate: roster.birthDate,
+  league: roster.league,
+  bio: roster.bio,
+  strengths: roster.strengths,
+  seasonStats: roster.seasonStats,
+  instagramHashtag: roster.instagramHashtag,
 } as const;
 
 export async function listPublicRosterPlayers(
@@ -96,8 +131,11 @@ export async function listPublicRosterPlayers(
     name: row.name ?? "",
     nationality: row.nationality ?? "",
     lastClub: row.lastClub ?? "",
+    strengths: row.strengths ?? [],
     gallery: [],
     videos: [],
+    career: [],
+    awards: [],
   }));
 }
 
@@ -133,19 +171,49 @@ export async function getPublicRosterPlayer(
     .select({
       id: rosterVideos.id,
       youtubeUrl: rosterVideos.youtubeUrl,
+      title: rosterVideos.title,
       sortOrder: rosterVideos.sortOrder,
     })
     .from(rosterVideos)
     .where(eq(rosterVideos.clientId, id))
-    .orderBy(asc(rosterVideos.sortOrder));
+    // Newest highlights first.
+    .orderBy(desc(rosterVideos.createdAt), desc(rosterVideos.sortOrder));
+
+  const career = await db
+    .select({
+      id: rosterCareerEntries.id,
+      season: rosterCareerEntries.season,
+      club: rosterCareerEntries.club,
+      league: rosterCareerEntries.league,
+      country: rosterCareerEntries.country,
+      isCurrent: rosterCareerEntries.isCurrent,
+    })
+    .from(rosterCareerEntries)
+    .where(eq(rosterCareerEntries.clientId, id))
+    .orderBy(asc(rosterCareerEntries.sortOrder));
+
+  const awards = await db
+    .select({
+      id: rosterAwards.id,
+      title: rosterAwards.title,
+      detail: rosterAwards.detail,
+      year: rosterAwards.year,
+      kind: rosterAwards.kind,
+    })
+    .from(rosterAwards)
+    .where(eq(rosterAwards.clientId, id))
+    .orderBy(asc(rosterAwards.sortOrder));
 
   return {
     ...row,
     name: row.name ?? "",
     nationality: row.nationality ?? "",
     lastClub: row.lastClub ?? "",
+    strengths: row.strengths ?? [],
     gallery,
     videos,
+    career,
+    awards,
   };
 }
 

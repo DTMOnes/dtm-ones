@@ -1,5 +1,5 @@
 import { and, asc, eq, isNull } from "drizzle-orm";
-import { schema, type Database } from "@dtm/database";
+import { schema, type Database, type SeasonStats } from "@dtm/database";
 
 import type { Coach } from "@/types/coach";
 import type { PlayerDetail, PlayerVisibility } from "@/types/player";
@@ -25,6 +25,12 @@ export type PlayerWrite = {
   categoryId?: string | null;
   presentationImageUrl?: string | null;
   eurobasketLink?: string | null;
+  birthDate?: string | null;
+  league?: string | null;
+  bio?: string | null;
+  strengths?: string[];
+  seasonStats?: SeasonStats | null;
+  instagramHashtag?: string | null;
 };
 
 export type PlayerPatch = Partial<Omit<PlayerWrite, "presentationImageUrl">>;
@@ -108,6 +114,12 @@ export async function getPlayer(
       heightCm: true,
       categoryId: true,
       presentationImageUrl: true,
+      birthDate: true,
+      league: true,
+      bio: true,
+      strengths: true,
+      seasonStats: true,
+      instagramHashtag: true,
     },
     where: and(
       eq(schema.clients.id, id),
@@ -134,6 +146,7 @@ export async function getPlayer(
         columns: {
           id: true,
           youtubeUrl: true,
+          title: true,
         },
         orderBy: [
           asc(schema.playerVideos.sortOrder),
@@ -173,6 +186,12 @@ export async function createPlayer(
         categoryId: input.categoryId ?? null,
         presentationImageUrl: input.presentationImageUrl ?? null,
         eurobasketLink: input.eurobasketLink ?? null,
+        birthDate: input.birthDate ?? null,
+        league: input.league ?? null,
+        bio: input.bio ?? null,
+        strengths: input.strengths ?? [],
+        seasonStats: input.seasonStats ?? null,
+        instagramHashtag: input.instagramHashtag ?? null,
       })
       .returning({ id: schema.clients.id });
 
@@ -238,6 +257,19 @@ export async function updatePlayer(
         categoryId: next.categoryId,
         presentationImageUrl: next.presentationImageUrl,
         eurobasketLink: next.eurobasketLink,
+        birthDate:
+          patch.birthDate === undefined ? existing.birthDate : patch.birthDate,
+        league: patch.league === undefined ? existing.league : patch.league,
+        bio: patch.bio === undefined ? existing.bio : patch.bio,
+        strengths: patch.strengths ?? existing.strengths,
+        seasonStats:
+          patch.seasonStats === undefined
+            ? existing.seasonStats
+            : patch.seasonStats,
+        instagramHashtag:
+          patch.instagramHashtag === undefined
+            ? existing.instagramHashtag
+            : patch.instagramHashtag,
         updatedAt: new Date(),
       })
       .where(eq(schema.clients.id, id));
@@ -290,7 +322,8 @@ export async function addPlayerVideo(
   db: Database,
   playerId: string,
   youtubeUrl: string,
-): Promise<{ id: string; youtubeUrl: string }> {
+  title: string | null = null,
+): Promise<{ id: string; youtubeUrl: string; title: string | null }> {
   const existing = await getPlayer(db, playerId);
   if (!existing) {
     throw new NotFoundError("Player");
@@ -302,11 +335,13 @@ export async function addPlayerVideo(
       clientId: playerId,
       clientKind: "player",
       youtubeUrl,
+      title,
       sortOrder: existing.videos.length,
     })
     .returning({
       id: schema.playerVideos.id,
       youtubeUrl: schema.playerVideos.youtubeUrl,
+      title: schema.playerVideos.title,
     });
 
   if (!row) {

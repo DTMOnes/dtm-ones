@@ -1,8 +1,11 @@
+import type { SeasonStats } from "@dtm/database";
+
 export type PlayerVisibility = "public" | "private";
 
 export type PlayerVideo = {
   id: string;
   youtubeUrl: string;
+  title: string | null;
 };
 
 export type PlayerGalleryImage = {
@@ -21,6 +24,12 @@ export type Player = {
   categoryId: string | null;
   categoryName: string | null;
   presentationImageUrl: string | null;
+  birthDate: string | null;
+  league: string | null;
+  bio: string | null;
+  strengths: string[] | null;
+  seasonStats: SeasonStats | null;
+  instagramHashtag: string | null;
 };
 
 export type PlayerDetail = Player & {
