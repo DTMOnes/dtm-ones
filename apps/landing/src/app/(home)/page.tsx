@@ -5,13 +5,14 @@ import Link from "next/link";
 import Hero from "@/components/Hero";
 import LockOnVisit from "@/components/Roster/LockOnVisit";
 import { ArrowRightIcon } from "@/components/icons";
-import { signings, socials } from "@/config/site";
+import { featuredClientIds, signings, socials } from "@/config/site";
 import {
   hasInstagram,
   listAgencyPosts,
   postsWithHashtag,
 } from "@/lib/instagram";
 import { listPublicRosterPlayers } from "@/lib/roster/queries";
+import { pickFeatured } from "@/utils/player-display";
 
 import styles from "./styles.module.scss";
 
@@ -21,10 +22,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const [{ clients: players }, agencyPosts] = await Promise.all([
-    listPublicRosterPlayers({ kind: "player", limit: 5 }),
+  const [{ clients: publicPlayers }, agencyPosts] = await Promise.all([
+    // ponytail: reads up to 100 public players to find the featured ones; page through if the roster outgrows it.
+    listPublicRosterPlayers({ kind: "player", limit: 100 }),
     listAgencyPosts(),
   ]);
+  // Five fixed players (config/site.ts); a hidden one is replaced by the next public player.
+  const players = pickFeatured(publicPlayers, featuredClientIds, 5);
   // Two rows of six: the agency's latest Instagram posts tagged #dtmsigned (what it uses) or #signed.
   const signedPosts = postsWithHashtag(agencyPosts, ["dtmsigned", "signed"], 12);
   // Until Instagram is connected, the static posters stand in.

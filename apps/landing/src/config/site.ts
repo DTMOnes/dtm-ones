@@ -28,3 +28,16 @@ export const signings = [
   { name: "Damir Brooks", src: "/assets/signed/damir-brooks.jpg" },
   { name: "Johu Castillo", src: "/assets/signed/johu-castillo.jpg" },
 ] as const;
+
+/**
+ * Players shown on Home, in order (Client ids). One that stops being public is
+ * skipped and the next public players fill the gap, so Home always shows five.
+ * ponytail: fixed here; move to the dashboard if Staff need to change it without a deploy.
+ */
+export const featuredClientIds = [
+  "168be1a6-1029-4c6b-b398-bc61a36ccc1b", // Alphonso Anderson
+  "7bfe9b76-75ba-4959-891b-efc6edef5f0d", // Bryan Carabali
+  "4dd0db17-320a-41f3-a146-adbc1a96739e", // Romeao Ferguson
+  "0c3e9601-9db8-48ee-a1ae-0a4ab59c17fb", // Jerome Meyinsse
+  "27d42508-e7d1-45d7-8352-5c7fe7b9b421", // Tavario Miller
+] as const;
