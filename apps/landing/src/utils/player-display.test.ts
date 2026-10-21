@@ -7,6 +7,7 @@ import {
   ageFrom,
   formatHeight,
   formatStat,
+  pickFeatured,
   previousCountries,
   seasonEndYear,
   sortCareer,
@@ -90,4 +91,19 @@ test("previousCountries leaves out the current club's country", () => {
   } as PublicRosterPlayer;
 
   assert.deepEqual(previousCountries(client), []);
+});
+
+test("pickFeatured keeps the fixed order and fills a gap when one is hidden", () => {
+  const p = (id: string) => ({ id });
+  const list = ["a", "b", "c", "d", "e", "f", "g"].map(p);
+
+  assert.deepEqual(
+    pickFeatured(list, ["e", "a", "g"], 5).map((x) => x.id),
+    ["e", "a", "g", "b", "c"],
+  );
+  // "g" is no longer public: the next public player takes the fifth slot.
+  assert.deepEqual(
+    pickFeatured(list.filter((x) => x.id !== "g"), ["e", "a", "g"], 5).map((x) => x.id),
+    ["e", "a", "b", "c", "d"],
+  );
 });

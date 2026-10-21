@@ -76,3 +76,18 @@ export function previousCountries(client: PublicRosterPlayer): string[] {
   }
   return [...byKey.values()];
 }
+
+/**
+ * The featured players that are still public, in their order, topped up with the
+ * other public players (in list order) until there are `count`.
+ */
+export function pickFeatured<T extends { id: string }>(
+  players: T[],
+  featuredIds: readonly string[],
+  count: number,
+): T[] {
+  const byId = new Map(players.map((player) => [player.id, player]));
+  const featured = featuredIds.flatMap((id) => byId.get(id) ?? []);
+  const rest = players.filter((player) => !featuredIds.includes(player.id));
+  return [...featured, ...rest].slice(0, count);
+}
