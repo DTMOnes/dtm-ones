@@ -14,6 +14,8 @@
 }
 
 .shot {
+  /* Extra zoom a shot can ask for, on top of the slow push-in. */
+  --zoom: 1;
   object-fit: cover;
   opacity: 0;
   filter: blur(2px) saturate(0.85);
@@ -188,7 +190,7 @@
 @keyframes shot {
   0% {
     opacity: 0;
-    transform: scale(1.03);
+    transform: scale(calc(1.03 * var(--zoom)));
   }
   4.5% {
     opacity: 1;
@@ -198,11 +200,39 @@
   }
   28.5% {
     opacity: 0;
-    transform: scale(1.09);
+    transform: scale(calc(1.09 * var(--zoom)));
   }
   100% {
     opacity: 0;
-    transform: scale(1.09);
+    transform: scale(calc(1.09 * var(--zoom)));
+  }
+}
+
+/* Mineros: a wide shot of one player, zoomed toward him (origin = his center) so he
+   reads bigger. The hero stays 860px tall, so wider screens crop it tighter: the zoom
+   eases off before it would cut him, and from 1700px (where he no longer fits whole)
+   the frame keeps his head and lets the legs go. Measured head-to-shoes at full push-in. */
+.shotMineros {
+  --zoom: 1.12;
+  object-position: 50% 75%;
+  transform-origin: 49.5% 54%;
+}
+
+@media (width >= 1400px) {
+  .shotMineros {
+    --zoom: 1.05;
+  }
+}
+
+@media (width >= 1520px) {
+  .shotMineros {
+    --zoom: 1;
+  }
+}
+
+@media (width >= 1700px) {
+  .shotMineros {
+    object-position: 50% 55%;
   }
 }
 
