@@ -236,6 +236,25 @@
   }
 }
 
+/* Marinos: a portrait shot. Filling the width, it keeps the player whole from the
+   knees up only while the screen is at most 1380px wide (the hero stays 860px tall).
+   Wider screens show it as a 1380px centered panel whose sides fade into the navy
+   background, so he is never cut. Measured head-to-knees at full push-in. */
+.shotMarinos {
+  object-position: 58% 37%;
+  transform-origin: 54% 54%;
+}
+
+@media (width > 1380px) {
+  .shotMarinos {
+    /* next/image `fill` sets left/width inline. */
+    left: 50% !important;
+    width: 1380px !important;
+    translate: -50% 0;
+    mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent);
+  }
+}
+
 @keyframes star {
   0% {
     opacity: 0;

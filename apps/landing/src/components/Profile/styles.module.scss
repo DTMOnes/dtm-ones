@@ -563,23 +563,61 @@
     background: rgb(5 11 28 / 0.95);
   }
 
+  /* Previous arrow, photo, next arrow in one row, centered. */
   &[open] {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 16px;
+  }
+
+  /* The close button's form stays out of the row (the button is fixed). */
+  form {
+    display: contents;
+  }
+
+  /* Phones: the photo takes the full width and the arrows sit over its side edges. */
+  @media (width < 720px) {
+    padding-inline: 0;
   }
 }
 
 .lightboxImage {
+  min-width: 0;
   max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
+
+  @media (width < 720px) {
+    width: 100%;
+  }
+}
+
+.lightboxArrow {
+  flex: none;
+
+  @media (width < 720px) {
+    position: fixed;
+    top: 50%;
+    z-index: 1;
+    translate: 0 -50%;
+  }
+}
+
+@media (width < 720px) {
+  .lightboxPrev {
+    left: 8px;
+  }
+
+  .lightboxNext {
+    right: 8px;
+  }
 }
 
 .lightboxClose,
-.lightboxNav button {
+.lightboxArrow {
   display: inline-flex;
   width: 44px;
   height: 44px;
@@ -599,13 +637,6 @@
   right: 16px;
 }
 
-.lightboxNav {
-  position: fixed;
-  right: 16px;
-  bottom: 16px;
-  display: flex;
-  gap: 8px;
-}
 
 /* career */
 .career {

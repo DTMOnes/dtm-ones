@@ -121,7 +121,7 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
               <TextareaField
                 name="bio"
                 label="About"
-                placeholder="Coaching path and approach."
+                placeholder={"Title\n\nDescription"}
                 disabled={isExecuting}
               />
               <TextField

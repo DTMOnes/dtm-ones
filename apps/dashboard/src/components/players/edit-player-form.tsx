@@ -183,7 +183,7 @@ export function EditPlayerForm({
               <TextareaField
                 name="bio"
                 label="About"
-                placeholder="Career path, playing style, recent progress."
+                placeholder={"Title\n\nDescription"}
                 disabled={isExecuting}
               />
               <TextareaField

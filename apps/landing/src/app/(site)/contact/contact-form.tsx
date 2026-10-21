@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,11 +14,31 @@ import {
   type CreateContactRequest,
 } from "@/lib/validation/contact-requests";
 
+import {
+  CALLING_COUNTRIES,
+  DEFAULT_COUNTRY,
+  callingCountry,
+  countryFromLocale,
+  fullPhone,
+} from "@/utils/country-calling-code";
 import styles from "./styles.module.scss";
+
+const noSubscribe = () => () => {};
 
 export default function ContactForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  // Country of the phone number: the visitor's pick, else their browser language region.
+  const [pickedCountry, setPickedCountry] = useState<string | null>(null);
+  const localeCountry = useSyncExternalStore(
+    noSubscribe,
+    () => countryFromLocale(navigator.language),
+    () => DEFAULT_COUNTRY,
+  );
+  const country = callingCountry(pickedCountry ?? localeCountry);
+  // Country names come from the runtime's Intl data, which differs between server and
+  // browser, so the full list renders in the browser only.
+  const mounted = useSyncExternalStore(noSubscribe, () => true, () => false);
   const {
     register,
     handleSubmit,
@@ -63,7 +84,10 @@ export default function ContactForm() {
       className={styles.form}
       onSubmit={handleSubmit((values) => {
         setSubmitError(null);
-        return executeAsync(values);
+        return executeAsync({
+          ...values,
+          phone: fullPhone(country.code, values.phone),
+        });
       })}
       noValidate
     >
@@ -115,23 +139,61 @@ export default function ContactForm() {
           ) : null}
         </label>
 
-        <label className={styles.field}>
-          <span className={styles.label}>Phone</span>
-          <input
-            type="tel"
-            placeholder="+1 555 000 0000"
-            autoComplete="tel"
-            aria-invalid={!!errors.phone}
-            disabled={isExecuting}
-            {...register("phone")}
-            className={styles.input}
-          />
+        <div className={styles.field}>
+          <span className={styles.label} id="contact-phone-label">
+            Phone
+          </span>
+          <div
+            className={`${styles.input} ${styles.phone}`}
+            data-invalid={!!errors.phone}
+            data-disabled={isExecuting}
+          >
+            {/* Flag and code on show; the native select on top does the picking. */}
+            <span className={styles.country}>
+              <Image
+                src={`/assets/flags/${country.code}.svg`}
+                alt=""
+                width={24}
+                height={16}
+                unoptimized
+              />
+              <span>+{country.dial}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" aria-hidden>
+                <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" />
+              </svg>
+              <select
+                aria-label="Country calling code"
+                value={country.code}
+                disabled={isExecuting}
+                onChange={(event) => setPickedCountry(event.target.value)}
+              >
+                {mounted ? (
+                  CALLING_COUNTRIES.map((option) => (
+                    <option key={option.code} value={option.code}>
+                      {option.name} (+{option.dial})
+                    </option>
+                  ))
+                ) : (
+                  <option value={country.code}>+{country.dial}</option>
+                )}
+              </select>
+            </span>
+            <input
+              type="tel"
+              placeholder="555 000 0000"
+              autoComplete="tel-national"
+              aria-labelledby="contact-phone-label"
+              aria-invalid={!!errors.phone}
+              disabled={isExecuting}
+              {...register("phone")}
+            />
+          </div>
           {errors.phone?.message ? (
             <p className={styles.error} role="alert">
               {errors.phone.message}
             </p>
           ) : null}
-        </label>
+        </div>
       </div>
 
       <label className={styles.field}>
