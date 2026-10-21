@@ -60,6 +60,16 @@ export default function Gallery({
           if (event.key === "ArrowLeft") step(-1);
         }}
       >
+        {images.length > 1 ? (
+          <button
+            type="button"
+            className={`${styles.lightboxArrow} ${styles.lightboxPrev}`}
+            onClick={() => step(-1)}
+            aria-label="Previous photo"
+          >
+            ‹
+          </button>
+        ) : null}
         {current ? (
           <Image
             className={styles.lightboxImage}
@@ -70,6 +80,16 @@ export default function Gallery({
             sizes="100vw"
           />
         ) : null}
+        {images.length > 1 ? (
+          <button
+            type="button"
+            className={`${styles.lightboxArrow} ${styles.lightboxNext}`}
+            onClick={() => step(1)}
+            aria-label="Next photo"
+          >
+            ›
+          </button>
+        ) : null}
         <form method="dialog">
           <button type="submit" className={styles.lightboxClose} aria-label="Close photo">
             <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
@@ -77,16 +97,6 @@ export default function Gallery({
             </svg>
           </button>
         </form>
-        {images.length > 1 ? (
-          <div className={styles.lightboxNav}>
-            <button type="button" onClick={() => step(-1)} aria-label="Previous photo">
-              ‹
-            </button>
-            <button type="button" onClick={() => step(1)} aria-label="Next photo">
-              ›
-            </button>
-          </div>
-        ) : null}
       </dialog>
     </>
   );
