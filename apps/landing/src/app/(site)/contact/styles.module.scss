@@ -262,9 +262,17 @@
     width: 100%;
     opacity: 0;
     cursor: pointer;
+    /* The open list is drawn by the browser: dark, like the site, with readable text
+       (it would otherwise inherit the white text on a white list). */
+    color-scheme: dark;
 
     &:disabled {
       cursor: not-allowed;
+    }
+
+    option {
+      background: var(--navy-900);
+      color: var(--color-white);
     }
   }
 }

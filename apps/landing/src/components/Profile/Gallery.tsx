@@ -67,7 +67,9 @@ export default function Gallery({
             onClick={() => step(-1)}
             aria-label="Previous photo"
           >
-            ‹
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+              <path d="M15.5 5l-7 7 7 7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+            </svg>
           </button>
         ) : null}
         {current ? (
@@ -87,7 +89,9 @@ export default function Gallery({
             onClick={() => step(1)}
             aria-label="Next photo"
           >
-            ›
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+              <path d="M8.5 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+            </svg>
           </button>
         ) : null}
         <form method="dialog">
