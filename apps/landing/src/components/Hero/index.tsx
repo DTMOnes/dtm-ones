@@ -22,7 +22,7 @@ const SHOTS = [
     wholeOnMobile: true,
   },
   { src: "/assets/hero/hero-2.jpg", position: "55% 45%" },
-  { src: "/assets/hero/hero-4.jpg", position: "55% 40%" },
+  { src: "/assets/hero/hero-mineros.webp", position: "50% 35%" },
   { src: "/assets/hero/hero-manama.jpg", position: "55% 30%" },
 ];
 
