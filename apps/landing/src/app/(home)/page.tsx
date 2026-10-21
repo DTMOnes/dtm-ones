@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Hero from "@/components/Hero";
+import LockOnVisit from "@/components/Roster/LockOnVisit";
 import { ArrowRightIcon } from "@/components/icons";
 import { signings, socials } from "@/config/site";
 import {
@@ -31,6 +32,7 @@ export default async function Page() {
 
   return (
     <main>
+      <LockOnVisit />
       <Hero />
 
       <section id="roster" className={styles.roster}>

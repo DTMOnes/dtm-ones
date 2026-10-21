@@ -3,7 +3,11 @@
 import { z } from "zod";
 
 import { actionClient } from "@/lib/safe-action";
-import { grantPlayersAccess, isPlayersPassword } from "@/lib/roster/access";
+import {
+  grantPlayersAccess,
+  isPlayersPassword,
+  revokePlayersAccess,
+} from "@/lib/roster/access";
 import { AppError } from "@/utils/errors";
 
 export const unlockPlayersAction = actionClient
@@ -15,6 +19,15 @@ export const unlockPlayersAction = actionClient
     }
 
     await grantPlayersAccess();
+
+    return { ok: true as const };
+  });
+
+/** Visiting Home locks the Clients list again, so it asks for the password next time. */
+export const lockPlayersAction = actionClient
+  .metadata({ actionName: "lockPlayers" })
+  .action(async () => {
+    await revokePlayersAccess();
 
     return { ok: true as const };
   });
