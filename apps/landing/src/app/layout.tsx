@@ -24,9 +24,11 @@ const siteDescription =
 
 // Link previews (og-image.png) when a page is shared on social apps or chats.
 export const metadata: Metadata = {
+  // The site's fixed production domain (set by Vercel on every deployment), so shared
+  // links keep a working preview image after later deploys.
   metadataBase: new URL(
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
+    process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000",
   ),
   title: "DTMones",
