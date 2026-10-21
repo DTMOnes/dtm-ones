@@ -46,8 +46,15 @@ export function ContactRequestCard({
       }}
       className={cn("cursor-pointer", !isNew && "opacity-60 hover:opacity-80")}
     >
-      <ItemMedia variant="icon">
+      <ItemMedia variant="icon" className="relative">
         <EnvelopeSimpleIcon />
+        {isNew ? (
+          // Unread marker; the row's aria-label already announces the status.
+          <span
+            aria-hidden
+            className="bg-destructive ring-card absolute -top-1 -right-1 size-2.5 rounded-full ring-2"
+          />
+        ) : null}
       </ItemMedia>
       <ItemContent>
         <ItemTitle

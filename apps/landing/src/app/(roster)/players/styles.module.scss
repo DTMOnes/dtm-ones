@@ -1,0 +1,33 @@
+@use "styles/typography" as type;
+
+.main {
+  padding: 72px 64px 104px;
+  background:
+    radial-gradient(ellipse 50% 380px at 15% 0%, rgb(3 105 176 / 0.35), transparent 70%),
+    var(--navy-950);
+}
+
+.inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.title {
+  @include type.display(clamp(72px, 9vw, 128px));
+  margin: 14px 0 0;
+  line-height: 0.92;
+}
+
+@media (width < 720px) {
+  .main {
+    padding: 44px var(--gutter) 64px;
+    background:
+      radial-gradient(ellipse 90% 300px at 20% 0%, rgb(3 105 176 / 0.35), transparent 70%),
+      var(--navy-950);
+  }
+
+  .title {
+    margin-top: 10px;
+    font-size: 72px;
+  }
+}

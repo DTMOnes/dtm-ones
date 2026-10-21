@@ -1,11 +1,11 @@
 // Styles
 import styles from "./styles.module.scss";
 
-const SKELETON_COUNT = 8;
+const SKELETON_COUNT = 6;
 
 export default function GridLoading() {
   return (
-    <main className={styles.loading} aria-busy="true" aria-label="Loading players">
+    <div className={styles.loading} aria-busy="true" aria-label="Loading players">
       {Array.from({ length: SKELETON_COUNT }, (_, index) => (
         <div
           key={index}
@@ -19,6 +19,6 @@ export default function GridLoading() {
           </div>
         </div>
       ))}
-    </main>
+    </div>
   );
 }

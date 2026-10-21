@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import ContactView from "./contact-view";
 
 export const metadata: Metadata = {
-  title: "Contact | DTM Ones",
+  title: "Contact | DTMones",
   description:
-    "Reach out to DTM Ones about basketball careers and opportunities.",
+    "Reach out to DTMones about basketball careers and opportunities.",
 };
 
 export default function ContactPage() {

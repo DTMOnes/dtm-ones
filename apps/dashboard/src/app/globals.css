@@ -38,83 +38,88 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* Square corners, like the public site. */
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
-  --font-heading: var(--font-sans);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
+  --font-heading: var(--font-anton);
 }
 
 :root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Light brand palette, like the landing's "Work with us" band: white and light-blue
+     ground, navy text, blue action, red only as an accent. The sidebar stays navy. */
+  --radius: 0px;
+  --background: #f1f6fc;
+  --foreground: #0a1530;
+  --card: #ffffff;
+  --card-foreground: #0a1530;
+  --popover: #ffffff;
+  --popover-foreground: #0a1530;
+  --primary: #0369b0;
+  --primary-foreground: #ffffff;
+  --secondary: #e3eff9;
+  --secondary-foreground: #0a1530;
+  --muted: #e3eff9;
+  --muted-foreground: #5a6a84;
+  --accent: #e3eff9;
+  --accent-foreground: #0a1530;
+  --destructive: #e10a1e;
+  --border: #d6e2ef;
+  --input: #c3d4e6;
+  --ring: #0369b0;
+  --chart-1: #0369b0;
+  --chart-2: #8cc4f2;
+  --chart-3: #e10a1e;
+  --chart-4: #0a4170;
+  --chart-5: #5a6a84;
+  --sidebar: #0a1530;
+  --sidebar-foreground: #d5e2f2;
+  --sidebar-primary: #8cc4f2;
+  --sidebar-primary-foreground: #0a1530;
+  --sidebar-accent: #13284f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 10%);
+  --sidebar-ring: #8cc4f2;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.922 0 0);
-  --sidebar-primary-foreground: oklch(0.205 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Navy palette, kept for the sign-in screen (the wordmark is white). */
+  --radius: 0px;
+  --background: #050b1c;
+  --foreground: #ffffff;
+  --card: #0a1530;
+  --card-foreground: #ffffff;
+  --popover: #0a1530;
+  --popover-foreground: #ffffff;
+  --primary: #e10a1e;
+  --primary-foreground: #ffffff;
+  --secondary: #0e2147;
+  --secondary-foreground: #ffffff;
+  --muted: #0e2147;
+  --muted-foreground: #a8b5cc;
+  --accent: #0e2147;
+  --accent-foreground: #ffffff;
+  --destructive: #f0192d;
+  --border: rgb(255 255 255 / 14%);
+  --input: rgb(255 255 255 / 18%);
+  --ring: #8cc4f2;
+  --chart-1: #0369b0;
+  --chart-2: #8cc4f2;
+  --chart-3: #e10a1e;
+  --chart-4: #0a4170;
+  --chart-5: #a8b5cc;
+  --sidebar: #050b1c;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #e10a1e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #0e2147;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 10%);
+  --sidebar-ring: #8cc4f2;
 }
 
 @layer base {
@@ -128,4 +133,43 @@
   html {
     @apply font-sans;
   }
+}
+
+/* Page and card titles in Anton capitals, as on the public site.
+   Unlayered so it wins over the components' own text-size utilities. */
+h1,
+[data-slot="card-title"] {
+  font-family: var(--font-anton);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+/* A thin line between stacked form fields, centered in the group's gap. */
+[data-slot="field-group"] > :is([data-slot="field"], [data-slot="field-set"])
+  ~ :is([data-slot="field"], [data-slot="field-set"]) {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+}
+
+/* Active sidebar item: light-blue tint with a thin red edge, the only red in the chrome. */
+[data-sidebar="menu-button"][data-active="true"] {
+  background: #1b3866;
+  box-shadow: inset 3px 0 0 #e10a1e;
+}
+
+[data-slot="sidebar-group-label"] {
+  color: #8cc4f2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[data-slot="card-title"] {
+  font-size: 1.375rem;
+  line-height: 1.1;
 }

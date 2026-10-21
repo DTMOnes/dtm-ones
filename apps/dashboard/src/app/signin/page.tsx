@@ -22,16 +22,21 @@ export default async function Page({
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="dark bg-background text-foreground flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-10">
-        <div className="flex items-center justify-center gap-3">
-          <Image
-            src="/assets/dtm-ones-logo.svg"
-            alt="DTM ONES"
-            width={25}
-            height={21}
-          />
-          <h1 className="text-2xl font-semibold tracking-tight">DTM ONES</h1>
+        <div className="flex flex-col items-center gap-3">
+          <h1>
+            <Image
+              src="/assets/dtm-ones-wordmark.png"
+              alt="DTMones"
+              width={197}
+              height={32}
+              priority
+            />
+          </h1>
+          <p className="text-muted-foreground text-xs font-bold tracking-[0.3em] uppercase">
+            Dashboard
+          </p>
         </div>
         <SignInForm showDenied={denied} />
       </div>

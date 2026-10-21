@@ -31,7 +31,7 @@ export function ContactRequestFilter({
       <TabsList
         variant="line"
         aria-label="Filter inbox"
-        className="w-full overflow-x-auto"
+        className="w-full overflow-x-auto overflow-y-hidden"
       >
         {FILTER_OPTIONS.map((option) => (
           <TabsTrigger key={option.value} value={option.value}>

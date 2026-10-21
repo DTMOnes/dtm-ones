@@ -4,21 +4,21 @@ import Link from "next/link";
 import LegalDoc from "@/components/Legal";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | DTM Ones",
-  description: "Terms for using the DTM Ones public website.",
+  title: "Terms and Conditions | DTMones",
+  description: "Terms for using the DTMones public website.",
 };
 
 export default function Page() {
   return (
     <LegalDoc title="Terms and Conditions">
       <p>
-        These terms cover use of the DTM Ones public website, including the
+        These terms cover use of the DTMones public website, including the
         Roster, player pages, and the contact form.
       </p>
 
       <h2>The site</h2>
       <p>
-        DTM Ones is a basketball agency. This site shows public Clients on the
+        DTMones is a basketball agency. This site shows public Clients on the
         Roster and accepts inquiries. Information is provided so clubs, scouts,
         and people seeking representation can learn about the agency and get in
         touch. It is not a contract for representation or a hiring offer.

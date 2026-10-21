@@ -1,60 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
-import styles from "./styles.module.scss";
-
-import Cards from "../Cards";
-import { useHeaderOverride } from "@/components/Header/HeaderProvider";
+import Cards from "@/components/Cards";
 import { loadRosterAction } from "@/actions/roster";
 import type { PublicRosterPlayer } from "@/types/roster";
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
-
-function EmptyState() {
-  const { replace } = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { startRosterTransition } = useHeaderOverride();
-  const reduce = useReducedMotion();
-
-  const query = searchParams.get("q")?.trim() ?? "";
-  const category = searchParams.get("c");
-  const kind = searchParams.get("kind");
-  const hasFilters = query.length > 0 || Boolean(category) || Boolean(kind);
-
-  const handleClear = () => {
-    startRosterTransition(() => {
-      replace(pathname);
-    });
-  };
-
-  return (
-    <motion.div
-      className={styles.empty}
-      initial={reduce ? false : { opacity: 1, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: easeOut }}
-    >
-      <h2 className={styles.empty_title}>
-        {hasFilters ? "No matches" : "Empty roster"}
-      </h2>
-      <p className={styles.empty_copy}>
-        {hasFilters
-          ? "Nothing fits that search or filter. Clear filters to see the full roster."
-          : "The public roster is empty right now. Check back soon."}
-      </p>
-      {hasFilters ? (
-        <button type="button" className={styles.empty_action} onClick={handleClear}>
-          Clear filters
-        </button>
-      ) : null}
-    </motion.div>
-  );
-}
+import styles from "./styles.module.scss";
 
 export default function Grid({
   clients,
@@ -62,37 +15,49 @@ export default function Grid({
   q,
   categoryIds,
   kind,
+  onClear,
 }: {
   clients: PublicRosterPlayer[];
   hasMore: boolean;
   q: string | undefined;
   categoryIds: string[];
   kind: "coach" | undefined;
+  onClear: () => void;
 }) {
   const [items, setItems] = useState(clients);
   const [more, setMore] = useState(hasMore);
   const { executeAsync, isExecuting } = useAction(loadRosterAction);
+  const hasFilters = Boolean(q) || categoryIds.length > 0 || Boolean(kind);
 
   if (items.length === 0) {
     return (
-      <main className={styles.empty_shell}>
-        <EmptyState />
-      </main>
+      <div className={styles.empty}>
+        <p className={styles.emptyTitle}>
+          {hasFilters ? "No clients match your search" : "The roster is empty right now"}
+        </p>
+        {hasFilters ? (
+          <button type="button" className="btn btn-ghost" onClick={onClear}>
+            Clear filters
+          </button>
+        ) : null}
+      </div>
     );
   }
 
   return (
-    <main className={styles.container}>
-      <AnimatePresence>
-        {items.map((client, index) => (
-          <Cards key={client.id} player={client} index={index} />
+    <>
+      <ul className={styles.grid}>
+        {items.map((client) => (
+          <li key={client.id}>
+            <Cards player={client} />
+          </li>
         ))}
-      </AnimatePresence>
+      </ul>
       {more ? (
         <div className={styles.loadMore}>
           <button
             type="button"
-            className={styles.loadMoreButton}
+            className="btn btn-ghost"
             disabled={isExecuting}
             onClick={async () => {
               const result = await executeAsync({
@@ -109,10 +74,10 @@ export default function Grid({
               setMore(page.hasMore);
             }}
           >
-            Load more
+            {isExecuting ? "Loading…" : "Load more"}
           </button>
         </div>
       ) : null}
-    </main>
+    </>
   );
 }

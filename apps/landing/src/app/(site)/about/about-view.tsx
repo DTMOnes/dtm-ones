@@ -75,23 +75,39 @@ export default function AboutView() {
         initial={reduce ? false : "hidden"}
         animate="show"
       >
-        <motion.h1 variants={reduce ? undefined : itemVariants}>
-          DTM ONES
-        </motion.h1>
-
-        <motion.p
-          className={styles.paragraph}
+        <motion.p className="kicker" variants={reduce ? undefined : itemVariants}>
+          About
+        </motion.p>
+        <motion.h1
+          className={styles.title}
           variants={reduce ? undefined : itemVariants}
         >
-          Since 2000, DTM Ones has worked without interruption to build
-          something rare in this industry — an agency where loyalty and hard
-          work aren&apos;t talking points, but the way we operate every single
-          day.{" "}
-          <span className={styles.highlight}>
-            Twenty-five years later, that&apos;s still the reputation we
-            protect.
-          </span>
-        </motion.p>
+          DTMones
+        </motion.h1>
+
+        <motion.div
+          className={styles.copy}
+          variants={reduce ? undefined : itemVariants}
+        >
+          <p className={styles.paragraph}>
+            We are a worldwide basketball agency, focused on player development
+            and growth. Over 26 years of experience speak for themselves,
+            supporting and guiding players throughout their careers and driving
+            ourselves with values of hard work, commitment and loyalty.
+          </p>
+          <p>
+            Working closely with basketball players to manage professional
+            opportunities across multiple countries around the world, providing
+            strategic guidance and ongoing support across each stage of their
+            journey as basketball professionals.
+          </p>
+          <p>
+            DTMones takes pride with the treatment provided to their clients,
+            always aiming towards building strong and confident relationships
+            based on trust, discipline and professionalism.
+          </p>
+          <p className={styles.highlight}>Let&apos;s draw the line of your dreams!</p>
+        </motion.div>
 
         <motion.div
           className={styles.meta}

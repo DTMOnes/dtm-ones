@@ -1,27 +1,26 @@
 import type { Metadata } from "next";
-import { Big_Shoulders, Inter } from "next/font/google";
+import { Anton, Montserrat } from "next/font/google";
 import "./globals.css";
 
 // Components
 import NavigationProgress from "@/components/NavigationProgress";
-import { HeaderProvider } from "@/components/Header/HeaderProvider";
 import SiteHeader from "@/components/Header/SiteHeader";
 import Footer from "@/components/Footer";
 
-const bigShoulders = Big_Shoulders({
-  weight: ["400", "700", "800", "900"],
+const anton = Anton({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-big-shoulders",
+  variable: "--font-anton",
 });
 
-const inter = Inter({
-  weight: ["400", "500", "600", "700"],
+const montserrat = Montserrat({
+  weight: ["400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
-  title: "DTM ONES",
+  title: "DTMones",
   description:
     "Basketball talent agency built on 25 years of trust. Connecting players and coaches with opportunities worldwide.",
 };
@@ -34,15 +33,13 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bigShoulders.variable} ${inter.variable} group/chrome dark font-sans`}
+      className={`${anton.variable} ${montserrat.variable} group/chrome dark font-sans`}
     >
       <body className="antialiased">
         <NavigationProgress />
-        <HeaderProvider>
-          <SiteHeader />
-          <div className="page-scroll">{children}</div>
-          <Footer />
-        </HeaderProvider>
+        <SiteHeader />
+        <div className="page-scroll">{children}</div>
+        <Footer />
       </body>
     </html>
   );

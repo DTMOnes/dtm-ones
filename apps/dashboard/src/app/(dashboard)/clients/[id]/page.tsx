@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { schema } from "@dtm/database";
 
+import { ClientCareer } from "@/components/career/client-career";
 import { CoachMedia } from "@/components/coaches/coach-media";
 import { CoachVisibilityCard } from "@/components/coaches/coach-visibility-card";
 import { EditCoachForm } from "@/components/coaches/edit-coach-form";
@@ -16,6 +17,7 @@ import { PlayerDetailTabs } from "@/components/players/player-detail-tabs";
 import { PlayerVisibilityCard } from "@/components/players/player-visibility-card";
 import { RemoveToTrashCard } from "@/components/trash/remove-to-trash-card";
 import { db } from "@/lib/db";
+import { getClientCareer } from "@/utils/career";
 import { coachCompletenessGaps, getCoach } from "@/utils/coaches";
 import { clientDisplayName } from "@/utils/clients";
 import { getPlayer, playerCompletenessChecks } from "@/utils/players";
@@ -42,7 +44,7 @@ export default async function Page({
   }
 
   if (row.kind === "player") {
-    const [player, categories] = await Promise.all([
+    const [player, categories, { career, awards }] = await Promise.all([
       getPlayer(db, id),
       db.query.categories.findMany({
         columns: {
@@ -51,6 +53,7 @@ export default async function Page({
         },
         orderBy: [asc(schema.categories.name)],
       }),
+      getClientCareer(db, id),
     ]);
 
     if (!player) {
@@ -70,7 +73,16 @@ export default async function Page({
           tab={tab}
           info={
             <DetailLayout
-              main={<EditPlayerForm player={player} categories={categories} />}
+              main={
+                <div className="flex flex-col gap-6">
+                  <EditPlayerForm player={player} categories={categories} />
+                  <ClientCareer
+                    clientId={player.id}
+                    career={career}
+                    awards={awards}
+                  />
+                </div>
+              }
               rail={
                 <>
                   <PlayerVisibilityCard
@@ -88,7 +100,10 @@ export default async function Page({
     );
   }
 
-  const coach = await getCoach(db, id);
+  const [coach, { career, awards }] = await Promise.all([
+    getCoach(db, id),
+    getClientCareer(db, id),
+  ]);
 
   if (!coach) {
     notFound();
@@ -110,7 +125,16 @@ export default async function Page({
         tab={tab}
         info={
           <DetailLayout
-            main={<EditCoachForm coach={coach} />}
+            main={
+              <div className="flex flex-col gap-6">
+                <EditCoachForm coach={coach} />
+                <ClientCareer
+                  clientId={coach.id}
+                  career={career}
+                  awards={awards}
+                />
+              </div>
+            }
             rail={
               <>
                 <CoachVisibilityCard

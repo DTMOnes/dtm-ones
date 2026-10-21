@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 
 import { createContactRequestAction } from "@/actions/contact-requests";
+import { ArrowRightIcon } from "@/components/icons";
 import {
   createContactRequestSchema,
   type CreateContactRequest,
@@ -16,7 +17,7 @@ import styles from "./styles.module.scss";
 
 export default function ContactForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,8 +33,8 @@ export default function ContactForm() {
   });
 
   const { executeAsync, isExecuting } = useAction(createContactRequestAction, {
-    onSuccess: ({ data }) => {
-      setSubmitMessage(data?.message ?? "Your message was sent successfully.");
+    onSuccess: () => {
+      setSent(true);
       reset();
     },
     onError: ({ error }) => {
@@ -43,22 +44,34 @@ export default function ContactForm() {
     },
   });
 
+  if (sent) {
+    return (
+      <div role="status" className={styles.sent}>
+        <p className={styles.sentTitle}>Message sent</p>
+        <p className={styles.sentCopy}>
+          Thanks for reaching out. We&apos;ll get back to you soon.
+        </p>
+        <button type="button" className={styles.again} onClick={() => setSent(false)}>
+          Send another message
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form
       className={styles.form}
       onSubmit={handleSubmit((values) => {
         setSubmitError(null);
-        setSubmitMessage(null);
         return executeAsync(values);
       })}
       noValidate
     >
       <fieldset className={styles.fieldset}>
-        <legend className={styles.visuallyHidden}>Inquiry type</legend>
-        <div className={styles.options}>
-          <label className={styles.option} htmlFor="contact-reason-seeking">
+        <legend className={styles.label}>Inquiry type</legend>
+        <div className={styles.segments}>
+          <label className={styles.segment}>
             <input
-              id="contact-reason-seeking"
               type="radio"
               value="seeking_representation"
               disabled={isExecuting}
@@ -66,9 +79,8 @@ export default function ContactForm() {
             />
             <span>Seeking representation</span>
           </label>
-          <label className={styles.option} htmlFor="contact-reason-looking">
+          <label className={styles.segment}>
             <input
-              id="contact-reason-looking"
               type="radio"
               value="looking_for_a_player"
               disabled={isExecuting}
@@ -126,11 +138,11 @@ export default function ContactForm() {
         <span className={styles.label}>Message</span>
         <textarea
           placeholder="Tell us what you need"
-          rows={5}
+          rows={6}
           aria-invalid={!!errors.message}
           disabled={isExecuting}
           {...register("message")}
-          className={styles.textarea}
+          className={`${styles.input} ${styles.textarea}`}
         />
         {errors.message?.message ? (
           <p className={styles.error} role="alert">
@@ -139,22 +151,16 @@ export default function ContactForm() {
         ) : null}
       </label>
 
-      <div className={styles.actions}>
-        <button type="submit" disabled={isExecuting} className={styles.button}>
-          {isExecuting ? "Sending…" : "Send message"}
-        </button>
+      <button type="submit" disabled={isExecuting} className={`btn btn-red ${styles.submit}`}>
+        {isExecuting ? "Sending…" : "Send message"}
+        <ArrowRightIcon size={18} />
+      </button>
 
-        {submitError ? (
-          <p className={styles.error} role="alert">
-            {submitError}
-          </p>
-        ) : null}
-        {submitMessage ? (
-          <p className={styles.success} role="status">
-            {submitMessage}
-          </p>
-        ) : null}
-      </div>
+      {submitError ? (
+        <p className={styles.error} role="alert">
+          {submitError}
+        </p>
+      ) : null}
     </form>
   );
 }

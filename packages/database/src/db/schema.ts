@@ -2,8 +2,10 @@ import { and, eq, isNull, relations, sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  date,
   foreignKey,
   integer,
+  jsonb,
   pgEnum,
   pgSchema,
   pgTable,
@@ -24,11 +26,27 @@ export const contactRequestReason = pgEnum("contact_request_reason", [
   "looking_for_a_player",
 ]);
 
+export const awardKind = pgEnum("award_kind", ["team", "individual"]);
+
 export const contactRequestStatus = pgEnum("contact_request_status", [
   "new",
   "read",
   "archived",
 ]);
+
+/** One season line of per-game averages and shooting percentages. */
+export type SeasonStats = {
+  season: string;
+  ppg: number | null;
+  rpg: number | null;
+  apg: number | null;
+  mpg: number | null;
+  spg: number | null;
+  bpg: number | null;
+  fgPct: number | null;
+  threePct: number | null;
+  ftPct: number | null;
+};
 
 export const categories = pgTable(
   "categories",
@@ -65,6 +83,13 @@ export const clients = pgTable(
     }),
     presentationImageUrl: text("presentation_image_url"),
     presentationImageKey: text("presentation_image_key"),
+    birthDate: date("birth_date"),
+    league: text("league"),
+    bio: text("bio"),
+    strengths: text("strengths").array(),
+    seasonStats: jsonb("season_stats").$type<SeasonStats>(),
+    /** Without "#"; the profile NEWS section shows the agency's posts tagged with it. */
+    instagramHashtag: text("instagram_hashtag"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -113,6 +138,7 @@ export const playerVideos = pgTable(
     clientId: uuid("client_id").notNull(),
     clientKind: clientKind("client_kind").notNull().default("player"),
     youtubeUrl: text("youtube_url").notNull(),
+    title: text("title"),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -127,6 +153,38 @@ export const playerVideos = pgTable(
     }).onDelete("cascade"),
   ],
 );
+
+export const clientCareerEntries = pgTable("client_career_entries", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  season: text("season").notNull(),
+  club: text("club").notNull(),
+  league: text("league"),
+  country: text("country"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  /** Staff's pick when two clubs share the latest season; at most one per Client. */
+  isCurrent: boolean("is_current").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const clientAwards = pgTable("client_awards", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  clientId: uuid("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  detail: text("detail"),
+  year: text("year"),
+  kind: awardKind("kind").notNull().default("team"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 export const roster = pgView("roster").as((qb) =>
   qb
@@ -145,6 +203,13 @@ export const roster = pgView("roster").as((qb) =>
       presentationImageKey: clients.presentationImageKey,
       createdAt: clients.createdAt,
       updatedAt: clients.updatedAt,
+      // New columns go last; see migrations/0001_profile_fields.sql.
+      birthDate: clients.birthDate,
+      league: clients.league,
+      bio: clients.bio,
+      strengths: clients.strengths,
+      seasonStats: clients.seasonStats,
+      instagramHashtag: clients.instagramHashtag,
     })
     .from(clients)
     .leftJoin(categories, eq(clients.categoryId, categories.id))
@@ -171,9 +236,44 @@ export const rosterVideos = pgView("roster_videos").as((qb) =>
       clientId: playerVideos.clientId,
       youtubeUrl: playerVideos.youtubeUrl,
       sortOrder: playerVideos.sortOrder,
+      title: playerVideos.title,
+      createdAt: playerVideos.createdAt,
     })
     .from(playerVideos)
     .innerJoin(clients, eq(playerVideos.clientId, clients.id))
+    .where(and(eq(clients.visibility, "public"), isNull(clients.trashedAt))),
+);
+
+export const rosterCareerEntries = pgView("roster_career_entries").as((qb) =>
+  qb
+    .select({
+      id: clientCareerEntries.id,
+      clientId: clientCareerEntries.clientId,
+      season: clientCareerEntries.season,
+      club: clientCareerEntries.club,
+      league: clientCareerEntries.league,
+      country: clientCareerEntries.country,
+      sortOrder: clientCareerEntries.sortOrder,
+      isCurrent: clientCareerEntries.isCurrent,
+    })
+    .from(clientCareerEntries)
+    .innerJoin(clients, eq(clientCareerEntries.clientId, clients.id))
+    .where(and(eq(clients.visibility, "public"), isNull(clients.trashedAt))),
+);
+
+export const rosterAwards = pgView("roster_awards").as((qb) =>
+  qb
+    .select({
+      id: clientAwards.id,
+      clientId: clientAwards.clientId,
+      title: clientAwards.title,
+      detail: clientAwards.detail,
+      year: clientAwards.year,
+      sortOrder: clientAwards.sortOrder,
+      kind: clientAwards.kind,
+    })
+    .from(clientAwards)
+    .innerJoin(clients, eq(clientAwards.clientId, clients.id))
     .where(and(eq(clients.visibility, "public"), isNull(clients.trashedAt))),
 );
 
@@ -264,6 +364,25 @@ export const clientsRelations = relations(clients, ({ one, many }) => ({
   }),
   galleryImages: many(playerGalleryImages),
   videos: many(playerVideos),
+  careerEntries: many(clientCareerEntries),
+  awards: many(clientAwards),
+}));
+
+export const clientCareerEntriesRelations = relations(
+  clientCareerEntries,
+  ({ one }) => ({
+    client: one(clients, {
+      fields: [clientCareerEntries.clientId],
+      references: [clients.id],
+    }),
+  }),
+);
+
+export const clientAwardsRelations = relations(clientAwards, ({ one }) => ({
+  client: one(clients, {
+    fields: [clientAwards.clientId],
+    references: [clients.id],
+  }),
 }));
 
 export const playerGalleryImagesRelations = relations(

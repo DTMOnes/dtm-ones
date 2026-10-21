@@ -1,4 +1,5 @@
 export { createDatabase, schema, type Database } from "./db";
+export type { SeasonStats } from "./db/schema";
 export {
   getPublicRosterPlayer,
   listPublicRosterCategories,

@@ -1,0 +1,320 @@
+@use "styles/typography" as type;
+
+.hero {
+  position: relative;
+  min-height: 860px;
+  overflow: hidden;
+  background: var(--navy-950);
+}
+
+.reel {
+  position: absolute;
+  inset: 0;
+  animation: fade 1.6s ease 3.1s both;
+}
+
+.shot {
+  object-fit: cover;
+  opacity: 0;
+  filter: blur(2px) saturate(0.85);
+  /* Four shots, 6s each: the loop is 4 × 6s. */
+  animation: shot 24s infinite;
+
+  &:nth-child(2) {
+    animation-delay: 6s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 12s;
+  }
+
+  &:nth-child(4) {
+    animation-delay: 18s;
+  }
+}
+
+.paused .shot {
+  animation-play-state: paused;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  background: rgb(5 11 28 / 0.55);
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(5 11 28 / 0.6) 0%,
+    rgb(5 11 28 / 0.1) 35%,
+    rgb(5 11 28 / 0.5) 72%,
+    var(--navy-950) 100%
+  );
+}
+
+.content {
+  position: relative;
+  display: flex;
+  min-height: 860px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 140px 48px 130px;
+  text-align: center;
+}
+
+.title {
+  position: relative;
+  width: min(820px, 100%);
+  /* Where the logo sat when a 56px star stood above it (30px gap + 56px star). */
+  margin: 86px 0 0;
+
+  /* Blue glow centered on the logo itself (not on the section), at any screen size. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -135% -30%; /* same glow size as before, around the now-shorter logo box */
+    background: radial-gradient(ellipse 50% 50% at 50% 50%, rgb(3 105 176 / 0.3), transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.logo {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* 3. The solid logo fades in once the outline is closed. */
+.logoFill {
+  fill: var(--color-white);
+  opacity: 0;
+  animation: fade-in 0.6s ease 3s both;
+}
+
+/* 2. A white line runs along the logo's outline, around the star. */
+.logoLines path {
+  fill: none;
+  stroke: var(--color-white);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation:
+    draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 1.5s both,
+    fade-out 0.5s ease 3.3s forwards;
+}
+
+/* 1. The ball's star appears big in the middle, then settles into the ball. */
+.logoStar {
+  --star-rest: scale(0.8); /* smaller than its hole: leaves a dark margin to the white edge */
+  fill: #e30613;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: var(--star-rest);
+  animation: star 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.3s both;
+}
+
+.sub {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 34px 0 0;
+  font: 700 15px/1.2 var(--font-body);
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.85);
+  animation: rise 0.8s ease 3.4s both;
+}
+
+.rule {
+  flex: none;
+  width: 72px;
+  height: 1px;
+  background: rgb(255 255 255 / 0.35);
+}
+
+.tagline {
+  @include type.body(22px);
+  margin: 28px 0 0;
+  font-weight: 600;
+  line-height: 1.4;
+  animation: rise 0.8s ease 3.7s both;
+
+  span {
+    color: var(--sky-300);
+  }
+}
+
+.chevron {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  display: flex;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  align-items: center;
+  justify-content: center;
+  color: rgb(255 255 255 / 0.7);
+  animation: fade 0.8s ease 4.1s both;
+}
+
+.pause {
+  position: absolute;
+  right: var(--gutter);
+  bottom: 24px;
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  background: rgb(5 11 28 / 0.5);
+  color: var(--color-white);
+  cursor: pointer;
+  animation: fade 0.8s ease 4.1s both;
+
+  &:hover {
+    border-color: var(--color-white);
+  }
+}
+
+@keyframes shot {
+  0% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  4.5% {
+    opacity: 1;
+  }
+  24% {
+    opacity: 1;
+  }
+  28.5% {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.09);
+  }
+}
+
+@keyframes star {
+  0% {
+    opacity: 0;
+    transform: translate(var(--star-dx), var(--star-dy)) scale(0) rotate(-120deg);
+  }
+  35%,
+  55% {
+    opacity: 1;
+    transform: translate(var(--star-dx), var(--star-dy)) scale(2.4) rotate(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: var(--star-rest);
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@media (width < 720px) {
+  /* Shown complete on phones; the navy hero background fills above and below. */
+  .shotWhole {
+    object-fit: contain;
+    object-position: center !important;
+  }
+
+  .hero,
+  .content {
+    min-height: 780px;
+  }
+
+  .content {
+    padding: 96px 20px 110px;
+  }
+
+  .title {
+    width: 100%;
+    margin-top: 66px; /* 22px gap + the 44px star it used to have above */
+  }
+
+  .sub {
+    gap: 10px;
+    margin-top: 24px;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+  }
+
+  .rule {
+    width: 24px;
+  }
+
+  .tagline {
+    margin-top: 22px;
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel,
+  .sub,
+  .tagline,
+  .chevron,
+  .pause,
+  .logoStar {
+    animation: none;
+  }
+
+  .logoFill {
+    animation: none;
+    opacity: 1;
+  }
+
+  .logoLines {
+    display: none;
+  }
+
+  .shot {
+    animation: none;
+
+    &:first-child {
+      opacity: 1;
+    }
+  }
+}

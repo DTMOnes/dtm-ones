@@ -1,0 +1,81 @@
+@use "styles/typography" as type;
+
+.header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 96px;
+  padding: 0 64px;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  background: var(--navy-950);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0 0 auto;
+  background: transparent;
+  animation: fade-in 0.8s ease 0.2s both;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+}
+
+.logo {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+
+  img {
+    display: block;
+    height: 22px;
+    width: auto;
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: rgb(255 255 255 / 0.25);
+}
+
+.sub {
+  @include type.label(10.5px, 0.34em);
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (width < 720px) {
+  .header {
+    height: 72px;
+    padding: 0 20px;
+  }
+
+  .logo img {
+    height: 20px;
+  }
+
+  .divider,
+  .sub {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    animation: none;
+  }
+}

@@ -1,73 +1,194 @@
 @use "styles/typography" as type;
 
 .card {
-  width: 100%;
-  min-width: 0;
-  aspect-ratio: 360 / 420;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--blue-500);
+  background: var(--navy-900);
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: rgb(255 255 255 / 0.35);
+    border-top-color: var(--red-500);
+
+    .photo img {
+      transform: scale(1.05);
+    }
+
+    .last {
+      color: var(--sky-300);
+    }
+  }
+}
+
+.top {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 20px;
+  padding: 0 20px 20px 0;
+}
+
+.photoCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.photo {
   position: relative;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
-  cursor: pointer;
-  transform-origin: center bottom;
-  will-change: transform, opacity;
+  background: var(--navy-950);
 
-  .media {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 1;
-  }
-
-  .media_inner {
-    width: 100%;
-    height: 100%;
-    transform-origin: center center;
-  }
-
-  .image {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+  img {
     object-fit: cover;
-    border-radius: inherit;
-    opacity: 0.65;
-    transition:
-      opacity 0.35s ease,
-      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    object-position: 50% 25%;
+    transition: transform 0.5s;
+  }
+}
+
+.position {
+  @include type.label(10.5px, 0.16em);
+  padding: 9px 6px;
+  background: var(--red-500);
+  text-align: center;
+}
+
+.info {
+  min-width: 0;
+  padding-top: 18px;
+}
+
+.name {
+  display: block;
+}
+
+.first {
+  @include type.label(11px, 0.28em);
+  display: block;
+  font-weight: 700;
+  color: var(--sky-300);
+}
+
+.last {
+  @include type.display(38px);
+  display: block;
+  margin-top: 4px;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  transition: color 0.2s;
+}
+
+.facts {
+  display: grid;
+  gap: 7px;
+  margin: 16px 0 0;
+}
+
+.fact {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 10px;
+  font-size: 13px;
+
+  dt {
+    @include type.label(10px, 0.16em);
+    padding-top: 2px;
+    color: var(--ink-2);
   }
 
-  .player_info {
-    position: absolute;
-    inset: 0;
-    box-sizing: border-box;
-    padding: 16px 12px;
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.stats {
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+  background: var(--navy-950);
+}
+
+/* Same height as a filled box, contents hidden. */
+.statsEmpty > * {
+  visibility: hidden;
+}
+
+.statsTitle {
+  @include type.label(10.5px, 0.22em);
+  margin: 0;
+  padding: 14px 20px 0;
+  color: var(--sky-300);
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 10px 0 14px;
+
+  > div {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
-    /* TODO: Replace black on gradient with background color */
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0) 85%
-    );
-    z-index: 2;
+    flex-direction: column-reverse;
+    align-items: center;
   }
 
-  .player_name {
-    @include type.big-shoulders(24px);
+  > div + div {
+    border-left: 1px solid var(--line);
   }
 
-  .player_position {
-    @include type.inter(12px);
-    text-transform: uppercase;
-    opacity: 0.5;
+  dd {
+    @include type.display(28px);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  dt {
+    @include type.label(10px, 0.18em);
+    margin-top: 4px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+}
+
+.foot {
+  @include type.label(12px, 0.12em);
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  border-top: 1px solid var(--line);
+  font-weight: 700;
+
+  .stats + & {
+    margin-top: 0;
   }
 
   &:hover {
-    .image {
-      opacity: 1;
-      transform: scale(1.05);
-    }
+    color: var(--sky-300);
+  }
+}
+
+@media (width < 720px) {
+  .top {
+    grid-template-columns: 116px minmax(0, 1fr);
+    gap: 16px;
+    padding: 0 16px 16px 0;
+  }
+
+  .info {
+    padding-top: 14px;
+  }
+
+  .last {
+    font-size: 30px;
+  }
+
+  .fact {
+    grid-template-columns: 60px minmax(0, 1fr);
+    font-size: 12.5px;
   }
 }

@@ -11,6 +11,7 @@ import {
 
 import { db } from "@/lib/db";
 import { ROSTER_PAGE_SIZE } from "@/lib/roster/constants";
+import { sortCareer } from "@/utils/player-display";
 import type {
   PublicRosterCategory,
   PublicRosterPlayer,
@@ -29,6 +30,25 @@ function toPublicPlayer(player: RosterPlayer): PublicRosterPlayer {
     last_club: player.lastClub,
     eurobasket_link: player.eurobasketLink,
     presentation_image_url: player.presentationImageUrl,
+    birth_date: player.birthDate,
+    league: player.league,
+    bio: player.bio,
+    strengths: player.strengths,
+    season_stats: player.seasonStats
+      ? {
+          season: player.seasonStats.season,
+          ppg: player.seasonStats.ppg,
+          rpg: player.seasonStats.rpg,
+          apg: player.seasonStats.apg,
+          mpg: player.seasonStats.mpg,
+          spg: player.seasonStats.spg,
+          bpg: player.seasonStats.bpg,
+          fg_pct: player.seasonStats.fgPct,
+          three_pct: player.seasonStats.threePct,
+          ft_pct: player.seasonStats.ftPct,
+        }
+      : null,
+    instagram_hashtag: player.instagramHashtag,
     categories:
       player.categoryId && player.categoryName
         ? [
@@ -47,8 +67,11 @@ function toPublicPlayer(player: RosterPlayer): PublicRosterPlayer {
     videos: player.videos.map((video) => ({
       id: video.id,
       youtube_url: video.youtubeUrl,
+      title: video.title,
       sort_order: video.sortOrder,
     })),
+    career: sortCareer(player.career),
+    awards: player.awards,
   };
 }
 

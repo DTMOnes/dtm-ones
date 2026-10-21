@@ -6,6 +6,8 @@ export const env = createEnv({
   extends: [databaseEnv],
   server: {
     NODE_ENV: z.enum(["development", "production", "test"]),
+    /** Instagram API with Instagram Login, long-lived token. Optional: without it the feeds fall back. */
+    INSTAGRAM_ACCESS_TOKEN: z.string().min(1).optional(),
   },
 
   /**

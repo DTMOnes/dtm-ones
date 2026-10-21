@@ -48,12 +48,11 @@ export default function Menu() {
 
       if (event.key !== "Tab") return;
 
-      const menuLinks = Array.from(
-        document.querySelectorAll<HTMLElement>("#site-menu a[href]"),
+      const focusableElements = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          "#site-menu a[href], #site-menu button",
+        ),
       );
-      const focusableElements = menuButton
-        ? [...menuLinks, menuButton]
-        : menuLinks;
 
       if (focusableElements.length === 0) return;
 

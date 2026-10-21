@@ -7,8 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-heading: var(--font-big-shoulders);
+  --font-sans: var(--font-montserrat);
+  --font-heading: var(--font-anton);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,58 +48,73 @@
 }
 
 :root {
-  --content-width: 1280px;
-  --font-title: var(--font-big-shoulders);
-  --font-body: var(--font-inter);
-  --anton-size-display: 84px;
-  --anton-size-player: 32px;
-  --anton-size-ui: 18px;
-  --body-size: 16px;
-  --spacing-sm: 16px;
-  --spacing-md: 32px;
-  --spacing-lg: 64px;
+  /* Brand palette (Instagram feed language): navy ground, blue structure, red action. */
+  --navy-950: #050b1c;
+  --navy-900: #0a1530;
+  --navy-800: #0e2147;
+  --navy-700: #0a4170;
+  --blue-500: #0369b0;
+  --sky-300: #8cc4f2;
+  --red-500: #e10a1e;
+  --red-400: #f0192d;
+  --red-800: #8e0c18;
+  --ink-2: #a8b5cc;
+  --ink-3: #7d8ba6;
+  --ink-dark: #3a4a68;
+  --line: rgb(255 255 255 / 0.14);
+  --line-strong: rgb(255 255 255 / 0.4);
   --color-white: #ffffff;
-  --color-black: #000000;
-  --color-dark-gray: #1d1d1d;
-  --color-light-blue: #0084ff;
-  --color-red: #ff0000;
-  --background-base: #0f0f0f;
-  --font-anton: var(--font-big-shoulders);
-  --radius: 0.5rem;
-  --background: var(--color-black);
+  --font-display: var(--font-anton);
+  --font-body: var(--font-montserrat);
+  --gutter: 48px;
+  --radius: 0;
+  --background: var(--navy-950);
   --foreground: var(--color-white);
-  --card: var(--color-dark-gray);
+  --card: var(--navy-900);
   --card-foreground: var(--color-white);
-  --popover: var(--color-dark-gray);
+  --popover: var(--navy-900);
   --popover-foreground: var(--color-white);
-  --primary: var(--color-light-blue);
+  --primary: var(--red-500);
   --primary-foreground: var(--color-white);
-  --secondary: var(--color-dark-gray);
+  --secondary: var(--navy-900);
   --secondary-foreground: var(--color-white);
-  --muted: var(--color-dark-gray);
-  --muted-foreground: var(--color-white);
-  --accent: var(--color-dark-gray);
+  --muted: var(--navy-900);
+  --muted-foreground: var(--ink-2);
+  --accent: var(--navy-800);
   --accent-foreground: var(--color-white);
-  --destructive: var(--color-red);
-  --border: var(--color-dark-gray);
-  --input: var(--color-dark-gray);
-  --ring: var(--color-light-blue);
-  --chart-1: var(--color-light-blue);
+  --destructive: var(--red-500);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--sky-300);
+  --chart-1: var(--blue-500);
   --chart-2: var(--color-white);
-  --chart-3: var(--color-dark-gray);
-  --chart-4: var(--background-base);
-  --chart-5: var(--color-black);
-  --sidebar: var(--color-black);
+  --chart-3: var(--navy-800);
+  --chart-4: var(--navy-900);
+  --chart-5: var(--navy-950);
+  --sidebar: var(--navy-950);
   --sidebar-foreground: var(--color-white);
-  --sidebar-primary: var(--color-light-blue);
+  --sidebar-primary: var(--red-500);
   --sidebar-primary-foreground: var(--color-white);
-  --sidebar-accent: var(--color-dark-gray);
+  --sidebar-accent: var(--navy-800);
   --sidebar-accent-foreground: var(--color-white);
-  --sidebar-border: var(--color-dark-gray);
-  --sidebar-ring: var(--color-light-blue);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--sky-300);
+}
+
+@media (width < 720px) {
+  :root {
+    --gutter: 20px;
+  }
 }
 
 @layer base {
+  /* In the base layer so button and icon classes (components layer) keep their colors on links. */
+  a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -125,34 +140,128 @@ body {
   overflow-x: hidden;
 }
 
-.search-pill {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 44px;
-  width: 100%;
-  padding: 0 16px;
-  border: 1px solid rgb(255 255 255 / 0.1);
-  border-radius: 999px;
-  background: #1d1d1d;
-  outline: none;
-  box-shadow: 0 0 16px 1px rgb(255 255 255 / 0.25);
-}
-
-.search-pill:focus-within {
-  border-color: rgb(255 255 255 / 0.16);
-  box-shadow: 0 0 20px 1px rgb(255 255 255 / 0.25);
-}
-
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
+:focus-visible {
+  outline: 2px solid var(--sky-300);
+  outline-offset: 2px;
 }
 
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+
+/* Shared brand pieces: square corners everywhere except the main button's diagonal cut. */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 24px;
+    border: 0;
+    font: 800 13px/1 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .btn-red {
+    background: var(--red-500);
+    color: var(--color-white);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  }
+
+  .btn-red:hover:not(:disabled) {
+    background: var(--red-400);
+  }
+
+  .btn-ghost {
+    border: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--color-white);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-white);
+    background: rgb(255 255 255 / 0.08);
+  }
+
+  .btn-navy {
+    border: 1px solid var(--navy-900);
+    background: transparent;
+    color: var(--navy-900);
+  }
+
+  .btn-navy:hover {
+    background: var(--navy-900);
+    color: var(--color-white);
+  }
+
+  .btn:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font: 800 13px/1 var(--font-body);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--sky-300);
+  }
+
+  .kicker::before {
+    content: "";
+    flex: none;
+    width: 36px;
+    height: 3px;
+    background: var(--red-500);
+  }
+
+  .ico-box {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    color: var(--ink-2);
+    transition:
+      color 0.2s,
+      border-color 0.2s;
+  }
+
+  .ico-box:hover {
+    border-color: var(--color-white);
+    color: var(--color-white);
+  }
+
+  @media (width < 720px) {
+    .kicker {
+      gap: 12px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+    }
+
+    .kicker::before {
+      width: 24px;
+    }
+  }
+}

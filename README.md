@@ -42,9 +42,10 @@ Names live in `.env.example`. Do not add InsForge keys.
 pnpm dev              # Run all apps (Turborepo)
 pnpm build            # Build all apps
 pnpm lint             # Lint all apps
-pnpm test             # Run tests
+pnpm test             # Run tests (DB tests need TEST_DATABASE_URL set to a Neon test branch: they wipe tables)
 pnpm db:push          # Push Drizzle schema to Neon
 pnpm db:grant-landing # Grant the landing role Roster SELECT and ContactRequest INSERT
+pnpm db:migrate migrations/0001_profile_fields.sql # Apply a hand-written SQL migration
 pnpm db:seed          # Seed a dev Owner (dashboard)
 ```
 
@@ -83,6 +84,16 @@ pnpm db:grant-landing
 ```
 
 That role can `SELECT` the Roster views and `INSERT` ContactRequests. It cannot read `better_auth` or the real Client tables.
+
+### Schema changes
+
+`drizzle-kit push` misreads Postgres 18 `NOT NULL` constraints and offers to truncate `clients`. Answer no. Apply schema changes with the SQL files in `packages/database/migrations/` instead, against a Neon branch first, then the owner `DATABASE_URL`:
+
+```bash
+pnpm db:migrate migrations/0001_profile_fields.sql
+```
+
+Each file is additive and idempotent and grants the landing role its new views.
 
 ### 2. Two Vercel projects
 

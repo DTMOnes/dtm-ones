@@ -1,0 +1,116 @@
+@use "styles/typography" as type;
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 40px 0 32px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.chipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chipsLabel {
+  @include type.label(11px, 0.24em);
+  margin-right: 10px;
+  color: var(--ink-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  @include type.label(12px, 0.14em);
+  flex: none;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--color-white);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+
+  &:hover {
+    border-color: var(--color-white);
+  }
+}
+
+.chipOn,
+.chipOn:hover {
+  border-color: var(--red-500);
+  background: var(--red-500);
+}
+
+.search {
+  position: relative;
+  display: block;
+  width: 320px;
+  max-width: 100%;
+
+  svg {
+    position: absolute;
+    top: 13px;
+    left: 15px;
+    color: var(--ink-2);
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px 0 44px;
+    border: 1px solid var(--line);
+    background: var(--navy-900);
+    color: var(--color-white);
+    font: 600 14px var(--font-body);
+    outline: none;
+
+    &::placeholder {
+      color: var(--ink-3);
+    }
+
+    &:focus {
+      border-color: var(--sky-300);
+    }
+  }
+}
+
+@media (width < 720px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 28px;
+  }
+
+  .chipsRow {
+    display: block;
+  }
+
+  /* Chips scroll sideways instead of wrapping into a tall block. */
+  .chips {
+    flex-wrap: nowrap;
+    margin: 12px calc(var(--gutter) * -1) 0;
+    padding: 0 var(--gutter);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .search {
+    width: 100%;
+  }
+}

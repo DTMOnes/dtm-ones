@@ -18,6 +18,7 @@ export const addPlayerVideoAction = staffActionClient
       db,
       parsedInput.playerId,
       parsedInput.youtubeUrl,
+      parsedInput.title,
     );
 
     revalidatePath(`/clients/${parsedInput.playerId}`);
