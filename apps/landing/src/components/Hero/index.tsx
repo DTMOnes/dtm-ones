@@ -22,7 +22,8 @@ const SHOTS = [
     wholeOnMobile: true,
   },
   { src: "/assets/hero/hero-2.jpg", position: "55% 45%" },
-  { src: "/assets/hero/hero-mineros.webp", position: "50% 35%" },
+  // Wide shot of one player: framed and zoomed per screen width in styles (.shotMineros).
+  { src: "/assets/hero/hero-mineros.webp", className: styles.shotMineros },
   { src: "/assets/hero/hero-manama.jpg", position: "55% 30%" },
 ];
 
@@ -38,17 +39,17 @@ export default function Hero() {
         {SHOTS.map((shot, index) => (
           <Image
             key={shot.src}
-            className={
-              "wholeOnMobile" in shot
-                ? `${styles.shot} ${styles.shotWhole}`
-                : styles.shot
-            }
+            className={[
+              styles.shot,
+              "wholeOnMobile" in shot ? styles.shotWhole : "",
+              "className" in shot ? shot.className : "",
+            ].join(" ")}
             src={shot.src}
             alt=""
             fill
             sizes="100vw"
             priority={index === 0}
-            style={{ objectPosition: shot.position }}
+            style={"position" in shot ? { objectPosition: shot.position } : undefined}
           />
         ))}
         <div className={styles.dim} />
