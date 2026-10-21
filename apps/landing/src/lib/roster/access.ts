@@ -17,6 +17,10 @@ export async function hasPlayersAccess(): Promise<boolean> {
   return (await cookies()).get(PLAYERS_ACCESS_COOKIE)?.value === "1";
 }
 
+export async function revokePlayersAccess(): Promise<void> {
+  (await cookies()).delete(PLAYERS_ACCESS_COOKIE);
+}
+
 export async function grantPlayersAccess(): Promise<void> {
   (await cookies()).set(PLAYERS_ACCESS_COOKIE, "1", {
     httpOnly: true,
