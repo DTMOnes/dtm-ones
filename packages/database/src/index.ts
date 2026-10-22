@@ -10,6 +10,7 @@ export {
 } from "./db/roster";
 export {
   getRosterAccess,
+  getRosterPassword,
   hashRosterPassword,
   rosterAccessToken,
   setRosterPassword,

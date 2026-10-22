@@ -45,13 +45,23 @@ export async function getRosterAccess(
   return row ?? null;
 }
 
+/** Dashboard (Owner) only: the readable password. The landing role cannot read it. */
+export async function getRosterPassword(db: Database): Promise<string | null> {
+  const [row] = await db
+    .select({ password: rosterAccess.password })
+    .from(rosterAccess)
+    .where(eq(rosterAccess.id, 1));
+  return row?.password ?? null;
+}
+
 export async function setRosterPassword(db: Database, password: string): Promise<void> {
-  const passwordHash = hashRosterPassword(password);
+  const plain = password.trim();
+  const passwordHash = hashRosterPassword(plain);
   await db
     .insert(rosterAccess)
-    .values({ id: 1, passwordHash })
+    .values({ id: 1, passwordHash, password: plain })
     .onConflictDoUpdate({
       target: rosterAccess.id,
-      set: { passwordHash, updatedAt: new Date() },
+      set: { passwordHash, password: plain, updatedAt: new Date() },
     });
 }

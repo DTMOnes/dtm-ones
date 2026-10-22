@@ -298,6 +298,8 @@ export const rosterAccess = pgTable(
   {
     id: integer("id").primaryKey().default(1),
     passwordHash: text("password_hash").notNull(),
+    /** Readable copy for the Owner in the dashboard; the landing role has no grant on it. */
+    password: text("password"),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
