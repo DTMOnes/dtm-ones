@@ -39,3 +39,11 @@ export const removeAwardSchema = z.object({
   clientId: z.uuid(),
   awardId: z.uuid(),
 });
+
+export const updateCareerEntrySchema = addCareerEntrySchema.extend({
+  entryId: z.uuid(),
+});
+
+export const updateAwardSchema = addAwardSchema.extend({
+  awardId: z.uuid(),
+});
