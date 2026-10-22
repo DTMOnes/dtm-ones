@@ -35,10 +35,6 @@
   }
 }
 
-.paused .shot {
-  animation-play-state: paused;
-}
-
 .dim {
   position: absolute;
   inset: 0;
@@ -165,26 +161,6 @@
   justify-content: center;
   color: rgb(255 255 255 / 0.7);
   animation: fade 0.8s ease 4.1s both;
-}
-
-.pause {
-  position: absolute;
-  right: var(--gutter);
-  bottom: 24px;
-  display: inline-flex;
-  width: 44px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line-strong);
-  background: rgb(5 11 28 / 0.5);
-  color: var(--color-white);
-  cursor: pointer;
-  animation: fade 0.8s ease 4.1s both;
-
-  &:hover {
-    border-color: var(--color-white);
-  }
 }
 
 @keyframes shot {
@@ -345,7 +321,6 @@
   .sub,
   .tagline,
   .chevron,
-  .pause,
   .logoStar {
     animation: none;
   }

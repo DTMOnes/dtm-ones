@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import Image from "next/image";
 
 import {
@@ -29,14 +27,9 @@ const SHOTS = [
 ];
 
 export default function Hero() {
-  const [paused, setPaused] = useState(false);
-
   return (
     <section className={styles.hero}>
-      <div
-        className={`${styles.reel} ${paused ? styles.paused : ""}`}
-        aria-hidden
-      >
+      <div className={styles.reel} aria-hidden>
         {SHOTS.map((shot, index) => (
           <Image
             key={shot.src}
@@ -121,36 +114,6 @@ export default function Hero() {
           <path d="M6 9l6 6 6-6" />
         </svg>
       </a>
-
-      <button
-        type="button"
-        className={styles.pause}
-        onClick={() => setPaused((value) => !value)}
-        aria-label={paused ? "Play background reel" : "Pause background reel"}
-        aria-pressed={paused}
-      >
-        {paused ? (
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden
-          >
-            <path d="M7 4v16l13-8z" />
-          </svg>
-        ) : (
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden
-          >
-            <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
-          </svg>
-        )}
-      </button>
     </section>
   );
 }
