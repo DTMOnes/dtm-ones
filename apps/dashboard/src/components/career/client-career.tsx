@@ -181,10 +181,10 @@ function CareerEntryEditor({
         <input type="hidden" {...methods.register("clientId")} />
         <input type="hidden" {...methods.register("entryId")} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <TextField name="season" label="Season or range" placeholder="2020-2025" disabled={save.isExecuting} />
-          <TextField name="club" label="Club" placeholder="Mineros" disabled={save.isExecuting} />
-          <TextField name="league" label="League (optional)" placeholder="LNBP" disabled={save.isExecuting} />
-          <TextField name="country" label="Country (optional)" placeholder="Mexico" disabled={save.isExecuting} />
+          <TextField name="season" label="Season or range" placeholder="2026/2027 or 2024-2026" disabled={save.isExecuting} />
+          <TextField name="club" label="Club" placeholder="Club name" disabled={save.isExecuting} />
+          <TextField name="league" label="League (optional)" placeholder="League" disabled={save.isExecuting} />
+          <TextField name="country" label="Country (optional)" placeholder="Country" disabled={save.isExecuting} />
         </div>
         <EditActions isExecuting={save.isExecuting} onCancel={onDone} />
       </form>
@@ -233,8 +233,8 @@ function AwardEditor({
         <input type="hidden" {...methods.register("awardId")} />
         <div className="grid gap-4 sm:grid-cols-2">
           <SelectField name="kind" label="Type" options={AWARD_KINDS} disabled={save.isExecuting} />
-          <TextField name="title" label="Title" placeholder="Copa VALUE Final MVP" disabled={save.isExecuting} />
-          <TextField name="detail" label="Club · league (optional)" placeholder="Mineros · LNBP" disabled={save.isExecuting} />
+          <TextField name="title" label="Title" placeholder="Award title" disabled={save.isExecuting} />
+          <TextField name="detail" label="Club · league (optional)" placeholder="Club name - League" disabled={save.isExecuting} />
           <TextField name="year" label="Year (optional)" placeholder="2026" disabled={save.isExecuting} />
         </div>
         <EditActions isExecuting={save.isExecuting} onCancel={onDone} />
@@ -358,10 +358,10 @@ function CareerCard({
           >
             <input type="hidden" {...methods.register("clientId")} />
             <div className="grid gap-4 sm:grid-cols-2">
-              <TextField name="season" label="Season or range" placeholder="2020-2025" disabled={add.isExecuting} />
-              <TextField name="club" label="Club" placeholder="Mineros" disabled={add.isExecuting} />
-              <TextField name="league" label="League (optional)" placeholder="LNBP" disabled={add.isExecuting} />
-              <TextField name="country" label="Country (optional)" placeholder="Mexico" disabled={add.isExecuting} />
+              <TextField name="season" label="Season or range" placeholder="2026/2027 or 2024-2026" disabled={add.isExecuting} />
+              <TextField name="club" label="Club" placeholder="Club name" disabled={add.isExecuting} />
+              <TextField name="league" label="League (optional)" placeholder="League" disabled={add.isExecuting} />
+              <TextField name="country" label="Country (optional)" placeholder="Country" disabled={add.isExecuting} />
             </div>
             <div>
               <SubmitButton label="Add club" icon={<PlusIcon />} isExecuting={add.isExecuting} />
@@ -459,8 +459,8 @@ function AwardsCard({
             <input type="hidden" {...methods.register("clientId")} />
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField name="kind" label="Type" options={AWARD_KINDS} disabled={add.isExecuting} />
-              <TextField name="title" label="Title" placeholder="Copa VALUE Final MVP" disabled={add.isExecuting} />
-              <TextField name="detail" label="Club · league (optional)" placeholder="Mineros · LNBP" disabled={add.isExecuting} />
+              <TextField name="title" label="Title" placeholder="Award title" disabled={add.isExecuting} />
+              <TextField name="detail" label="Club · league (optional)" placeholder="Club name - League" disabled={add.isExecuting} />
               <TextField name="year" label="Year (optional)" placeholder="2026" disabled={add.isExecuting} />
             </div>
             <div>

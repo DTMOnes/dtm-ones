@@ -134,25 +134,31 @@ export function EditPlayerForm({
               <TextField
                 name="name"
                 label="Name"
-                placeholder="Manu Ginobili"
+                placeholder="Full name"
                 disabled={isExecuting}
               />
               <TextField
                 name="nationality"
                 label="Nationality"
-                placeholder="Argentina"
+                placeholder="Country"
                 disabled={isExecuting}
               />
               <TextField
                 name="lastClub"
                 label="Last club"
-                placeholder="San Antonio Spurs"
+                placeholder="Club"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="league"
+                label="Current league"
+                placeholder="League - Country"
                 disabled={isExecuting}
               />
               <TextField
                 name="heightCm"
                 label="Height (cm)"
-                placeholder="198"
+                placeholder="Height"
                 disabled={isExecuting}
               />
               <TextField
@@ -169,15 +175,9 @@ export function EditPlayerForm({
                 disabled={isExecuting}
               />
               <TextField
-                name="league"
-                label="Current league"
-                placeholder="LNBP · Mexico"
-                disabled={isExecuting}
-              />
-              <TextField
                 name="birthDate"
                 label="Birth date (YYYY-MM-DD)"
-                placeholder="1998-04-21"
+                placeholder="YYYY-MM-DD"
                 disabled={isExecuting}
               />
               <TextareaField
@@ -196,7 +196,7 @@ export function EditPlayerForm({
               <TextField
                 name="instagramHashtag"
                 label="Instagram hashtag (for NEWS)"
-                placeholder="RomeaoFerguson"
+                placeholder="NameLastname"
                 disabled={isExecuting}
               />
               <FieldSet>
