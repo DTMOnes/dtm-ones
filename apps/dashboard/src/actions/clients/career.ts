@@ -10,6 +10,8 @@ import {
   removeAwardSchema,
   removeCareerEntrySchema,
   setCurrentCareerEntrySchema,
+  updateAwardSchema,
+  updateCareerEntrySchema,
 } from "@/lib/validation/career";
 import {
   addAward,
@@ -17,6 +19,8 @@ import {
   removeAward,
   removeCareerEntry,
   setCurrentCareerEntry,
+  updateAward,
+  updateCareerEntry,
 } from "@/utils/career";
 
 export const addCareerEntryAction = staffActionClient
@@ -25,6 +29,18 @@ export const addCareerEntryAction = staffActionClient
   .action(async ({ parsedInput }) => {
     const { clientId, ...entry } = parsedInput;
     await addCareerEntry(db, clientId, entry);
+
+    revalidatePath(`/clients/${clientId}`);
+
+    return { ok: true as const };
+  });
+
+export const updateCareerEntryAction = staffActionClient
+  .metadata({ actionName: "updateCareerEntry" })
+  .inputSchema(updateCareerEntrySchema)
+  .action(async ({ parsedInput }) => {
+    const { clientId, entryId, ...entry } = parsedInput;
+    await updateCareerEntry(db, clientId, entryId, entry);
 
     revalidatePath(`/clients/${clientId}`);
 
@@ -59,6 +75,18 @@ export const addAwardAction = staffActionClient
   .action(async ({ parsedInput }) => {
     const { clientId, ...award } = parsedInput;
     await addAward(db, clientId, award);
+
+    revalidatePath(`/clients/${clientId}`);
+
+    return { ok: true as const };
+  });
+
+export const updateAwardAction = staffActionClient
+  .metadata({ actionName: "updateAward" })
+  .inputSchema(updateAwardSchema)
+  .action(async ({ parsedInput }) => {
+    const { clientId, awardId, ...award } = parsedInput;
+    await updateAward(db, clientId, awardId, award);
 
     revalidatePath(`/clients/${clientId}`);
 

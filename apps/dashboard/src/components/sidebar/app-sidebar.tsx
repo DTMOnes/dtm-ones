@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   EnvelopeSimpleIcon,
   FolderIcon,
+  GearSixIcon,
   TrashIcon,
   UserGearIcon,
   UsersIcon,
@@ -46,11 +47,16 @@ const clientItems: MenuItem[] = [
   },
 ];
 
-const usersItems: MenuItem[] = [
+const adminItems: MenuItem[] = [
   {
     title: "Users",
     url: "/users",
     icon: UserGearIcon,
+  },
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: GearSixIcon,
   },
 ];
 
@@ -79,7 +85,7 @@ export function AppSidebar({
         <NavGroup items={inboxItems} />
         <NavGroup items={clientItems} />
         {isOwner ? (
-          <NavGroup label="Administration" items={usersItems} />
+          <NavGroup label="Administration" items={adminItems} />
         ) : null}
       </SidebarContent>
       <SidebarFooter>

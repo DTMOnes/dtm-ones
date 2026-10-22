@@ -91,31 +91,31 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
               <TextField
                 name="name"
                 label="Name"
-                placeholder="Pat Riley"
+                placeholder="Full name"
                 disabled={isExecuting}
               />
               <TextField
                 name="nationality"
                 label="Nationality"
-                placeholder="USA"
+                placeholder="Country"
                 disabled={isExecuting}
               />
               <TextField
                 name="lastClub"
                 label="Last club"
-                placeholder="Miami Heat"
+                placeholder="Club"
+                disabled={isExecuting}
+              />
+              <TextField
+                name="league"
+                label="Last league"
+                placeholder="League - Country"
                 disabled={isExecuting}
               />
               <TextField
                 name="eurobasketLink"
                 label="Eurobasket link"
                 placeholder="https://basketball.eurobasket.com/..."
-                disabled={isExecuting}
-              />
-              <TextField
-                name="league"
-                label="Current league"
-                placeholder="NBA · USA"
                 disabled={isExecuting}
               />
               <TextareaField
@@ -127,7 +127,7 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
               <TextField
                 name="instagramHashtag"
                 label="Instagram hashtag (for NEWS)"
-                placeholder="CoachName"
+                placeholder="NameLastname"
                 disabled={isExecuting}
               />
             </FieldGroup>

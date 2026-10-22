@@ -91,6 +91,28 @@ export async function addCareerEntry(
     .values({ clientId, sortOrder, ...entry });
 }
 
+export async function updateCareerEntry(
+  db: Database,
+  clientId: string,
+  entryId: string,
+  entry: Omit<CareerEntry, "id" | "isCurrent">,
+): Promise<void> {
+  const [row] = await db
+    .update(schema.clientCareerEntries)
+    .set(entry)
+    .where(
+      and(
+        eq(schema.clientCareerEntries.id, entryId),
+        eq(schema.clientCareerEntries.clientId, clientId),
+      ),
+    )
+    .returning({ id: schema.clientCareerEntries.id });
+
+  if (!row) {
+    throw new NotFoundError("Career entry");
+  }
+}
+
 export async function removeCareerEntry(
   db: Database,
   clientId: string,
@@ -149,6 +171,28 @@ export async function addAward(
     .where(eq(schema.clientAwards.clientId, clientId));
 
   await db.insert(schema.clientAwards).values({ clientId, sortOrder, ...award });
+}
+
+export async function updateAward(
+  db: Database,
+  clientId: string,
+  awardId: string,
+  award: Omit<Award, "id">,
+): Promise<void> {
+  const [row] = await db
+    .update(schema.clientAwards)
+    .set(award)
+    .where(
+      and(
+        eq(schema.clientAwards.id, awardId),
+        eq(schema.clientAwards.clientId, clientId),
+      ),
+    )
+    .returning({ id: schema.clientAwards.id });
+
+  if (!row) {
+    throw new NotFoundError("Award");
+  }
 }
 
 export async function removeAward(

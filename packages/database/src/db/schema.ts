@@ -292,6 +292,19 @@ export const contactRequests = pgTable("contact_requests", {
     .defaultNow(),
 });
 
+/** One row (id 1): the hashed password of the landing Clients list, set by the Owner. */
+export const rosterAccess = pgTable(
+  "roster_access",
+  {
+    id: integer("id").primaryKey().default(1),
+    passwordHash: text("password_hash").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [check("roster_access_single_row", sql`${table.id} = 1`)],
+);
+
 export const betterAuthSchema = pgSchema("better_auth");
 
 export const user = betterAuthSchema.table("user", {

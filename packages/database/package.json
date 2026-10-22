@@ -13,7 +13,7 @@
     "db:push": "drizzle-kit push --config ./src/config/drizzle-kit.ts",
     "db:grant-landing": "tsx src/scripts/grant-landing-role.ts",
     "db:migrate": "tsx src/scripts/migrate.ts",
-    "test": "node --import tsx --test --test-concurrency=1 src/career.test.ts src/testing.test.ts src/db/schema.test.ts src/db/landing-roster.test.ts",
+    "test": "node --import tsx --test --test-concurrency=1 src/career.test.ts src/testing.test.ts src/roster-access.test.ts src/db/schema.test.ts src/db/landing-roster.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

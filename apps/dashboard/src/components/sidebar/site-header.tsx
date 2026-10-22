@@ -24,6 +24,7 @@ const routeLabels: Array<{
   { prefix: "/categories", label: "Categories" },
   { prefix: "/trash", label: "Trash" },
   { prefix: "/users", label: "Users" },
+  { prefix: "/settings", label: "Settings" },
 ];
 
 function crumbsForPath(pathname: string): {

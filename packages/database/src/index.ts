@@ -8,3 +8,10 @@ export {
   type RosterCategory,
   type RosterPlayer,
 } from "./db/roster";
+export {
+  getRosterAccess,
+  hashRosterPassword,
+  rosterAccessToken,
+  setRosterPassword,
+  verifyRosterPassword,
+} from "./roster-access";

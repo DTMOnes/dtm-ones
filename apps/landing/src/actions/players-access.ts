@@ -14,7 +14,7 @@ export const unlockPlayersAction = actionClient
   .metadata({ actionName: "unlockPlayers" })
   .inputSchema(z.object({ password: z.string().max(100) }))
   .action(async ({ parsedInput }) => {
-    if (!isPlayersPassword(parsedInput.password)) {
+    if (!(await isPlayersPassword(parsedInput.password))) {
       throw new AppError("WRONG_PASSWORD", "Incorrect password. Try again.");
     }
 
