@@ -233,7 +233,7 @@ function AwardEditor({
         <input type="hidden" {...methods.register("awardId")} />
         <div className="grid gap-4 sm:grid-cols-2">
           <SelectField name="kind" label="Type" options={AWARD_KINDS} disabled={save.isExecuting} />
-          <TextField name="title" label="Title" placeholder="Award title" disabled={save.isExecuting} />
+          <TextField name="title" label="Title" placeholder="Award name" disabled={save.isExecuting} />
           <TextField name="detail" label="Club · league (optional)" placeholder="Club name - League" disabled={save.isExecuting} />
           <TextField name="year" label="Year (optional)" placeholder="2026" disabled={save.isExecuting} />
         </div>
@@ -459,7 +459,7 @@ function AwardsCard({
             <input type="hidden" {...methods.register("clientId")} />
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField name="kind" label="Type" options={AWARD_KINDS} disabled={add.isExecuting} />
-              <TextField name="title" label="Title" placeholder="Award title" disabled={add.isExecuting} />
+              <TextField name="title" label="Title" placeholder="Award name" disabled={add.isExecuting} />
               <TextField name="detail" label="Club · league (optional)" placeholder="Club name - League" disabled={add.isExecuting} />
               <TextField name="year" label="Year (optional)" placeholder="2026" disabled={add.isExecuting} />
             </div>

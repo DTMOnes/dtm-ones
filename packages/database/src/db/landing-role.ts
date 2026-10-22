@@ -61,8 +61,12 @@ export async function grantLandingPrivileges(
   );
   await ownerDb.execute(
     sql.raw(
-      `GRANT SELECT ON roster, roster_gallery_images, roster_videos, roster_career_entries, roster_awards, roster_access TO ${role}`,
+      `GRANT SELECT ON roster, roster_gallery_images, roster_videos, roster_career_entries, roster_awards TO ${role}`,
     ),
+  );
+  // Only the hash: the readable password column is for the dashboard (Owner) alone.
+  await ownerDb.execute(
+    sql.raw(`GRANT SELECT (id, password_hash, updated_at) ON roster_access TO ${role}`),
   );
   await ownerDb.execute(sql.raw(`GRANT INSERT ON contact_requests TO ${role}`));
 }
