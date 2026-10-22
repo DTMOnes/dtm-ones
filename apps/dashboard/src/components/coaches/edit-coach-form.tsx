@@ -108,7 +108,7 @@ export function EditCoachForm({ coach }: { coach: Coach }) {
               />
               <TextField
                 name="league"
-                label="Current league"
+                label="Last league"
                 placeholder="League - Country"
                 disabled={isExecuting}
               />

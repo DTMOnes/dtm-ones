@@ -151,7 +151,7 @@ export function EditPlayerForm({
               />
               <TextField
                 name="league"
-                label="Current league"
+                label="Last league"
                 placeholder="League - Country"
                 disabled={isExecuting}
               />
