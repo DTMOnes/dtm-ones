@@ -21,6 +21,7 @@ import {
 
 import Gallery from "./Gallery";
 import Highlights from "./Highlights";
+import ShowMore from "./ShowMore";
 import WatchHighlightsLink from "./WatchHighlightsLink";
 import styles from "./styles.module.scss";
 
@@ -215,8 +216,11 @@ export default function Profile({
               {client.career.length > 0 ? (
                 <div>
                   <h2 className="kicker">Career</h2>
-                  <ol className={styles.timeline}>
-                    {client.career.map((entry, index) => (
+                  {/* Eight clubs at first; "See more" adds four at a time. */}
+                  <ShowMore
+                    list="ol"
+                    className={styles.timeline}
+                    items={client.career.map((entry, index) => (
                       <li
                         key={entry.id}
                         className={index === 0 ? styles.timelineCurrent : undefined}
@@ -237,14 +241,15 @@ export default function Profile({
                         </div>
                       </li>
                     ))}
-                  </ol>
+                  />
                 </div>
               ) : null}
               {client.awards.length > 0 ? (
                 <div>
                   <h2 className="kicker">Titles &amp; awards</h2>
-                  <ul className={styles.awards}>
-                    {client.awards.map((award) => (
+                  <ShowMore
+                    className={styles.awards}
+                    items={client.awards.map((award) => (
                       <li
                         key={award.id}
                         className={
@@ -274,7 +279,7 @@ export default function Profile({
                         ) : null}
                       </li>
                     ))}
-                  </ul>
+                  />
                 </div>
               ) : null}
             </section>
