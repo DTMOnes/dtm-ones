@@ -8,7 +8,7 @@ import {
   formatHeight,
   formatStat,
   pickFeatured,
-  previousCountries,
+  previousLeagues,
   seasonEndYear,
   sortCareer,
   splitName,
@@ -41,19 +41,6 @@ test("formatStat rounds to one decimal and marks missing values", () => {
   assert.equal(formatStat(null), "—");
 });
 
-test("previousCountries skips the current club and repeats", () => {
-  const client = {
-    career: [
-      { id: "1", season: "2026", club: "Mineros", league: "LNBP", country: "Mexico" },
-      { id: "2", season: "2025", club: "A", league: null, country: "Spain" },
-      { id: "3", season: "2024", club: "B", league: null, country: "spain" },
-      { id: "4", season: "2023", club: "C", league: null, country: null },
-    ],
-  } as PublicRosterPlayer;
-
-  assert.deepEqual(previousCountries(client), ["Spain"]);
-});
-
 test("sortCareer puts the newest season first, whatever the entry order", () => {
   const entries = [
     { season: "2021-2024", club: "Olimpico" },
@@ -81,18 +68,6 @@ test("sortCareer puts the club marked current first among the latest season", ()
   );
 });
 
-test("previousCountries leaves out the current club's country", () => {
-  const client = {
-    career: [
-      { id: "1", season: "2026", club: "El Ceibo", league: null, country: "Argentina" },
-      { id: "2", season: "2024", club: "Independiente", league: null, country: "argentina" },
-      { id: "3", season: "2021", club: "Olimpico", league: null, country: "Argentina" },
-    ],
-  } as PublicRosterPlayer;
-
-  assert.deepEqual(previousCountries(client), []);
-});
-
 test("pickFeatured keeps the fixed order and fills a gap when one is hidden", () => {
   const p = (id: string) => ({ id });
   const list = ["a", "b", "c", "d", "e", "f", "g"].map(p);
@@ -106,4 +81,27 @@ test("pickFeatured keeps the fixed order and fills a gap when one is hidden", ()
     pickFeatured(list.filter((x) => x.id !== "g"), ["e", "a", "g"], 5).map((x) => x.id),
     ["e", "a", "b", "c", "d"],
   );
+});
+
+test("previousLeagues lists earlier leagues once, without the current one", () => {
+  const client = {
+    league: "LNBP - Mexico",
+    career: [
+      { id: "1", season: "2026/2027", club: "Soles", league: "LNBP", country: "Mexico" },
+      { id: "2", season: "2025/2026", club: "Quimsa", league: "La Liga", country: "Argentina" },
+      { id: "3", season: "2024/2025", club: "Ironi", league: "Winner League", country: "Israel" },
+      { id: "4", season: "2023/2024", club: "Mets", league: "BSN", country: "Puerto Rico" },
+      { id: "5", season: "2022/2023", club: "Ironi", league: "Winner League", country: "Israel" },
+      { id: "6", season: "2020/2021", club: "Aguacateros", league: "LNBP", country: "Mexico" },
+      { id: "7", season: "2019", club: "No data", league: null, country: null },
+      { id: "8", season: "2018", club: "Flamengo", league: null, country: "Brazil" },
+    ],
+  } as PublicRosterPlayer;
+
+  assert.deepEqual(previousLeagues(client), [
+    "La Liga · Argentina",
+    "Winner League · Israel",
+    "BSN · Puerto Rico",
+    "Brazil",
+  ]);
 });

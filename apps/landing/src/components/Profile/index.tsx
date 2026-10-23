@@ -15,7 +15,7 @@ import {
   formatHeight,
   formatStat,
   positionLabel,
-  previousCountries,
+  previousLeagues,
   splitName,
 } from "@/utils/player-display";
 
@@ -52,7 +52,7 @@ export default function Profile({
   const position = positionLabel(client);
   const height = formatHeight(client.height_cm);
   const age = ageFrom(client.birth_date);
-  const prevCountries = previousCountries(client);
+  const prevLeagues = previousLeagues(client);
   const stats = client.season_stats;
   const statItems = stats
     ? STAT_LABELS.filter(({ key }) => stats[key] != null)
@@ -133,9 +133,9 @@ export default function Profile({
                     {client.league || client.last_club}
                   </li>
                 ) : null}
-                {prevCountries.map((country) => (
-                  <li key={country} className={styles.tag}>
-                    Prev · {country}
+                {prevLeagues.map((league) => (
+                  <li key={league} className={styles.tag}>
+                    {league}
                   </li>
                 ))}
               </ul>
