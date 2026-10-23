@@ -8,6 +8,7 @@ import {
   type RosterCategory,
   type RosterPlayer,
 } from "@dtm/database";
+import { sortAwardsByYear } from "@dtm/database/career";
 
 import { db } from "@/lib/db";
 import { ROSTER_PAGE_SIZE } from "@/lib/roster/constants";
@@ -71,7 +72,7 @@ function toPublicPlayer(player: RosterPlayer): PublicRosterPlayer {
       sort_order: video.sortOrder,
     })),
     career: sortCareer(player.career),
-    awards: player.awards,
+    awards: sortAwardsByYear(player.awards),
   };
 }
 
