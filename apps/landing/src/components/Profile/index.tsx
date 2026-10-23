@@ -247,8 +247,10 @@ export default function Profile({
               {client.awards.length > 0 ? (
                 <div>
                   <h2 className="kicker">Titles &amp; awards</h2>
+                  {/* Six titles at first; "See more" adds four at a time. */}
                   <ShowMore
                     className={styles.awards}
+                    initial={6}
                     items={client.awards.map((award) => (
                       <li
                         key={award.id}
