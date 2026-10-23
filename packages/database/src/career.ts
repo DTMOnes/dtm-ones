@@ -20,3 +20,12 @@ export function latestSeasonTies(career: { id: string; season: string }[]): Set<
   const tied = career.filter((entry) => seasonEndYear(entry.season) === latest);
   return new Set(tied.length > 1 ? tied.map((entry) => entry.id) : []);
 }
+
+/**
+ * Titles newest first by year ("2026", "2025-26" → 2026). Ones without a year go
+ * last; ties keep the order Staff entered them in.
+ */
+export function sortAwardsByYear<T extends { year: string | null }>(awards: T[]): T[] {
+  const yearOf = (award: T) => (award.year ? seasonEndYear(award.year) : 0);
+  return [...awards].sort((a, b) => yearOf(b) - yearOf(a));
+}

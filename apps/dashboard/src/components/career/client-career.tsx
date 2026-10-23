@@ -14,7 +14,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@phosphor-icons/react";
-import { latestSeasonTies } from "@dtm/database/career";
+import { latestSeasonTies, sortAwardsByYear } from "@dtm/database/career";
 
 import {
   addAwardAction,
@@ -405,14 +405,14 @@ function AwardsCard({
       <CardHeader>
         <CardTitle>Titles &amp; awards</CardTitle>
         <CardDescription>
-          Shown on the profile in this order, only when there is at least one.
+          Shown on the profile newest year first (no year: last), only when there is at least one.
           Team titles get a trophy icon and individual awards a star.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {awards.length > 0 ? (
           <ul className="flex flex-col gap-2">
-            {awards.map((award) => (
+            {sortAwardsByYear(awards).map((award) => (
               <li key={award.id}>
                 {editingId === award.id ? (
                   <AwardEditor
