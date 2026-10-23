@@ -63,15 +63,33 @@ export function sortCareer<
   );
 }
 
-/** Countries of earlier clubs, without the current club's country (career is newest first). */
-export function previousCountries(client: PublicRosterPlayer): string[] {
-  const current = client.career[0]?.country?.trim().toLowerCase();
+/** "League · Country" of a career entry (either part may be missing). */
+function leagueLabel(entry: { league: string | null; country: string | null }): string {
+  return [entry.league?.trim(), entry.country?.trim()].filter(Boolean).join(" · ");
+}
+
+/** Same label whatever the separator or case: "LNBP - Mexico" = "lnbp · mexico". */
+function labelKey(label: string): string {
+  return label.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
+/**
+ * Leagues of earlier clubs as "League · Country", newest first (career is newest
+ * first), once each, leaving out the current one: the current club's and the
+ * Last league shown in the first tag.
+ */
+export function previousLeagues(client: PublicRosterPlayer): string[] {
+  const current = new Set(
+    [client.league ?? "", client.career[0] ? leagueLabel(client.career[0]) : ""]
+      .map(labelKey)
+      .filter(Boolean),
+  );
   const byKey = new Map<string, string>();
   for (const entry of client.career.slice(1)) {
-    const country = entry.country?.trim();
-    const key = country?.toLowerCase();
-    if (country && key && key !== current && !byKey.has(key)) {
-      byKey.set(key, country);
+    const label = leagueLabel(entry);
+    const key = labelKey(label);
+    if (key && !current.has(key) && !byKey.has(key)) {
+      byKey.set(key, label);
     }
   }
   return [...byKey.values()];
