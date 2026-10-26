@@ -90,6 +90,22 @@
   }
 }
 
+/* The photo itself is the button that opens it full screen. */
+.photoButton {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+
+  &:focus-visible {
+    outline: 2px solid var(--sky-300);
+    outline-offset: -2px;
+  }
+}
+
 .who {
   grid-area: who;
   align-self: end;
