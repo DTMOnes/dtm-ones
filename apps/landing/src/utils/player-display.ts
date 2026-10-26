@@ -109,3 +109,8 @@ export function pickFeatured<T extends { id: string }>(
   const rest = players.filter((player) => !featuredIds.includes(player.id));
   return [...featured, ...rest].slice(0, count);
 }
+
+/** "LNBP - Mexico" → "LNBP · Mexico": a spaced dash or bar reads as the site's dot. */
+export function formatLeague(value: string): string {
+  return value.trim().replace(/\s+[-–—|]\s*|\s*[-–—|]\s+/g, " · ");
+}

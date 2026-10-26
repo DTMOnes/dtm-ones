@@ -5,6 +5,7 @@ import { ArrowRightIcon } from "@/components/icons";
 import type { PublicRosterPlayer } from "@/types/roster";
 import {
   formatHeight,
+  formatLeague,
   formatStat,
   positionLabel,
   splitName,
@@ -20,7 +21,7 @@ export default function Cards({ player }: { player: PublicRosterPlayer }) {
 
   const facts = [
     { label: "Team", value: player.last_club },
-    { label: "League", value: player.league },
+    { label: "League", value: player.league && formatLeague(player.league) },
     { label: "Country", value: player.nationality },
     { label: "Height", value: formatHeight(player.height_cm) },
   ].filter((fact) => Boolean(fact.value));

@@ -6,6 +6,7 @@ import type { PublicRosterPlayer } from "@/types/roster";
 import {
   ageFrom,
   formatHeight,
+  formatLeague,
   formatStat,
   pickFeatured,
   previousLeagues,
@@ -104,4 +105,12 @@ test("previousLeagues lists earlier leagues once, without the current one", () =
     "BSN · Puerto Rico",
     "Brazil",
   ]);
+});
+
+test("formatLeague shows a spaced dash or bar as the dot", () => {
+  assert.equal(formatLeague("LNBP - Mexico"), "LNBP · Mexico");
+  assert.equal(formatLeague("La Liga – Argentina"), "La Liga · Argentina");
+  assert.equal(formatLeague("BSN | Puerto Rico"), "BSN · Puerto Rico");
+  assert.equal(formatLeague("LNBP · Mexico"), "LNBP · Mexico");
+  assert.equal(formatLeague("Hai-Motors League"), "Hai-Motors League");
 });

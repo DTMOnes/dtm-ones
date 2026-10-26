@@ -13,6 +13,7 @@ import type { PublicRosterPlayer, PublicRosterSeasonStats } from "@/types/roster
 import {
   ageFrom,
   formatHeight,
+  formatLeague,
   formatStat,
   positionLabel,
   previousLeagues,
@@ -130,7 +131,7 @@ export default function Profile({
               <ul className={styles.tags}>
                 {client.league || client.last_club ? (
                   <li className={`${styles.tag} ${styles.tagCurrent}`}>
-                    {client.league || client.last_club}
+                    {client.league ? formatLeague(client.league) : client.last_club}
                   </li>
                 ) : null}
                 {prevLeagues.map((league) => (
