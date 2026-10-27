@@ -13,6 +13,7 @@ import type { PublicRosterPlayer, PublicRosterSeasonStats } from "@/types/roster
 import {
   ageFrom,
   formatHeight,
+  formatLeague,
   formatStat,
   positionLabel,
   previousLeagues,
@@ -21,6 +22,7 @@ import {
 
 import Gallery from "./Gallery";
 import Highlights from "./Highlights";
+import ProfilePhoto from "./ProfilePhoto";
 import ShowMore from "./ShowMore";
 import WatchHighlightsLink from "./WatchHighlightsLink";
 import styles from "./styles.module.scss";
@@ -78,13 +80,7 @@ export default function Profile({
               <span className={styles.photoFrame} aria-hidden />
               <div className={styles.photo}>
                 {client.presentation_image_url ? (
-                  <Image
-                    src={client.presentation_image_url}
-                    alt={client.full_name}
-                    fill
-                    sizes="180px"
-                    priority
-                  />
+                  <ProfilePhoto src={client.presentation_image_url} name={client.full_name} />
                 ) : null}
               </div>
             </div>
@@ -130,7 +126,7 @@ export default function Profile({
               <ul className={styles.tags}>
                 {client.league || client.last_club ? (
                   <li className={`${styles.tag} ${styles.tagCurrent}`}>
-                    {client.league || client.last_club}
+                    {client.league ? formatLeague(client.league) : client.last_club}
                   </li>
                 ) : null}
                 {prevLeagues.map((league) => (

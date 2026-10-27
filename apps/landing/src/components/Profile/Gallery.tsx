@@ -7,7 +7,14 @@ import type { PublicRosterGalleryImage } from "@/types/roster";
 
 import styles from "./styles.module.scss";
 
-/** Photo grid; a click opens the photo full screen in a native <dialog>. */
+/** Photos in the grid at first; "See more" adds this many more. */
+const INITIAL = 12;
+const STEP = 4;
+
+/**
+ * Photo grid; a click opens the photo full screen in a native <dialog>, whose
+ * arrows step through every photo, shown in the grid or not.
+ */
 export default function Gallery({
   images,
   name,
@@ -17,6 +24,7 @@ export default function Gallery({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState<number | null>(null);
+  const [visible, setVisible] = useState(INITIAL);
   const current = open === null ? null : images[open];
 
   const show = (index: number) => {
@@ -33,7 +41,7 @@ export default function Gallery({
   return (
     <>
       <ul className={styles.gallery}>
-        {images.map((image, index) => (
+        {images.slice(0, visible).map((image, index) => (
           <li key={image.id}>
             <button
               type="button"
@@ -46,6 +54,15 @@ export default function Gallery({
           </li>
         ))}
       </ul>
+      {visible < images.length ? (
+        <button
+          type="button"
+          className={`btn btn-ghost ${styles.seeMore}`}
+          onClick={() => setVisible((count) => count + STEP)}
+        >
+          See more
+        </button>
+      ) : null}
 
       <dialog
         ref={dialogRef}
