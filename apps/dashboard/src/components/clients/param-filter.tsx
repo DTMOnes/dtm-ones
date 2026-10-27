@@ -23,36 +23,41 @@ export function ParamFilter({
     : "all";
 
   return (
-    <ToggleGroup
-      type="single"
-      size="sm"
-      variant="outline"
-      spacing={2}
-      value={selected}
-      aria-label={label}
-      onValueChange={(value) => {
-        if (!value) {
-          return;
-        }
+    <div className="flex items-center gap-2">
+      <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+        {label}
+      </span>
+      <ToggleGroup
+        type="single"
+        size="sm"
+        variant="outline"
+        spacing={2}
+        value={selected}
+        aria-label={`Filter by ${label}`}
+        onValueChange={(value) => {
+          if (!value) {
+            return;
+          }
 
-        const params = new URLSearchParams(searchParams);
+          const params = new URLSearchParams(searchParams);
 
-        if (value === "all") {
-          params.delete(param);
-        } else {
-          params.set(param, value);
-        }
+          if (value === "all") {
+            params.delete(param);
+          } else {
+            params.set(param, value);
+          }
 
-        const query = params.toString();
-        replace(query ? `${pathname}?${query}` : pathname);
-      }}
-    >
-      <ToggleGroupItem value="all">All</ToggleGroupItem>
-      {options.map((option) => (
-        <ToggleGroupItem key={option.value} value={option.value}>
-          {option.label}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+          const query = params.toString();
+          replace(query ? `${pathname}?${query}` : pathname);
+        }}
+      >
+        <ToggleGroupItem value="all">All</ToggleGroupItem>
+        {options.map((option) => (
+          <ToggleGroupItem key={option.value} value={option.value}>
+            {option.label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+    </div>
   );
 }

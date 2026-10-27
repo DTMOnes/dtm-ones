@@ -21,6 +21,7 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
+import { Separator } from "@/components/ui/separator";
 import { db } from "@/lib/db";
 import {
   clientDisplayName,
@@ -67,17 +68,18 @@ export default async function Page({
           <Suspense>
             <ParamFilter
               param="kind"
-              label="Filter by kind"
+              label="Type"
               options={[
                 { value: "player", label: "Player" },
                 { value: "coach", label: "Coach" },
               ]}
             />
           </Suspense>
+          <Separator orientation="vertical" className="mx-1" />
           <Suspense>
             <ParamFilter
               param="visibility"
-              label="Filter by visibility"
+              label="Visibility"
               options={[
                 { value: "public", label: "Public" },
                 { value: "private", label: "Private" },
