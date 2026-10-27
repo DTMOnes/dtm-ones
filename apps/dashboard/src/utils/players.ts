@@ -351,6 +351,29 @@ export async function addPlayerVideo(
   return row;
 }
 
+export async function updatePlayerVideo(
+  db: Database,
+  playerId: string,
+  videoId: string,
+  youtubeUrl: string,
+  title: string | null = null,
+): Promise<void> {
+  const [row] = await db
+    .update(schema.playerVideos)
+    .set({ youtubeUrl, title })
+    .where(
+      and(
+        eq(schema.playerVideos.id, videoId),
+        eq(schema.playerVideos.clientId, playerId),
+      ),
+    )
+    .returning({ id: schema.playerVideos.id });
+
+  if (!row) {
+    throw new NotFoundError("Video");
+  }
+}
+
 export async function removePlayerVideo(
   db: Database,
   playerId: string,

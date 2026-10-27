@@ -144,6 +144,10 @@ export const addPlayerVideoSchema = z.object({
   title: optionalText,
 });
 
+export const updatePlayerVideoSchema = addPlayerVideoSchema.extend({
+  videoId: z.uuid(),
+});
+
 export const removePlayerVideoSchema = z.object({
   playerId: z.uuid(),
   videoId: z.uuid(),

@@ -8,12 +8,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import {
-  DotsThreeIcon,
-  PencilSimpleIcon,
-  PlusIcon,
-  TrashIcon,
-} from "@phosphor-icons/react";
+import { PlusIcon } from "@phosphor-icons/react";
 import { latestSeasonTies, sortAwardsByYear } from "@dtm/database/career";
 
 import {
@@ -25,17 +20,12 @@ import {
   updateAwardAction,
   updateCareerEntryAction,
 } from "@/actions/clients/career";
+import { RowMenu } from "@/components/form/row-menu";
 import SelectField from "@/components/form/select-field";
 import SubmitButton from "@/components/form/submit-button";
 import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
   Card,
@@ -52,7 +42,6 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
 import {
   addAwardSchema,
   addCareerEntrySchema,
@@ -74,49 +63,6 @@ function onServerError({
   if (error.serverError) {
     toast.error(error.serverError.message);
   }
-}
-
-/** The "⋯" menu on a career or award row: Edit opens the row's form, Delete removes it. */
-function RowMenu({
-  label,
-  busy,
-  onEdit,
-  onDelete,
-}: {
-  label: string;
-  busy: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
-}) {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          disabled={busy}
-          aria-label={`${label} options`}
-        >
-          {busy ? (
-            <Spinner />
-          ) : (
-            <DotsThreeIcon className="size-5" weight="bold" />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onSelect={onEdit}>
-          <PencilSimpleIcon />
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem variant="destructive" onSelect={onDelete}>
-          <TrashIcon />
-          Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
 }
 
 function EditActions({
