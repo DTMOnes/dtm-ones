@@ -3,7 +3,7 @@ import Link from "next/link";
 import { UsersIcon } from "@phosphor-icons/react/ssr";
 
 import { CreateClientDialog } from "@/components/clients/create-client-dialog";
-import { KindFilter } from "@/components/clients/kind-filter";
+import { ParamFilter } from "@/components/clients/param-filter";
 import {
   ListEmpty,
   ListRowAvatar,
@@ -33,15 +33,20 @@ import { visibilityLabel } from "@/utils/list-row";
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; kind?: string }>;
+  searchParams: Promise<{ q?: string; kind?: string; visibility?: string }>;
 }) {
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const kind: ClientKind | undefined =
     sp.kind === "player" || sp.kind === "coach" ? sp.kind : undefined;
+  const visibility =
+    sp.visibility === "public" || sp.visibility === "private"
+      ? sp.visibility
+      : undefined;
 
   const clients = await listClients(db, {
     kind,
+    visibility,
     q: q || undefined,
   });
 
@@ -60,7 +65,24 @@ export default async function Page({
             </Suspense>
           </div>
           <Suspense>
-            <KindFilter />
+            <ParamFilter
+              param="kind"
+              label="Filter by kind"
+              options={[
+                { value: "player", label: "Player" },
+                { value: "coach", label: "Coach" },
+              ]}
+            />
+          </Suspense>
+          <Suspense>
+            <ParamFilter
+              param="visibility"
+              label="Filter by visibility"
+              options={[
+                { value: "public", label: "Public" },
+                { value: "private", label: "Private" },
+              ]}
+            />
           </Suspense>
         </PageToolbar>
       </div>

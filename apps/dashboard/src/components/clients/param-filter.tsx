@@ -4,18 +4,23 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-const OPTIONS = [
-  { value: "all", label: "All" },
-  { value: "player", label: "Player" },
-  { value: "coach", label: "Coach" },
-] as const;
-
-export function KindFilter() {
+/** An "All / A / B" toggle kept in one URL search param; "All" removes it. */
+export function ParamFilter({
+  param,
+  label,
+  options,
+}: {
+  param: string;
+  label: string;
+  options: readonly { value: string; label: string }[];
+}) {
   const { replace } = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const raw = searchParams.get("kind");
-  const selected = raw === "player" || raw === "coach" ? raw : "all";
+  const raw = searchParams.get(param);
+  const selected = options.some((option) => option.value === raw)
+    ? raw!
+    : "all";
 
   return (
     <ToggleGroup
@@ -24,7 +29,7 @@ export function KindFilter() {
       variant="outline"
       spacing={2}
       value={selected}
-      aria-label="Filter by kind"
+      aria-label={label}
       onValueChange={(value) => {
         if (!value) {
           return;
@@ -33,16 +38,17 @@ export function KindFilter() {
         const params = new URLSearchParams(searchParams);
 
         if (value === "all") {
-          params.delete("kind");
+          params.delete(param);
         } else {
-          params.set("kind", value);
+          params.set(param, value);
         }
 
         const query = params.toString();
         replace(query ? `${pathname}?${query}` : pathname);
       }}
     >
-      {OPTIONS.map((option) => (
+      <ToggleGroupItem value="all">All</ToggleGroupItem>
+      {options.map((option) => (
         <ToggleGroupItem key={option.value} value={option.value}>
           {option.label}
         </ToggleGroupItem>

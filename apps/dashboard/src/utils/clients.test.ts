@@ -124,6 +124,24 @@ test("Staff can filter the list by Player or Coach", async () => {
   );
 });
 
+test("Staff can filter the list by Public or Private", async () => {
+  const hidden = await createClient(db, { kind: "player" });
+  const shown = await createClient(db, { kind: "coach" });
+  await db
+    .update(schema.clients)
+    .set({ visibility: "public" })
+    .where(eq(schema.clients.id, shown.id));
+
+  assert.deepEqual(
+    (await listClients(db, { visibility: "public" })).map((client) => client.id),
+    [shown.id],
+  );
+  assert.deepEqual(
+    (await listClients(db, { visibility: "private" })).map((client) => client.id),
+    [hidden.id],
+  );
+});
+
 test("search by name does not match unset names", async () => {
   const unnamed = await createClient(db, { kind: "player" });
   const named = await createPlayer(db, {

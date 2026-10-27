@@ -52,7 +52,11 @@ export async function createClient(
 
 export async function listClients(
   db: Database,
-  options: { kind?: ClientKind; q?: string } = {},
+  options: {
+    kind?: ClientKind;
+    visibility?: ClientListItem["visibility"];
+    q?: string;
+  } = {},
 ): Promise<ClientListItem[]> {
   const q = options.q?.trim();
 
@@ -66,6 +70,9 @@ export async function listClients(
     where: and(
       isNull(schema.clients.trashedAt),
       options.kind ? eq(schema.clients.kind, options.kind) : undefined,
+      options.visibility
+        ? eq(schema.clients.visibility, options.visibility)
+        : undefined,
       q ? ilike(schema.clients.name, `%${q}%`) : undefined,
     ),
     orderBy: [desc(schema.clients.createdAt)],
