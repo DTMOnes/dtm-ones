@@ -2,6 +2,7 @@ import { and, asc, eq, isNull } from "drizzle-orm";
 import { schema, type Database } from "@dtm/database";
 
 import type { Coach, CoachVisibility } from "@/types/coach";
+import { assignClientSlug } from "@/utils/clients";
 import { ConflictError, NotFoundError } from "@/utils/errors";
 
 export type CoachWrite = {
@@ -204,6 +205,9 @@ export async function setCoachVisibility(
     .update(schema.clients)
     .set({ visibility, updatedAt: new Date() })
     .where(eq(schema.clients.id, id));
+  if (visibility === "public") {
+    await assignClientSlug(db, id);
+  }
 
   const coach = await getCoach(db, id);
   if (!coach) {

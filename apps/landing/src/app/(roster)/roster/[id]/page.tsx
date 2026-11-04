@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { listAgencyPosts, postsWithHashtag } from "@/lib/instagram";
 import { getPublicRosterPlayer } from "@/lib/roster/queries";
@@ -34,6 +34,11 @@ export default async function Page({
 
   if (!client) {
     notFound();
+  }
+
+  // Old /roster/<uuid> links (shared before slugs) move to the readable one.
+  if (id !== client.slug) {
+    permanentRedirect(`/roster/${client.slug}`);
   }
 
   // Two rows of four: the agency's Instagram posts tagged with this Client's hashtag.

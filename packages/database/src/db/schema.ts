@@ -90,6 +90,8 @@ export const clients = pgTable(
     seasonStats: jsonb("season_stats").$type<SeasonStats>(),
     /** Without "#"; the profile NEWS section shows the agency's posts tagged with it. */
     instagramHashtag: text("instagram_hashtag"),
+    /** Profile link (/roster/<slug>), from the name the first time the Client goes public; then fixed. */
+    slug: text("slug").unique("clients_slug_key"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -210,6 +212,7 @@ export const roster = pgView("roster").as((qb) =>
       strengths: clients.strengths,
       seasonStats: clients.seasonStats,
       instagramHashtag: clients.instagramHashtag,
+      slug: clients.slug,
     })
     .from(clients)
     .leftJoin(categories, eq(clients.categoryId, categories.id))

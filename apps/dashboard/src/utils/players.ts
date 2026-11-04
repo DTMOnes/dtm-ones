@@ -3,6 +3,7 @@ import { schema, type Database, type SeasonStats } from "@dtm/database";
 
 import type { Coach } from "@/types/coach";
 import type { PlayerDetail, PlayerVisibility } from "@/types/player";
+import { assignClientSlug } from "./clients";
 import { getCoach, isCoachComplete } from "./coaches";
 import { ConflictError, NotFoundError } from "./errors";
 import {
@@ -309,6 +310,9 @@ export async function setPlayerVisibility(
     .update(schema.clients)
     .set({ visibility, updatedAt: new Date() })
     .where(eq(schema.clients.id, id));
+  if (visibility === "public") {
+    await assignClientSlug(db, id);
+  }
 
   const player = await getPlayer(db, id);
   if (!player) {

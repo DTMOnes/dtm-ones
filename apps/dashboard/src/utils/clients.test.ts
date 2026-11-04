@@ -8,6 +8,7 @@ import { createDatabase, schema } from "@dtm/database";
 
 import { createCoach, getCoach } from "./coaches";
 import {
+  assignClientSlug,
   clientDisplayName,
   createClient,
   kindLabel,
@@ -140,6 +141,35 @@ test("Staff can filter the list by Public or Private", async () => {
     (await listClients(db, { visibility: "private" })).map((client) => client.id),
     [hidden.id],
   );
+});
+
+test("a Client's profile slug comes from its name once and stays fixed", async () => {
+  const first = await createPlayer(db, {
+    name: "José Pérez",
+    nationality: "Argentina",
+    lastClub: "Boca",
+  });
+  const second = await createPlayer(db, {
+    name: "Jose Perez",
+    nationality: "Argentina",
+    lastClub: "River",
+  });
+  const slugOf = async (id: string) =>
+    (
+      await db.query.clients.findFirst({
+        columns: { slug: true },
+        where: eq(schema.clients.id, id),
+      })
+    )?.slug;
+
+  await assignClientSlug(db, first.id);
+  await assignClientSlug(db, second.id);
+  assert.equal(await slugOf(first.id), "jose-perez");
+  assert.equal(await slugOf(second.id), "jose-perez-2");
+
+  await updatePlayer(db, first.id, { name: "Joseph Perez" });
+  await assignClientSlug(db, first.id);
+  assert.equal(await slugOf(first.id), "jose-perez");
 });
 
 test("search by name does not match unset names", async () => {

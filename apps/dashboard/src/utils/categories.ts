@@ -4,13 +4,18 @@ import { schema, type Database } from "@dtm/database";
 import type { Category } from "@/types/category";
 import { ConflictError, NotFoundError } from "@/utils/errors";
 
-function slugify(name: string): string {
-  const slug = name
-    .trim()
+/** "José Pérez" → "jose-perez". Matches the backfill in migrations/0008_client_slug.sql. */
+export function slugify(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return slug.length > 0 ? slug : "category";
+}
+
+function categorySlug(name: string): string {
+  return slugify(name) || "category";
 }
 
 function postgresError(error: unknown): object | null {
@@ -41,7 +46,7 @@ export async function createCategory(
   try {
     const [row] = await db
       .insert(schema.categories)
-      .values({ name, slug: slugify(name) })
+      .values({ name, slug: categorySlug(name) })
       .returning({
         id: schema.categories.id,
         name: schema.categories.name,
@@ -70,7 +75,7 @@ export async function renameCategory(
   try {
     const [row] = await db
       .update(schema.categories)
-      .set({ name, slug: slugify(name), updatedAt: new Date() })
+      .set({ name, slug: categorySlug(name), updatedAt: new Date() })
       .where(eq(schema.categories.id, id))
       .returning({
         id: schema.categories.id,

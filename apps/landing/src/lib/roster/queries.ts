@@ -24,7 +24,7 @@ function toPublicPlayer(player: RosterPlayer): PublicRosterPlayer {
   return {
     id: player.id,
     kind: player.kind,
-    slug: player.id,
+    slug: player.slug ?? player.id,
     full_name: player.name,
     nationality: player.nationality,
     height_cm: player.heightCm,
