@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Anton, Montserrat } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 // Components
@@ -64,6 +65,7 @@ export default async function RootLayout({
         <SiteHeader />
         <div className="page-scroll">{children}</div>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

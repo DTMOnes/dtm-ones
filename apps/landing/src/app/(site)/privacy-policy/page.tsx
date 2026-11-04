@@ -48,6 +48,11 @@ export default function Page() {
         You can browse the Roster and public pages without creating an account
         and without us identifying you through cookies.
       </p>
+      <p>
+        We count visits with Vercel Web Analytics, which does not use cookies.
+        It records anonymous data such as the pages viewed, the referring site,
+        country, and device type. It does not identify you.
+      </p>
 
       <h2>Questions</h2>
       <p>
