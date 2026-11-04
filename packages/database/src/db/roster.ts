@@ -27,6 +27,8 @@ export type RosterPlayer = {
   strengths: string[];
   seasonStats: SeasonStats | null;
   instagramHashtag: string | null;
+  /** Null only for Clients made public before slugs existed and not backfilled. */
+  slug: string | null;
   gallery: { id: string; url: string; sortOrder: number }[];
   videos: {
     id: string;
@@ -88,6 +90,7 @@ const rosterColumns = {
   strengths: roster.strengths,
   seasonStats: roster.seasonStats,
   instagramHashtag: roster.instagramHashtag,
+  slug: roster.slug,
 } as const;
 
 export async function listPublicRosterPlayers(
@@ -139,23 +142,24 @@ export async function listPublicRosterPlayers(
   }));
 }
 
+/** By profile slug, or by id for links shared before slugs existed. */
 export async function getPublicRosterPlayer(
   db: Database,
-  id: string,
+  slugOrId: string,
 ): Promise<RosterPlayer | null> {
-  if (!isUuid(id)) {
-    return null;
-  }
-
   const [row] = await db
     .select(rosterColumns)
     .from(roster)
-    .where(eq(roster.id, id))
+    .where(
+      isUuid(slugOrId) ? eq(roster.id, slugOrId) : eq(roster.slug, slugOrId),
+    )
     .limit(1);
 
   if (!row) {
     return null;
   }
+
+  const id = row.id;
 
   const gallery = await db
     .select({

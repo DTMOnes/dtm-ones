@@ -14,7 +14,7 @@ import {
 import styles from "./styles.module.scss";
 
 export default function Cards({ player }: { player: PublicRosterPlayer }) {
-  const href = `/roster/${player.id}`;
+  const href = `/roster/${player.slug}`;
   const { first, last } = splitName(player.full_name);
   const position = positionLabel(player);
   const stats = player.season_stats;

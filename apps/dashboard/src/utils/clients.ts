@@ -1,5 +1,7 @@
-import { and, desc, eq, ilike, isNull } from "drizzle-orm";
+import { and, desc, eq, ilike, isNull, like } from "drizzle-orm";
 import { schema, type Database } from "@dtm/database";
+
+import { slugify } from "@/utils/categories";
 
 export type ClientKind = "player" | "coach";
 
@@ -48,6 +50,39 @@ export async function createClient(
   }
 
   return row;
+}
+
+/**
+ * Gives a Client its profile link (/roster/<slug>) from its name, once: later
+ * renames keep the slug so shared links keep working. Repeated names get -2, -3.
+ */
+export async function assignClientSlug(db: Database, id: string): Promise<void> {
+  const client = await db.query.clients.findFirst({
+    columns: { name: true, slug: true },
+    where: eq(schema.clients.id, id),
+  });
+  const base = slugify(client?.name ?? "");
+  if (!client || client.slug || !base) {
+    return;
+  }
+
+  const taken = new Set(
+    (
+      await db
+        .select({ slug: schema.clients.slug })
+        .from(schema.clients)
+        .where(like(schema.clients.slug, `${base}%`))
+    ).map((row) => row.slug),
+  );
+  let slug = base;
+  for (let n = 2; taken.has(slug); n++) {
+    slug = `${base}-${n}`;
+  }
+
+  await db
+    .update(schema.clients)
+    .set({ slug })
+    .where(and(eq(schema.clients.id, id), isNull(schema.clients.slug)));
 }
 
 export async function listClients(
