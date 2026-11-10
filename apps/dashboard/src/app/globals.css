@@ -133,6 +133,17 @@
   html {
     @apply font-sans;
   }
+
+  /* Tailwind v4 leaves buttons with the default arrow; show the hand on anything clickable. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"]:not([aria-disabled="true"]),
+  [role="menuitem"]:not([data-disabled]),
+  [role="option"]:not([data-disabled]),
+  [role="checkbox"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
 }
 
 /* Page and card titles in Anton capitals, as on the public site.
