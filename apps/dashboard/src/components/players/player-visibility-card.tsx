@@ -13,15 +13,8 @@ import {
 } from "@phosphor-icons/react";
 
 import { setPlayerVisibilityAction } from "@/actions/players/setPlayerVisibility";
+import { ProfileSection } from "@/components/clients/editor-layout";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import type { PlayerDetail } from "@/types/player";
 
@@ -87,9 +80,12 @@ function RequirementList({
 export function PlayerVisibilityCard({
   player,
   checks,
+  number,
 }: {
   player: PlayerDetail;
   checks: Array<{ label: string; met: boolean }>;
+  /** Section number in the editor. */
+  number: number;
 }) {
   const router = useRouter();
   const isPublic = player.visibility === "public";
@@ -111,20 +107,14 @@ export function PlayerVisibilityCard({
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-baseline gap-2">
-          Visibility
-          <span className="text-sm font-semibold tracking-tight">
-            {isPublic ? "Public" : "Private"}
-          </span>
-        </CardTitle>
-        <CardDescription>
-          Does this player show in the landing page? Private means no, public
-          means yes.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+    <ProfileSection
+      id="visibility"
+      number={number}
+      title={`Visibility · ${isPublic ? "Public" : "Private"}`}
+      icon={<GlobeSimpleIcon />}
+      description="Does this player show in the landing page? Private means no, public means yes."
+    >
+      <div className="grid gap-6 sm:grid-cols-2">
         {gaps.length > 0 ? (
           <RequirementList
             heading="Still needed"
@@ -142,8 +132,8 @@ export function PlayerVisibilityCard({
           playerId={player.id}
           muted
         />
-      </CardContent>
-      <CardFooter>
+      </div>
+      <div className="mt-5 border-t pt-4">
         <Button
           type="button"
           disabled={isExecuting || (!isPublic && gaps.length > 0)}
@@ -165,7 +155,7 @@ export function PlayerVisibilityCard({
             </>
           )}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </ProfileSection>
   );
 }

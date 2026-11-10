@@ -3,14 +3,15 @@ import { and, asc, eq, isNull } from "drizzle-orm";
 import { schema } from "@dtm/database";
 
 import { ClientCareer } from "@/components/career/client-career";
+import {
+  EditorLayout,
+  ProfileHeader,
+  SectionIndex,
+} from "@/components/clients/editor-layout";
 import { CoachMedia } from "@/components/coaches/coach-media";
 import { CoachVisibilityCard } from "@/components/coaches/coach-visibility-card";
 import { EditCoachForm } from "@/components/coaches/edit-coach-form";
-import {
-  DetailLayout,
-  PageHeader,
-  PageShell,
-} from "@/components/page/page-frame";
+import { PageShell } from "@/components/page/page-frame";
 import { EditPlayerForm } from "@/components/players/edit-player-form";
 import { PlayerMedia } from "@/components/players/media/player-media";
 import { PlayerDetailTabs } from "@/components/players/player-detail-tabs";
@@ -33,6 +34,8 @@ export default async function Page({
   const sp = await searchParams;
   const tab = sp.tab === "media" ? "media" : "info";
   const basePath = `/clients/${id}`;
+  // Ticks in the section index: the saved profile has that field filled in.
+  const filled = (value: string | null | undefined) => Boolean(value?.trim());
 
   const row = await db.query.clients.findFirst({
     columns: { kind: true },
@@ -60,39 +63,78 @@ export default async function Page({
       notFound();
     }
 
+    const checks = playerCompletenessChecks(player);
+    const isPublic = player.visibility === "public";
+
     return (
       <PageShell>
-        <PageHeader
-          backHref="/clients"
-          title={clientDisplayName("player", player.name)}
-          description="Player profile"
+        <ProfileHeader
+          name={clientDisplayName("player", player.name)}
+          kind="Player"
+          isPublic={isPublic}
+          missing={checks.filter((check) => !check.met).length}
+          progress={{
+            done: checks.filter((check) => check.met).length,
+            total: checks.length,
+          }}
         />
 
         <PlayerDetailTabs
           basePath={basePath}
           tab={tab}
           info={
-            <DetailLayout
-              main={
-                <div className="flex flex-col gap-6">
-                  <EditPlayerForm player={player} categories={categories} />
-                  <ClientCareer
-                    clientId={player.id}
-                    career={career}
-                    awards={awards}
-                  />
-                </div>
+            <EditorLayout
+              index={
+                <SectionIndex
+                  items={[
+                    {
+                      id: "identity",
+                      label: "Identity",
+                      done:
+                        filled(player.name) &&
+                        filled(player.nationality) &&
+                        filled(player.birthDate) &&
+                        player.heightCm != null,
+                    },
+                    {
+                      id: "basketball",
+                      label: "Basketball",
+                      done:
+                        filled(player.lastClub) &&
+                        filled(player.league) &&
+                        Boolean(player.categoryId) &&
+                        filled(player.eurobasketLink),
+                    },
+                    {
+                      id: "about",
+                      label: "About",
+                      done:
+                        filled(player.bio) &&
+                        (player.strengths ?? []).length > 0 &&
+                        filled(player.instagramHashtag),
+                    },
+                    {
+                      id: "stats",
+                      label: "Statistics",
+                      done: filled(player.seasonStats?.season),
+                    },
+                    { id: "career", label: "Career", done: career.length > 0 },
+                    { id: "awards", label: "Titles", done: awards.length > 0 },
+                    { id: "visibility", label: "Visibility", done: isPublic },
+                  ]}
+                />
               }
-              rail={
-                <>
-                  <PlayerVisibilityCard
-                    player={player}
-                    checks={playerCompletenessChecks(player)}
-                  />
-                  <RemoveToTrashCard clientId={player.id} kind="player" />
-                </>
-              }
-            />
+            >
+              <EditPlayerForm player={player} categories={categories} />
+              <ClientCareer
+                clientId={player.id}
+                career={career}
+                awards={awards}
+                firstNumber={5}
+              />
+              <PlayerVisibilityCard player={player} checks={checks} number={7} />
+              <RemoveToTrashCard clientId={player.id} kind="player" />
+            </EditorLayout>
           }
           media={<PlayerMedia player={player} />}
         />
@@ -110,41 +152,60 @@ export default async function Page({
   }
 
   const isPublic = coach.visibility === "public";
+  const gaps = coachCompletenessGaps(coach);
 
   return (
     <PageShell>
-      <PageHeader
-        backHref="/clients"
-        title={clientDisplayName("coach", coach.name)}
-        description="Coach profile"
-        status={isPublic ? "Public" : "Private"}
+      <ProfileHeader
+        name={clientDisplayName("coach", coach.name)}
+        kind="Coach"
+        isPublic={isPublic}
+        missing={gaps.length}
       />
 
       <PlayerDetailTabs
         basePath={basePath}
         tab={tab}
         info={
-          <DetailLayout
-            main={
-              <div className="flex flex-col gap-6">
-                <EditCoachForm coach={coach} />
-                <ClientCareer
-                  clientId={coach.id}
-                  career={career}
-                  awards={awards}
-                />
-              </div>
+          <EditorLayout
+            index={
+              <SectionIndex
+                items={[
+                  {
+                    id: "identity",
+                    label: "Identity",
+                    done: filled(coach.name) && filled(coach.nationality),
+                  },
+                  {
+                    id: "basketball",
+                    label: "Basketball",
+                    done:
+                      filled(coach.lastClub) &&
+                      filled(coach.league) &&
+                      filled(coach.eurobasketLink),
+                  },
+                  {
+                    id: "about",
+                    label: "About",
+                    done: filled(coach.bio) && filled(coach.instagramHashtag),
+                  },
+                  { id: "career", label: "Career", done: career.length > 0 },
+                  { id: "awards", label: "Titles", done: awards.length > 0 },
+                  { id: "visibility", label: "Visibility", done: isPublic },
+                ]}
+              />
             }
-            rail={
-              <>
-                <CoachVisibilityCard
-                  coach={coach}
-                  gaps={coachCompletenessGaps(coach)}
-                />
-                <RemoveToTrashCard clientId={coach.id} kind="coach" />
-              </>
-            }
-          />
+          >
+            <EditCoachForm coach={coach} />
+            <ClientCareer
+              clientId={coach.id}
+              career={career}
+              awards={awards}
+              firstNumber={4}
+            />
+            <CoachVisibilityCard coach={coach} gaps={gaps} number={6} />
+            <RemoveToTrashCard clientId={coach.id} kind="coach" />
+          </EditorLayout>
         }
         media={<CoachMedia coach={coach} />}
       />
