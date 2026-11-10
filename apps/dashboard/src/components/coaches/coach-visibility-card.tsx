@@ -8,26 +8,20 @@ import { toast } from "sonner";
 import { EyeSlashIcon, GlobeSimpleIcon } from "@phosphor-icons/react";
 
 import { setCoachVisibilityAction } from "@/actions/coaches/setCoachVisibility";
+import { ProfileSection } from "@/components/clients/editor-layout";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 import type { Coach } from "@/types/coach";
 
 export function CoachVisibilityCard({
   coach,
   gaps,
+  number,
 }: {
   coach: Coach;
   gaps: string[];
+  /** Section number in the editor. */
+  number: number;
 }) {
   const router = useRouter();
   const isPublic = coach.visibility === "public";
@@ -48,25 +42,14 @@ export function CoachVisibilityCard({
   });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Visibility</CardTitle>
-        <CardAction>
-          <span
-            className={cn(
-              "text-sm font-medium",
-              !isPublic && "text-muted-foreground",
-            )}
-          >
-            {isPublic ? "Public" : "Private"}
-          </span>
-        </CardAction>
-        <CardDescription>
-          Public means this Coach is on the Roster. Private means not on the
-          Roster. A Coach may be public only when the profile is complete.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
+    <ProfileSection
+      id="visibility"
+      number={number}
+      title={`Visibility · ${isPublic ? "Public" : "Private"}`}
+      icon={<GlobeSimpleIcon />}
+      description="Public means this Coach is on the Roster. Private means not on the Roster. A Coach may be public only when the profile is complete."
+    >
+      <div className="flex flex-col gap-3">
         {gaps.length > 0 ? (
           <div className="flex flex-col gap-2.5">
             <p className="text-sm font-medium">Incomplete for the Roster</p>
@@ -92,8 +75,8 @@ export function CoachVisibilityCard({
             This profile is complete. It can be public.
           </p>
         )}
-      </CardContent>
-      <CardFooter>
+      </div>
+      <div className="mt-5 border-t pt-4">
         <Button
           type="button"
           disabled={isExecuting || (!isPublic && gaps.length > 0)}
@@ -115,7 +98,7 @@ export function CoachVisibilityCard({
             </>
           )}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </ProfileSection>
   );
 }

@@ -8,7 +8,7 @@ import { useAction } from "next-safe-action/hooks";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import { PlusIcon } from "@phosphor-icons/react";
+import { PlusIcon, TrophyIcon, TreeStructureIcon } from "@phosphor-icons/react";
 import { latestSeasonTies, sortAwardsByYear } from "@dtm/database/career";
 
 import {
@@ -20,6 +20,7 @@ import {
   updateAwardAction,
   updateCareerEntryAction,
 } from "@/actions/clients/career";
+import { ProfileSection } from "@/components/clients/editor-layout";
 import { RowMenu } from "@/components/form/row-menu";
 import SelectField from "@/components/form/select-field";
 import SubmitButton from "@/components/form/submit-button";
@@ -27,13 +28,6 @@ import TextField from "@/components/form/text-field";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Item,
   ItemActions,
@@ -192,9 +186,11 @@ function AwardEditor({
 function CareerCard({
   clientId,
   career,
+  number,
 }: {
   clientId: string;
   career: CareerEntry[];
+  number: number;
 }) {
   const router = useRouter();
   const empty = { clientId, season: "", club: "", league: "", country: "" };
@@ -223,17 +219,14 @@ function CareerCard({
   const tied = latestSeasonTies(career);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Career</CardTitle>
-        <CardDescription>
-          Clubs and seasons, in any order: the profile sorts them by season,
-          newest first, and marks the newest as current. A season can be a
-          range, such as 2020-2025. If two clubs share the latest season, tick
-          the current one.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+    <ProfileSection
+      id="career"
+      number={number}
+      title="Career"
+      icon={<TreeStructureIcon />}
+      description="Clubs and seasons, in any order: the profile sorts them by season, newest first, and marks the newest as current. A season can be a range, such as 2020-2025. If two clubs share the latest season, tick the current one."
+    >
+      <div className="flex flex-col gap-4">
         {tied.size > 0 && !career.some((entry) => tied.has(entry.id) && entry.isCurrent) ? (
           <p className="border-primary/30 bg-accent text-accent-foreground border px-3 py-2 text-sm">
             Two or more clubs share the latest season. Tick &quot;Current team&quot; on the
@@ -314,17 +307,19 @@ function CareerCard({
             </div>
           </form>
         </FormProvider>
-      </CardContent>
-    </Card>
+      </div>
+    </ProfileSection>
   );
 }
 
 function AwardsCard({
   clientId,
   awards,
+  number,
 }: {
   clientId: string;
   awards: Award[];
+  number: number;
 }) {
   const router = useRouter();
   const empty = { clientId, title: "", detail: "", year: "", kind: "team" as const };
@@ -347,15 +342,14 @@ function AwardsCard({
   const [editingId, setEditingId] = useState<string | null>(null);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Titles &amp; awards</CardTitle>
-        <CardDescription>
-          Shown on the profile newest year first (no year: last), only when there is at least one.
-          Team titles get a trophy icon and individual awards a star.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+    <ProfileSection
+      id="awards"
+      number={number}
+      title="Titles & awards"
+      icon={<TrophyIcon />}
+      description="Shown on the profile newest year first (no year: last), only when there is at least one. Team titles get a trophy icon and individual awards a star."
+    >
+      <div className="flex flex-col gap-4">
         {awards.length > 0 ? (
           <ul className="flex flex-col gap-2">
             {sortAwardsByYear(awards).map((award) => (
@@ -414,8 +408,8 @@ function AwardsCard({
             </div>
           </form>
         </FormProvider>
-      </CardContent>
-    </Card>
+      </div>
+    </ProfileSection>
   );
 }
 
@@ -423,15 +417,18 @@ export function ClientCareer({
   clientId,
   career,
   awards,
+  firstNumber,
 }: {
   clientId: string;
   career: CareerEntry[];
   awards: Award[];
+  /** Section number of Career in the editor; Titles follows it. */
+  firstNumber: number;
 }) {
   return (
-    <div className="flex flex-col gap-6">
-      <CareerCard clientId={clientId} career={career} />
-      <AwardsCard clientId={clientId} awards={awards} />
+    <div className="grid gap-6 2xl:grid-cols-2">
+      <CareerCard clientId={clientId} career={career} number={firstNumber} />
+      <AwardsCard clientId={clientId} awards={awards} number={firstNumber + 1} />
     </div>
   );
 }

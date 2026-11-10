@@ -8,13 +8,6 @@ import { TrashIcon } from "@phosphor-icons/react";
 
 import { trashClientAction } from "@/actions/trash/trashClient";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { kindLabel } from "@/utils/clients";
 
@@ -41,16 +34,13 @@ export function RemoveToTrashCard({
   });
 
   return (
-    <Card className="ring-destructive/30">
-      <CardHeader className="border-destructive/20 bg-destructive/5">
-        <CardTitle>Trash</CardTitle>
-        <CardDescription>
-          Remove this {label} to the Trash. They leave this list and the
-          Roster. Restore keeps Visibility.
-        </CardDescription>
-      </CardHeader>
-      <CardFooter className="border-destructive/20 bg-destructive/5">
-        <Button
+    <div className="border-destructive/40 bg-destructive/5 flex flex-wrap items-center gap-3 border border-dashed px-4 py-3">
+      <TrashIcon aria-hidden className="text-destructive size-5 shrink-0" />
+      <p className="text-muted-foreground min-w-0 flex-1 text-sm">
+        Remove this {label} to the Trash. They leave this list and the Roster.
+        Restore keeps Visibility.
+      </p>
+      <Button
           type="button"
           variant="destructive"
           disabled={isExecuting}
@@ -66,8 +56,7 @@ export function RemoveToTrashCard({
               Move to trash bin
             </>
           )}
-        </Button>
-      </CardFooter>
-    </Card>
+      </Button>
+    </div>
   );
 }
