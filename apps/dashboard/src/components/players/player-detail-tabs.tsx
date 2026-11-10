@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { ImagesIcon, InfoIcon } from "@phosphor-icons/react";
 
 import {
   Tabs,
@@ -8,6 +9,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+
+/** Big Info / Media buttons: the selected one filled blue, the other light blue on hover. */
+const TRIGGER =
+  "h-11 rounded-none font-heading text-lg tracking-wide uppercase text-muted-foreground hover:bg-secondary hover:text-primary data-active:bg-primary data-active:text-primary-foreground data-active:shadow-sm dark:data-active:bg-primary dark:data-active:text-primary-foreground [&_svg:not([class*='size-'])]:size-5";
 
 export function PlayerDetailTabs({
   basePath,
@@ -31,9 +36,15 @@ export function PlayerDetailTabs({
       }}
       className="w-full gap-6"
     >
-      <TabsList variant="line" className="w-full">
-        <TabsTrigger value="info">Info</TabsTrigger>
-        <TabsTrigger value="media">Media</TabsTrigger>
+      <TabsList className="bg-card ring-foreground/10 w-full gap-1.5 rounded-none p-1.5 ring-1 group-data-horizontal/tabs:h-auto">
+        <TabsTrigger value="info" className={TRIGGER}>
+          <InfoIcon />
+          Info
+        </TabsTrigger>
+        <TabsTrigger value="media" className={TRIGGER}>
+          <ImagesIcon />
+          Media
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="info" className="w-full">
         {info}
