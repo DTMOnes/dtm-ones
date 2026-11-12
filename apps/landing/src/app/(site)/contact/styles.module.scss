@@ -158,6 +158,11 @@
   gap: 20px;
 }
 
+/* First and last name share a line; they stack on phones (see the 720px query). */
+.pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .field {
   display: block;
   min-width: 0;

@@ -10,6 +10,8 @@ import { NotFoundError } from "@/utils/errors";
 const contactRequestColumns = {
   id: schema.contactRequests.id,
   reason: schema.contactRequests.reason,
+  firstName: schema.contactRequests.firstName,
+  lastName: schema.contactRequests.lastName,
   email: schema.contactRequests.email,
   phone: schema.contactRequests.phone,
   message: schema.contactRequests.message,
@@ -25,6 +27,8 @@ export async function getContactRequest(
     columns: {
       id: true,
       reason: true,
+      firstName: true,
+      lastName: true,
       email: true,
       phone: true,
       message: true,

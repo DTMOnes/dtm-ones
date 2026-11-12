@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import type { ContactRequest } from "@/types/contact-request";
 import {
+  contactRequestName,
   contactRequestReasonLabel,
   formatContactRequestDate,
 } from "@/utils/contact-request-labels";
@@ -126,6 +127,7 @@ export function ContactRequestDialog({
   }
 
   const reasonLabel = contactRequestReasonLabel(request.reason);
+  const name = contactRequestName(request);
 
   function handleOpenChange(nextOpen: boolean): void {
     if (!nextOpen && isBusy) {
@@ -147,14 +149,30 @@ export function ContactRequestDialog({
             {reasonLabel} contact request
           </DialogDescription>
           <div className="flex w-full flex-col gap-4">
+            {name ? (
+              <ContactRequestField label="Name" className="w-full">
+                <div className="flex w-full min-w-0 items-center justify-between gap-1">
+                  <DialogTitle className="min-w-0 flex-1 truncate">
+                    {name}
+                  </DialogTitle>
+                  <CopyValueButton label="Name" value={name} disabled={isBusy} />
+                </div>
+              </ContactRequestField>
+            ) : null}
             <ContactRequestField label="Reason" className="w-full">
               <p className="text-sm">{reasonLabel}</p>
             </ContactRequestField>
             <ContactRequestField label="Email" className="w-full">
               <div className="flex w-full min-w-0 items-center justify-between gap-1">
-                <DialogTitle className="min-w-0 flex-1 truncate">
-                  {request.email}
-                </DialogTitle>
+                {name ? (
+                  <p className="min-w-0 flex-1 truncate text-sm">
+                    {request.email}
+                  </p>
+                ) : (
+                  <DialogTitle className="min-w-0 flex-1 truncate">
+                    {request.email}
+                  </DialogTitle>
+                )}
                 <CopyValueButton
                   label="Email"
                   value={request.email}

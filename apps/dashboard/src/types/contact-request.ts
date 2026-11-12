@@ -7,6 +7,9 @@ export type ContactRequestStatus = "new" | "read" | "archived";
 export type ContactRequest = {
   id: string;
   reason: ContactRequestReason;
+  /** Null on messages sent before the form asked for a name. */
+  firstName: string | null;
+  lastName: string | null;
   email: string;
   phone: string;
   message: string;

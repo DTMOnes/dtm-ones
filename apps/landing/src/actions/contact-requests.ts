@@ -12,6 +12,8 @@ export const createContactRequestAction = actionClient
   .action(async ({ parsedInput }) => {
     await db.insert(schema.contactRequests).values({
       reason: parsedInput.reason,
+      firstName: parsedInput.firstName,
+      lastName: parsedInput.lastName,
       email: parsedInput.email,
       phone: parsedInput.phone,
       message: parsedInput.message,

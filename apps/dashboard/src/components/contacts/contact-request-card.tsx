@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import type { ContactRequest } from "@/types/contact-request";
 import {
   contactRequestMessagePreview,
+  contactRequestName,
   contactRequestReasonLabel,
   contactRequestStatusLabel,
   formatContactRequestDate,
@@ -30,13 +31,14 @@ export function ContactRequestCard({
   onOpen,
 }: ContactRequestCardProps) {
   const isNew = request.status === "new";
+  const name = contactRequestName(request);
 
   return (
     <Item
       variant="muted"
       role="button"
       tabIndex={0}
-      aria-label={`${contactRequestStatusLabel(request.status)}: ${request.email}`}
+      aria-label={`${contactRequestStatusLabel(request.status)}: ${name ?? request.email}`}
       onClick={() => onOpen(request)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -60,9 +62,10 @@ export function ContactRequestCard({
         <ItemTitle
           className={isNew ? undefined : "font-normal text-muted-foreground"}
         >
-          {request.email}
+          {name ?? request.email}
         </ItemTitle>
         <ItemDescription>
+          {name ? `${request.email} · ` : null}
           {formatContactRequestDate(request.createdAt)}
           {request.message
             ? ` - ${contactRequestMessagePreview(request.message)}`

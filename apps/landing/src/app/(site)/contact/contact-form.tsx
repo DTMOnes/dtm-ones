@@ -47,6 +47,8 @@ export default function ContactForm() {
   } = useForm<CreateContactRequest>({
     resolver: zodResolver(createContactRequestSchema),
     defaultValues: {
+      firstName: "",
+      lastName: "",
       email: "",
       phone: "",
       message: "",
@@ -119,6 +121,44 @@ export default function ContactForm() {
           </p>
         ) : null}
       </fieldset>
+
+      <div className={`${styles.row} ${styles.pair}`}>
+        <label className={styles.field}>
+          <span className={styles.label}>First name</span>
+          <input
+            type="text"
+            placeholder="Alex"
+            autoComplete="given-name"
+            aria-invalid={!!errors.firstName}
+            disabled={isExecuting}
+            {...register("firstName")}
+            className={styles.input}
+          />
+          {errors.firstName?.message ? (
+            <p className={styles.error} role="alert">
+              {errors.firstName.message}
+            </p>
+          ) : null}
+        </label>
+
+        <label className={styles.field}>
+          <span className={styles.label}>Last name</span>
+          <input
+            type="text"
+            placeholder="Johnson"
+            autoComplete="family-name"
+            aria-invalid={!!errors.lastName}
+            disabled={isExecuting}
+            {...register("lastName")}
+            className={styles.input}
+          />
+          {errors.lastName?.message ? (
+            <p className={styles.error} role="alert">
+              {errors.lastName.message}
+            </p>
+          ) : null}
+        </label>
+      </div>
 
       <div className={styles.row}>
         <label className={styles.field}>

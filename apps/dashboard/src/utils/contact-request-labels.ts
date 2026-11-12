@@ -12,6 +12,18 @@ export function contactRequestReasonLabel(
   return "Looking for a player";
 }
 
+/** "First Last", or null for messages sent before the form asked for a name. */
+export function contactRequestName(request: {
+  firstName: string | null;
+  lastName: string | null;
+}): string | null {
+  const name = [request.firstName, request.lastName]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(" ");
+  return name || null;
+}
+
 export function contactRequestStatusLabel(
   status: ContactRequestStatus,
 ): string {

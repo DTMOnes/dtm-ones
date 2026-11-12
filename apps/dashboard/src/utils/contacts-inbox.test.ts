@@ -13,6 +13,8 @@ function request(
 ): ContactRequest {
   return {
     reason: "seeking_representation",
+    firstName: "Alex",
+    lastName: "Johnson",
     email: "alex@example.com",
     phone: "+1234567890",
     message: "I would like representation.",

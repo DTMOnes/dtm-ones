@@ -11,6 +11,8 @@ export default async function Page() {
     columns: {
       id: true,
       reason: true,
+      firstName: true,
+      lastName: true,
       email: true,
       phone: true,
       message: true,
