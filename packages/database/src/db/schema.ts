@@ -283,6 +283,9 @@ export const rosterAwards = pgView("roster_awards").as((qb) =>
 export const contactRequests = pgTable("contact_requests", {
   id: uuid("id").primaryKey().defaultRandom(),
   reason: contactRequestReason("reason").notNull(),
+  /** Null on messages sent before the form asked for a name. */
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   email: text("email").notNull(),
   phone: text("phone").notNull(),
   message: text("message").notNull(),

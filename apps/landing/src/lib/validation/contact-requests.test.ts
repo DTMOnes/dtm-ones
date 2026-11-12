@@ -4,6 +4,8 @@ import { test } from "node:test";
 import { createContactRequestSchema } from "./contact-requests";
 
 const valid = {
+  firstName: "Alex",
+  lastName: "Johnson",
   email: "alex@example.com",
   phone: "+1234567890",
   message: "I would like representation.",
@@ -23,6 +25,17 @@ test("ContactRequest schema accepts seeking representation and looking for a pla
     message: "We are looking for a player.",
   });
   assert.equal(hiring.success, true);
+});
+
+test("ContactRequest schema requires a first and last name", () => {
+  for (const missing of ["firstName", "lastName"] as const) {
+    const parsed = createContactRequestSchema.safeParse({
+      ...valid,
+      reason: "seeking_representation",
+      [missing]: "   ",
+    });
+    assert.equal(parsed.success, false, missing);
+  }
 });
 
 test("ContactRequest schema rejects a Player-shaped reason", () => {
