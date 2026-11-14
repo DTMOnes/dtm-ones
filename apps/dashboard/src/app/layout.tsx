@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
+import { Analytics } from "@vercel/analytics/next";
 
 const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton" });
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-sans" });
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <Toaster />
+        <Analytics />
       </body>
     </html>
   );
