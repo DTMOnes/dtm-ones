@@ -32,7 +32,7 @@ export default async function Page() {
   // Two rows of six: the agency's latest Instagram posts tagged #dtmsigned (what it uses) or #signed.
   const signedPosts = postsWithHashtag(agencyPosts, ["dtmsigned", "signed"], 12);
   // Until Instagram is connected, the static posters stand in.
-  const showStaticSignings = !hasInstagram();
+  const showStaticSignings = !(await hasInstagram());
 
   return (
     <main>
