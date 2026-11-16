@@ -69,6 +69,8 @@ export async function grantLandingPrivileges(
     sql.raw(`GRANT SELECT (id, password_hash, updated_at) ON roster_access TO ${role}`),
   );
   await ownerDb.execute(sql.raw(`GRANT INSERT ON contact_requests TO ${role}`));
+  // The feeds need the token itself; only the dashboard writes it.
+  await ownerDb.execute(sql.raw(`GRANT SELECT ON instagram_token TO ${role}`));
 }
 
 export async function ensureTestLandingRole(

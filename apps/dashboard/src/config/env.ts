@@ -9,6 +9,8 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(1),
     BETTER_AUTH_URL: z.url(),
     BLOB_READ_WRITE_TOKEN: z.string().min(1),
+    /** Vercel sends it as "Bearer <secret>" to the cron routes. Optional: without it they refuse. */
+    CRON_SECRET: z.string().min(16).optional(),
   },
 
   client: {

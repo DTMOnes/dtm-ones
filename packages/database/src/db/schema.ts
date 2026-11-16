@@ -299,6 +299,23 @@ export const contactRequests = pgTable("contact_requests", {
 });
 
 /** One row (id 1): the hashed password of the landing Clients list, set by the Owner. */
+/**
+ * The Instagram API long-lived token (60 days). The dashboard renews it weekly and the
+ * landing reads it for the feeds. One row; until it exists the landing uses its env token.
+ */
+export const instagramToken = pgTable(
+  "instagram_token",
+  {
+    id: integer("id").primaryKey().default(1),
+    accessToken: text("access_token").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    refreshedAt: timestamp("refreshed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [check("instagram_token_single_row", sql`${table.id} = 1`)],
+);
+
 export const rosterAccess = pgTable(
   "roster_access",
   {

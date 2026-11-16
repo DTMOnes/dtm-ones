@@ -1,7 +1,12 @@
-import { getRosterAccess, getRosterPassword } from "@dtm/database";
+import {
+  getInstagramToken,
+  getRosterAccess,
+  getRosterPassword,
+} from "@dtm/database";
 
 import { PageHeader, PageShell } from "@/components/page/page-frame";
 import { ClientsPasswordForm } from "@/components/settings/clients-password-form";
+import { InstagramTokenCard } from "@/components/settings/instagram-token-card";
 import {
   Card,
   CardContent,
@@ -10,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { db } from "@/lib/db";
+import { daysUntil } from "@/utils/instagram-token";
 
 const changedAt = new Intl.DateTimeFormat("en", {
   dateStyle: "medium",
@@ -21,10 +27,18 @@ const changedAt = new Intl.DateTimeFormat("en", {
 const DEFAULT_PASSWORD = "dtm-access";
 
 export default async function Page() {
-  const [access, password] = await Promise.all([
+  const [access, password, instagram] = await Promise.all([
     getRosterAccess(db),
     getRosterPassword(db),
+    getInstagramToken(db),
   ]);
+  const instagramStatus = instagram
+    ? {
+        expires: `${changedAt.format(instagram.expiresAt)} (Argentina time)`,
+        renewed: changedAt.format(instagram.refreshedAt),
+        daysLeft: daysUntil(instagram.expiresAt),
+      }
+    : null;
 
   return (
     <PageShell>
@@ -47,6 +61,7 @@ export default async function Page() {
           </p>
         </CardContent>
       </Card>
+      <InstagramTokenCard status={instagramStatus} />
     </PageShell>
   );
 }

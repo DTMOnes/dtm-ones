@@ -1,6 +1,9 @@
 import "server-only";
 
+import { getInstagramToken } from "@dtm/database";
+
 import { env } from "@/config/env";
+import { db } from "@/lib/db";
 
 import type { InstagramPost } from "./hashtags";
 
@@ -29,11 +32,25 @@ function toPost(item: MediaItem): InstagramPost | null {
 }
 
 /**
+ * The token the dashboard keeps renewed, else the one in the environment (before the
+ * first one is saved, or if the database read fails).
+ */
+async function accessToken(): Promise<string | undefined> {
+  try {
+    const stored = await getInstagramToken(db);
+    if (stored) return stored.accessToken;
+  } catch (error) {
+    console.error({ source: "instagram-token", message: (error as Error).message });
+  }
+  return env.INSTAGRAM_ACCESS_TOKEN;
+}
+
+/**
  * The agency's own posts, newest first, through the Instagram API with Instagram Login.
  * Returns [] without a token or when Instagram fails, so pages fall back instead of breaking.
  */
 export async function listAgencyPosts(): Promise<InstagramPost[]> {
-  const token = env.INSTAGRAM_ACCESS_TOKEN;
+  const token = await accessToken();
   if (!token) return [];
 
   const posts: InstagramPost[] = [];
@@ -65,6 +82,6 @@ export async function listAgencyPosts(): Promise<InstagramPost[]> {
   return posts;
 }
 
-export function hasInstagram(): boolean {
-  return Boolean(env.INSTAGRAM_ACCESS_TOKEN);
+export async function hasInstagram(): Promise<boolean> {
+  return Boolean(await accessToken());
 }
